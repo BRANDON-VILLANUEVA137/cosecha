@@ -97,6 +97,39 @@ const App = {
     return hints[mode] || hints.paso;
   },
 
+  /* ---------- Pistas predeterminadas por tema (Templates) ---------- */
+  plantillasPista: [
+    // Matemáticas
+    { matcher: /carita/i, pista: 'No olvides aplicar el método de la carita sonriente para hallar el denominador común.' },
+    { matcher: /diferente denom/i, pista: 'Encuentra el mínimo común múltiplo (mcm) de los denominadores antes de sumar.' },
+    { matcher: /mismo denom/i, pista: 'Si el denominador es igual, se deja igual y solo se suman los numeradores.' },
+    { matcher: /multiplic/i, pista: 'En la multiplicación no se busca denominador común: numerador por numerador, denominador por denominador.' },
+    { matcher: /grafic/i, pista: 'Divide la figura en el número de partes indicado por el denominador y colorea el numerador.' },
+    // Inglés
+    { matcher: /to ?be/i, pista: 'Recuerda la conjugación según el sujeto: I (am), He/She/It (is), You/We/They (are).' },
+    { matcher: /verbo to be/i, pista: 'Recuerda la conjugación según el sujeto: I (am), He/She/It (is), You/We/They (are).' },
+    { matcher: /pronombr/i, pista: 'Identifica si el sujeto es singular o plural para elegir el pronombre correcto (he/she/it/they/we).' },
+    { matcher: /traducci/i, pista: 'Traduce la oración completa al español primero para entender el contexto y elegir la palabra correcta.' }
+  ],
+
+  autocompletarPista() {
+    const temaInput = document.getElementById('newTema');
+    const pistaInput = document.getElementById('newPista');
+    if (!temaInput || !pistaInput) return;
+
+    const tema = temaInput.value.trim();
+    if (!tema) return;
+
+    // Solo autocompletar si el usuario no ha escrito una pista personalizada
+    const esPlantilla = this.plantillasPista.some(p => pistaInput.value.trim().toLowerCase() === p.pista.toLowerCase());
+    if (pistaInput.value.trim() && !esPlantilla) return;
+
+    const match = this.plantillasPista.find(p => p.matcher.test(tema));
+    if (match) {
+      pistaInput.value = match.pista;
+    }
+  },
+
   /* ---------- Inicialización ---------- */
   init() {
     const switchRoleBtn = document.getElementById('switchRoleBtn');
@@ -803,9 +836,12 @@ const App = {
 
     if (this.currentTaskView) {
       const ejerciciosTask = this.currentTaskExercises || [];
+      const tareaActualId = this.currentTaskView.id || 'libre';
       const tareas = ejerciciosTask.map(e => {
-        const intentos = this.intentosPorEjercicio[e.id] || 0;
-        const yaRespondido = this.completedExerciseIds?.includes(e.id);
+        // Clave compuesta: tareaId_ejercicioId — desvincula el progreso entre tareas que comparten ejercicios
+        const claveProgreso = `${tareaActualId}_${e.id}`;
+        const intentos = this.intentosPorEjercicio[claveProgreso] || 0;
+        const yaRespondido = this.completedExerciseIds?.includes(claveProgreso);
         return `
         <div class="task-card">
           <span class="tag ${esMat ? 'mat' : 'ing'}">${e.tema}</span>
@@ -1053,15 +1089,30 @@ const App = {
         <div style="margin-top:14px;">${lista}</div>
       `;
     } else if (tabActiva === 'crear') {
-      // Formulario de crear ejercicio
+      // Formulario de crear ejercicio — CONTEXTUAL según la materia activa
+      const tiposMat = `
+        <option value="fraccion">Fracción (a/b)</option>
+        <option value="entero">Número Entero</option>
+        <option value="opcion_multiple">Opción Múltiple</option>
+      `;
+      const tiposIng = `
+        <option value="completar">Completar Espacio (Fill in the blank)</option>
+        <option value="opcion_multiple">Opción Múltiple</option>
+        <option value="traduccion">Traducción</option>
+      `;
+      const tipos = esMat ? tiposMat : tiposIng;
+      const placeholderEnun = esMat ? 'Ej: 4/9 + 1/3 = ?' : 'Ej: She ___ (be) a doctor.';
+      const placeholderResp = esMat ? 'Ej: 7/9' : 'Ej: is';
+      const placeholderTema = esMat ? 'Ej: Fracciones · Carita Sonriente' : 'Ej: Verbo To Be · Pronombres';
+
       contenidoTab = `
         <h2>➕ Nuevo ejercicio de ${esMat ? 'Matemáticas' : 'Inglés'}</h2>
         <div class="grid2">
           <div>
-            <label>Tema</label>
-            <input type="text" id="newTema" placeholder="Ej: Fracciones · Carita Sonriente">
+            <label>Tema / Categoría</label>
+            <input type="text" id="newTema" placeholder="${placeholderTema}" oninput="App.autocompletarPista()">
             <label>Tipo</label>
-            <select id="newTipo"><option value="fraccion">Fracción (a/b)</option><option value="texto">Texto corto</option></select>
+            <select id="newTipo">${tipos}</select>
             <label>Metodología</label>
             <select id="newMetodologia">
               <option value="Estándar / Directo">Estándar / Directo</option>
@@ -1072,11 +1123,11 @@ const App = {
           </div>
           <div>
             <label>Enunciado</label>
-            <textarea id="newEnun" placeholder="Ej: 4/9 + 1/3 = ?"></textarea>
+            <textarea id="newEnun" placeholder="${placeholderEnun}"></textarea>
             <label>Respuesta correcta (no la verá la estudiante)</label>
-            <input type="text" id="newResp" placeholder="Ej: 7/9">
+            <input type="text" id="newResp" placeholder="${placeholderResp}">
             <label>Pista en caso de error</label>
-            <input type="text" id="newPista" placeholder="Ej: Revisa si aplicaste bien la carita sonriente.">
+            <input type="text" id="newPista" placeholder="Se autocompleta según el tema...">
           </div>
         </div>
         <div style="margin-top:14px;"><button class="primary" id="addExBtn" data-materia="${materia}">Guardar ejercicio</button></div>
@@ -1574,7 +1625,9 @@ const App = {
           btn.disabled = true;
           btn.textContent = 'Validando…';
 
-          this.intentosPorEjercicio[id] = (this.intentosPorEjercicio[id] || 0) + 1;
+          // Clave compuesta: tareaId_ejercicioId para desvincular progreso entre tareas
+          const claveProgreso = `${this.currentTaskView?.id || 'libre'}_${id}`;
+          this.intentosPorEjercicio[claveProgreso] = (this.intentosPorEjercicio[claveProgreso] || 0) + 1;
           this.saveProgressState();
           const fb = document.getElementById('fb_' + id);
           const card = btn.closest('.task-card');
@@ -1586,14 +1639,14 @@ const App = {
             if (card) {
               // Actualizar contador de intentos en el footer de la tarjeta
               const attemptsEl = card.querySelector('.attempts');
-              if (attemptsEl) attemptsEl.textContent = `Intentos: ${this.intentosPorEjercicio[id]}`;
+              if (attemptsEl) attemptsEl.textContent = `Intentos: ${this.intentosPorEjercicio[claveProgreso]}`;
             }
 
             // Mostrar feedback en la tarjeta
             fb.innerHTML = `<div class="feedback ${resultado.correcto ? 'ok' : 'bad'}">${resultado.correcto ? '🎉 ' : '🔍 '}${this.formatMathText(resultado.mensaje)}</div>`;
 
             if (resultado.correcto || resultado.yaCompletado) {
-              this.completedExerciseIds = [...new Set([...this.completedExerciseIds, id])];
+              this.completedExerciseIds = [...new Set([...this.completedExerciseIds, claveProgreso])];
               this.completeTask(this.currentTaskView?.id);
               if (!resultado.yaCompletado) {
                 this.toast('✅ Tarea completada');

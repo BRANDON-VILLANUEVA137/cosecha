@@ -148,7 +148,9 @@ router.post('/:id/validar', requireRole('estudiante'), async (req, res) => {
     };
 
     const logro = logroSnap.exists ? { ...defaultLogro, ...logroSnap.data() } : defaultLogro;
-    const yaCompletado = (logro.ejerciciosCompletados || []).includes(ejercicio.id);
+    // Clave compuesta: tareaId_ejercicioId para desvincular progreso entre tareas que comparten ejercicios
+    const claveCompletado = `${tareaId || 'libre'}_${ejercicio.id}`;
+    const yaCompletado = (logro.ejerciciosCompletados || []).includes(claveCompletado);
 
     if (yaCompletado) {
       return res.json({ correcto: true, yaCompletado: true, mensaje: 'Este ejercicio ya estaba resuelto.', nuevasPrendas: [] });
@@ -157,7 +159,7 @@ router.post('/:id/validar', requireRole('estudiante'), async (req, res) => {
     logro.intentos += 1;
 
     if (resultado.correcto) {
-      logro.ejerciciosCompletados.push(ejercicio.id);
+      logro.ejerciciosCompletados.push(claveCompletado);
       if (ejercicio.materia === 'matematicas') logro.aciertosMatematicas += 1;
       else logro.aciertosIngles += 1;
     }
