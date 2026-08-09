@@ -535,8 +535,37 @@ const App = {
       <!-- Ejercicios disponibles para agregar -->
       <div class="card">
         <h3>➕ Agregar ejercicios desde el banco</h3>
-        <p style="color:var(--texto-suave); font-size:13px;">Ejercicios disponibles que puedes agregar a esta tarea:</p>
-        <div style="margin-top:10px;">${disponiblesHtml}</div>
+        
+        <!-- Barra de búsqueda y filtros -->
+        <div style="background:var(--fondo-2); padding:12px; border-radius:8px; margin-bottom:12px;">
+          <input type="text" id="searchEjercicios" placeholder="🔍 Buscar por enunciado o tema..." 
+                 style="width:100%; padding:8px; border:1px solid var(--borde); border-radius:4px; margin-bottom:8px;"
+                 oninput="App.filtrarEjerciciosDisponibles()">
+          
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <select id="filtroTema" onchange="App.filtrarEjerciciosDisponibles()" 
+                    style="padding:6px; border:1px solid var(--borde); border-radius:4px; flex:1; min-width:150px;">
+              <option value="">Todos los temas</option>
+            </select>
+            
+            <select id="filtroMetodologia" onchange="App.filtrarEjerciciosDisponibles()" 
+                    style="padding:6px; border:1px solid var(--borde); border-radius:4px; flex:1; min-width:150px;">
+              <option value="">Todas las metodologías</option>
+              <option value="estándar">Estándar / Directo</option>
+              <option value="paso">Paso a Paso</option>
+              <option value="graficación">Graficación</option>
+              <option value="desafío">Desafío</option>
+            </select>
+          </div>
+        </div>
+
+        <p style="color:var(--texto-suave); font-size:13px; margin-bottom:8px;">
+          Mostrando <b id="countDisponibles">${ejerciciosDisponibles.length}</b> ejercicios disponibles
+        </p>
+        
+        <div id="listaEjerciciosDisponibles" style="margin-top:10px;">
+          ${disponiblesHtml}
+        </div>
       </div>
     `;
   },
@@ -581,6 +610,66 @@ const App = {
       await this.verTareaDocente(id);
     } catch (e) {
       this.toast('⚠️ ' + e.message);
+    }
+  },
+
+  filtrarEjerciciosDisponibles() {
+    const searchTerm = document.getElementById('searchEjercicios')?.value.toLowerCase() || '';
+    const filtroTema = document.getElementById('filtroTema')?.value || '';
+    const filtroMetodologia = document.getElementById('filtroMetodologia')?.value || '';
+    
+    const ejerciciosEnTarea = this.currentTaskExercises || [];
+    let ejerciciosFiltrados = this.allEjercicios.filter(ej => 
+      !ejerciciosEnTarea.some(e => e.id === ej.id)
+    );
+    
+    // Filtrar por búsqueda de texto
+    if (searchTerm) {
+      ejerciciosFiltrados = ejerciciosFiltrados.filter(ej => 
+        ej.enunciado.toLowerCase().includes(searchTerm) ||
+        ej.tema.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    // Filtrar por tema
+    if (filtroTema) {
+      ejerciciosFiltrados = ejerciciosFiltrados.filter(ej => ej.tema === filtroTema);
+    }
+    
+    // Filtrar por metodología
+    if (filtroMetodologia) {
+      ejerciciosFiltrados = ejerciciosFiltrados.filter(ej => 
+        ej.metodologia && ej.metodologia.toLowerCase().includes(filtroMetodologia)
+      );
+    }
+    
+    // Actualizar el contador
+    const countElement = document.getElementById('countDisponibles');
+    if (countElement) {
+      countElement.textContent = ejerciciosFiltrados.length;
+    }
+    
+    // Re-renderizar la lista
+    const listaElement = document.getElementById('listaEjerciciosDisponibles');
+    if (listaElement) {
+      const esMat = this.currentTaskView?.materia === 'matematicas';
+      
+      if (ejerciciosFiltrados.length === 0) {
+        listaElement.innerHTML = '<p class="empty">No se encontraron ejercicios con los filtros aplicados.</p>';
+        return;
+      }
+      
+      listaElement.innerHTML = ejerciciosFiltrados.map(ej => `
+        <div class="ex-item" style="border-style:dashed;">
+          <div class="top">
+            <div>
+              <span class="tag ${esMat ? 'mat' : 'ing'}">${ej.tema}</span>
+              <div class="ex-enun">${this.formatMathText(ej.enunciado)}</div>
+            </div>
+            <button class="primary" onclick="App.agregarEjercicioATarea('${ej.id}')">➕ Agregar</button>
+          </div>
+        </div>
+      `).join('');
     }
   },
 
