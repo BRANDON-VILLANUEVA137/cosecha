@@ -125,7 +125,7 @@ router.delete('/:id', requireRole('docente'), async (req, res) => {
 // POST /api/ejercicios/:id/validar  (estudiante responde)
 router.post('/:id/validar', requireRole('estudiante'), async (req, res) => {
   try {
-    const { respuesta } = req.body;
+    const { respuesta, tareaId } = req.body;
     if (!respuesta) return res.status(400).json({ error: 'Respuesta vacía' });
 
     const ejercicioRef = db.collection('ejercicios').doc(req.params.id);
@@ -165,6 +165,7 @@ router.post('/:id/validar', requireRole('estudiante'), async (req, res) => {
     logro.historial.push({
       ejercicioId: ejercicio.id,
       materia: ejercicio.materia,
+      tareaId: tareaId || null,
       enunciado: ejercicio.enunciado,
       metodologia: ejercicio.metodologia || 'Estándar / Directo',
       tema: ejercicio.tema || 'General',

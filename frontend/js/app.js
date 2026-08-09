@@ -26,6 +26,11 @@ const App = {
     fechaInicio: '',
     fechaFin: ''
   },
+  analyticsFilterMateria: '',
+  analyticsFilterTarea: '',
+  analyticsFilterTema: '',
+  tareasDisponibles: [],
+  temasDisponibles: [],
 
   formatMathText(texto) {
     if (typeof texto !== 'string' || !texto) return '';
@@ -1243,6 +1248,15 @@ const App = {
       console.error('Error cargando estudiantes:', e);
     }
 
+    // Cargar tareas disponibles para el filtro por tarea
+    try {
+      this.tareasDisponibles = await API.getTareas();
+      if (!Array.isArray(this.tareasDisponibles)) this.tareasDisponibles = [];
+    } catch (e) {
+      console.error('Error cargando tareas para filtro:', e);
+      this.tareasDisponibles = [];
+    }
+
     // Si no hay estudiante seleccionado, mostrar selector con lista cargada
     if (!this.selectedEstudianteId) {
       const estudiantesHtml = estudiantes.length > 0
@@ -1287,7 +1301,22 @@ const App = {
       const estudianteInfo = analytics.estudiante || {};
       const nombreEstudiante = estudianteInfo.nombre || estudiantes.find(e => e.estudianteId === this.selectedEstudianteId)?.nombre || 'Estudiante';
 
-      // Selector desplegable de estudiante
+      // Derivar temas disponibles del historial (único por materia)
+      this.temasDisponibles = [...new Set(historial.map(h => h.tema).filter(Boolean))];
+
+      // Aplicar filtros locales (materia, tarea, tema) al historial
+      let historialFiltrado = historial;
+      if (this.analyticsFilterMateria) {
+        historialFiltrado = historialFiltrado.filter(h => h.materia === this.analyticsFilterMateria);
+      }
+      if (this.analyticsFilterTarea) {
+        historialFiltrado = historialFiltrado.filter(h => h.tareaId === this.analyticsFilterTarea);
+      }
+      if (this.analyticsFilterTema) {
+        historialFiltrado = historialFiltrado.filter(h => h.tema === this.analyticsFilterTema);
+      }
+
+      // Selector desplegable de estudiante + barra de filtros
       const selectorEstudiante = `
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
           <label style="font-weight:600;">👤 Estudiante:</label>
@@ -1299,6 +1328,35 @@ const App = {
               </option>
             `).join('')}
           </select>
+        </div>
+      `;
+
+      // Barra de filtros (Asignatura, Tarea, Tema)
+      const filtrosBar = `
+        <div style="background:var(--fondo-2); padding:12px; border-radius:8px; margin-bottom:14px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:8px;">
+            <strong style="font-size:13px;">🔍 Filtrar análisis:</strong>
+            <select onchange="App.analyticsFilterMateria = this.value; App.render();"
+                    style="flex:1; min-width:150px; padding:6px; border:1px solid var(--borde); border-radius:4px;">
+              <option value="">📙 Todas las asignaturas</option>
+              <option value="matematicas" ${this.analyticsFilterMateria === 'matematicas' ? 'selected' : ''}>📙 Matemáticas</option>
+              <option value="ingles" ${this.analyticsFilterMateria === 'ingles' ? 'selected' : ''}>🌴 Inglés</option>
+            </select>
+            <select onchange="App.analyticsFilterTarea = this.value; App.render();"
+                    style="flex:1; min-width:180px; padding:6px; border:1px solid var(--borde); border-radius:4px;">
+              <option value="">📚 Todas las tareas</option>
+              ${(this.tareasDisponibles || []).map(t => `
+                <option value="${t.id}" ${this.analyticsFilterTarea === t.id ? 'selected' : ''}>${t.titulo}</option>
+              `).join('')}
+            </select>
+            <select onchange="App.analyticsFilterTema = this.value; App.render();"
+                    style="flex:1; min-width:160px; padding:6px; border:1px solid var(--borde); border-radius:4px;">
+              <option value="">🏷️ Todos los temas</option>
+              ${this.temasDisponibles.map(tema => `
+                <option value="${tema}" ${this.analyticsFilterTema === tema ? 'selected' : ''}>${tema}</option>
+              `).join('')}
+            </select>
+          </div>
         </div>
       `;
 
@@ -1323,27 +1381,45 @@ const App = {
         </div>
       `;
 
-      // Diagnóstico por Metodología (Tarjetas de Análisis Pedagógico)
-      const metodologiasHtml = Object.keys(porMetodologia).length > 0 ? `
+      // --- DIAGNÓSTICO POR TEMA (agrupado con semáforo) ---
+      // Agrupar el historial filtrado por tema
+      const temasAgrupados = {};
+      (historialFiltrado || []).forEach(h => {
+        const clave = h.tema || 'General';
+        if (!temasAgrupados[clave]) {
+          temasAgrupados[clave] = { total: 0, correctos: 0, pistasUsadas: 0, metodologia: h.metodologia || 'Estándar / Directo', materia: h.materia };
+        }
+        temasAgrupados[clave].total++;
+        if (h.correcto) temasAgrupados[clave].correctos++;
+        temasAgrupados[clave].pistasUsadas += h.pistasUsadas || 0;
+      });
+
+      // Calcular porcentaje y determinar estado semáforo
+      const temasHtml = Object.entries(temasAgrupados).length > 0 ? `
         <div class="card" style="margin-bottom:14px;">
-          <h3>📊 Diagnóstico por Metodología</h3>
+          <h3>📊 Diagnóstico por Tema</h3>
           <div style="display:grid; gap:10px; margin-top:10px;">
-            ${Object.entries(porMetodologia).map(([nombre, data]) => {
-              const pct = data?.porcentaje || 0;
-              const color = pct >= 80 ? '#4CAF50' : pct >= 60 ? '#8BC34A' : pct >= 40 ? '#FFC107' : '#F44336';
-              const emoji = pct >= 80 ? '🟩' : pct >= 60 ? '🟨' : pct >= 40 ? '🟧' : '🟥';
-              const alerta = pct < 60 ? `<div style="font-size:12px; color:#F44336; margin-top:4px;">⚠️ Alerta: Requiere refuerzo</div>` : '';
+            ${Object.entries(temasAgrupados).map(([nombre, data]) => {
+              const pct = data.total > 0 ? Math.round((data.correctos / data.total) * 100) : 0;
+              // Semáforo: >=80 óptimo (🟩), 60-79 en proceso (🟨), <60 deficiente (🟥)
+              const estado = pct >= 80 ? { color: '#4CAF50', emoji: '🟩', label: 'Dominado' }
+                : pct >= 60 ? { color: '#FFC107', emoji: '🟨', label: 'En Proceso' }
+                : { color: '#F44336', emoji: '🟥', label: '⚠️ Requiere Refuerzo' };
+              const iconoMateria = data.materia === 'matematicas' ? '📙' : '🌴';
+              const alerta = pct < 60 ? `<div style="font-size:12px; color:#F44336; margin-top:4px;">⚠️ Deficiencia detectada en: ${nombre}</div>` : '';
               return `
-                <div style="background:var(--fondo-2); padding:14px; border-radius:8px; border-left:4px solid ${color};">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <strong>${emoji} ${nombre}</strong>
-                    <span style="background:${color}; color:white; padding:4px 10px; border-radius:4px; font-size:13px; font-weight:bold;">${pct}% Éxito</span>
+                <div style="background:var(--fondo-2); padding:14px; border-radius:8px; border-left:5px solid ${estado.color};">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+                    <strong>${estado.emoji} ${iconoMateria} ${nombre}</strong>
+                    <span style="background:${estado.color}; color:white; padding:4px 10px; border-radius:4px; font-size:13px; font-weight:bold;">
+                      ${pct}% · ${estado.label}
+                    </span>
                   </div>
                   <div style="background:var(--borde); height:8px; border-radius:4px; overflow:hidden;">
-                    <div style="background:${color}; height:100%; width:${pct}%; transition:width 0.3s;"></div>
+                    <div style="background:${estado.color}; height:100%; width:${pct}%; transition:width 0.3s;"></div>
                   </div>
                   <div style="font-size:12px; color:var(--texto-suave); margin-top:4px;">
-                    ${data?.total || 0} ejercicios · ${data?.correctos || 0} correctos · ${data?.pistasUsadas || 0} pistas usadas
+                    ${data.total} ejercicios · ${data.correctos} correctos · ${data.pistasUsadas} pistas · ${data.metodologia}
                   </div>
                   ${alerta}
                 </div>
@@ -1353,40 +1429,47 @@ const App = {
         </div>
       ` : '';
 
-      // Tabla de Historial Completo del Estudiante
-      const historialHtml = historial.length > 0 ? `
+      // Tabla de Historial (filtrado, con columnas Asignatura y Tema/Tarea)
+      const historialHtml = historialFiltrado.length > 0 ? `
         <div class="card">
-          <h3>📋 Historial Completo del Estudiante</h3>
+          <h3>📋 Historial Completo del Estudiante (${historialFiltrado.length} registros)</h3>
           <div style="overflow-x:auto; margin-top:10px;">
             <table style="width:100%; border-collapse:collapse; font-size:13px;">
               <thead>
                 <tr style="background:var(--fondo-2);">
+                  <th style="padding:10px; text-align:left; border-bottom:2px solid var(--borde);">Asignatura</th>
+                  <th style="padding:10px; text-align:left; border-bottom:2px solid var(--borde);">Tema / Tarea</th>
                   <th style="padding:10px; text-align:left; border-bottom:2px solid var(--borde);">Enunciado</th>
                   <th style="padding:10px; text-align:left; border-bottom:2px solid var(--borde);">Metodología</th>
-                  <th style="padding:10px; text-align:center; border-bottom:2px solid var(--borde);">Respuesta Alumno</th>
-                  <th style="padding:10px; text-align:center; border-bottom:2px solid var(--borde);">Respuesta Correcta</th>
+                  <th style="padding:10px; text-align:center; border-bottom:2px solid var(--borde);">Respuesta</th>
                   <th style="padding:10px; text-align:center; border-bottom:2px solid var(--borde);">Resultado</th>
                 </tr>
               </thead>
               <tbody>
-                ${historial.map(h => `
+                ${historialFiltrado.map(h => {
+                  const tarea = this.tareasDisponibles.find(t => t.id === h.tareaId);
+                  const tareaLabel = tarea ? tarea.titulo : (h.tareaId ? 'Tarea' : 'Práctica libre');
+                  const materiaLabel = h.materia === 'matematicas' ? '📙 Mate' : '🌴 Inglés';
+                  return `
                   <tr style="border-bottom:1px solid var(--borde);">
+                    <td style="padding:10px;"><span class="tag" style="background:${h.materia === 'matematicas' ? 'var(--primario)' : 'var(--secundario)'}; color:white;">${materiaLabel}</span></td>
+                    <td style="padding:10px; font-size:12px;">${h.tema || 'General'}<br><small style="color:var(--texto-suave);">${tareaLabel}</small></td>
                     <td style="padding:10px;">${this.formatMathText(h.enunciado || 'N/A')}</td>
                     <td style="padding:10px;">${h.metodologia || 'Estándar / Directo'}</td>
                     <td style="padding:10px; text-align:center;">${this.formatMathText(h.respuesta || 'N/A')}</td>
-                    <td style="padding:10px; text-align:center;">${this.formatMathText(h.respuestaCorrecta || 'N/A')}</td>
                     <td style="padding:10px; text-align:center;">
                       <span class="tag" style="background:${h.correcto ? 'var(--secundario)' : 'var(--error-suave)'}; color:white;">
                         ${h.correcto ? '✅ Correcto' : '❌ Incorrecto'}
                       </span>
                     </td>
                   </tr>
-                `).join('')}
+                `;
+                }).join('')}
               </tbody>
             </table>
           </div>
         </div>
-      ` : '<p class="empty">No hay historial disponible para este estudiante</p>';
+      ` : '<p class="empty">No hay registros que coincidan con los filtros aplicados</p>';
 
       // Alertas de metodologías/temas críticos
       const alertas = [];
@@ -1415,9 +1498,10 @@ const App = {
 
       return `
         ${selectorEstudiante}
+        ${filtrosBar}
         ${headerEstudiante}
         ${alertasHtml}
-        ${metodologiasHtml}
+        ${temasHtml}
         ${historialHtml}
       `;
     } catch (e) {
@@ -1428,6 +1512,10 @@ const App = {
   cambiarAnalyticsView(view) {
     this.analyticsView = view;
     this.selectedEstudianteId = null;
+    // Reiniciar filtros locales
+    this.analyticsFilterMateria = '';
+    this.analyticsFilterTarea = '';
+    this.analyticsFilterTema = '';
     this.render();
   },
 
@@ -1487,7 +1575,7 @@ const App = {
           const fb = document.getElementById('fb_' + id);
 
           try {
-            const resultado = await API.validarRespuesta(id, respuesta);
+            const resultado = await API.validarRespuesta(id, respuesta, this.currentTaskView?.id || null);
             fb.innerHTML = `<div class="feedback ${resultado.correcto ? 'ok' : 'bad'}">${resultado.correcto ? '🎉 ' : '🔍 '}${this.formatMathText(resultado.mensaje)}</div>`;
 
             if (resultado.correcto || resultado.yaCompletado) {

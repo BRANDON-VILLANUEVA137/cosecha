@@ -73,10 +73,10 @@ const API = {
   eliminarEjercicio(id) {
     return this.request('/ejercicios/' + id, { method: 'DELETE' });
   },
-  validarRespuesta(id, respuesta) {
+  validarRespuesta(id, respuesta, tareaId = null) {
     return this.request('/ejercicios/' + id + '/validar', {
       method: 'POST',
-      body: JSON.stringify({ respuesta })
+      body: JSON.stringify({ respuesta, tareaId })
     });
   },
 
