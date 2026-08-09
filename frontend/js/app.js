@@ -15,6 +15,8 @@ const App = {
   currentDynamicMode: 'paso',
   currentTaskView: null,
   currentTaskExercises: [],
+  completedTaskIds: [],
+  completedExerciseIds: [],
 
   formatMathText(texto) {
     if (typeof texto !== 'string' || !texto) return '';
@@ -135,6 +137,7 @@ const App = {
   async onAuthStateChanged(user) {
     this.authUser = user;
     this.authReady = true;
+    this.loadProgressState();
 
     if (!user) {
       API.clearAuthToken();
@@ -325,6 +328,38 @@ const App = {
     setTimeout(() => t.remove(), 2400);
   },
 
+  getProgressStorageKey() {
+    return `cosecha-progress-${this.authUser?.uid || 'guest'}`;
+  },
+
+  loadProgressState() {
+    try {
+      const raw = window.localStorage.getItem(this.getProgressStorageKey());
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      this.completedTaskIds = Array.isArray(parsed.completedTaskIds) ? parsed.completedTaskIds : [];
+      this.completedExerciseIds = Array.isArray(parsed.completedExerciseIds) ? parsed.completedExerciseIds : [];
+      this.intentosPorEjercicio = parsed.intentosPorEjercicio && typeof parsed.intentosPorEjercicio === 'object'
+        ? parsed.intentosPorEjercicio
+        : {};
+    } catch (e) {
+      console.warn('No se pudo cargar el progreso guardado', e);
+    }
+  },
+
+  saveProgressState() {
+    try {
+      const payload = {
+        completedTaskIds: this.completedTaskIds,
+        completedExerciseIds: this.completedExerciseIds,
+        intentosPorEjercicio: this.intentosPorEjercicio
+      };
+      window.localStorage.setItem(this.getProgressStorageKey(), JSON.stringify(payload));
+    } catch (e) {
+      console.warn('No se pudo guardar el progreso local', e);
+    }
+  },
+
   goModule(mod) {
     this.currentModule = mod;
     this.currentTaskView = null;
@@ -336,6 +371,29 @@ const App = {
   startTask(task) {
     this.currentTaskView = task;
     this.currentTaskExercises = task.ejercicios || [];
+    this.render();
+  },
+
+  closeTaskView() {
+    this.currentTaskView = null;
+    this.currentTaskExercises = [];
+    this.render();
+  },
+
+  completeTask(id = this.currentTaskView?.id) {
+    if (id) {
+      this.completedTaskIds = [...new Set([...this.completedTaskIds, id])];
+    }
+    this.saveProgressState();
+  },
+
+  finishTask() {
+    this.completeTask();
+    if (this.currentTaskView?.id) {
+      this.toast('✅ Tarea finalizada');
+    }
+    this.currentTaskView = null;
+    this.currentTaskExercises = [];
     this.render();
   },
 
@@ -468,15 +526,21 @@ const App = {
       const ejerciciosTask = this.currentTaskExercises || [];
       const tareas = ejerciciosTask.map(e => {
         const intentos = this.intentosPorEjercicio[e.id] || 0;
+        const yaRespondido = this.completedExerciseIds?.includes(e.id);
         return `
         <div class="task-card">
           <span class="tag ${esMat ? 'mat' : 'ing'}">${e.tema}</span>
           <div class="enun">${this.formatMathText(e.enunciado)}</div>
-          <div class="answer-row">
-            <input type="text" placeholder="Tu respuesta" id="resp_${e.id}">
-            <button class="primary" data-check="${e.id}" data-materia="${materia}">Comprobar</button>
-          </div>
-          <div class="attempts">Intentos: ${intentos}</div>
+          ${yaRespondido ? `
+            <div class="feedback ok">✅ Resuelto correctamente</div>
+            <div class="attempts">Intentos: ${intentos}</div>
+          ` : `
+            <div class="answer-row">
+              <input type="text" placeholder="Tu respuesta" id="resp_${e.id}">
+              <button class="primary" data-check="${e.id}" data-materia="${materia}">Comprobar</button>
+            </div>
+            <div class="attempts">Intentos: ${intentos}</div>
+          `}
           <div id="fb_${e.id}"></div>
         </div>`;
       }).join('') || '<p class="empty">No hay ejercicios en esta tarea todavía.</p>';
@@ -490,24 +554,33 @@ const App = {
               <p>${this.currentTaskView.descripcion}</p>
             </div>
           </div>
+          <div class="task-nav-row">
+            <button class="ghost" onclick="App.closeTaskView()">← Volver a tareas</button>
+            <button class="primary" onclick="App.finishTask()">Finalizar tarea</button>
+          </div>
           <div class="hint-preview">Metodología: ${this.currentTaskView.metodologia || 'Estándar / Directo'}</div>
           ${tareas}
         </div>`;
     }
 
-    const taskCards = tareasAsignadas.map(task => `
+    const taskCards = tareasAsignadas.map(task => {
+      const completed = this.completedTaskIds.includes(task.id);
+      const status = completed ? 'Completada' : task.estado;
+      const buttonLabel = completed ? 'Revisar tarea' : 'Comenzar tarea';
+      return `
       <div class="task-card task-module-card">
         <div class="task-module-head">
           <div>
             <span class="tag ${esMat ? 'mat' : 'ing'}">Tutor</span>
             <h3>${task.titulo}</h3>
           </div>
-          <span class="task-status">${task.estado}</span>
+          <span class="task-status">${status}</span>
         </div>
         <p>${task.descripcion}</p>
-        <div class="task-meta">${task.ejercicios.length} ejercicios · ${task.metodologia}</div>
-        <button class="primary" onclick="App.startTask(${JSON.stringify(task).replace(/"/g, '&quot;')})">Comenzar Tarea</button>
-      </div>`).join('');
+        <div class="task-meta">${task.ejercicios.length} ejercicios · ${task.metodologia}${task.ejercicios[0]?.tema ? ` · ${task.ejercicios[0].tema}` : ''}</div>
+        <button class="${completed ? 'ghost' : 'primary'}" onclick="App.startTask(${JSON.stringify(task).replace(/"/g, '&quot;')})">${buttonLabel}</button>
+      </div>`;
+    }).join('');
 
     const graficacion = esMat ? `
       <div class="card">
@@ -747,13 +820,19 @@ const App = {
           if (!respuesta) return;
 
           this.intentosPorEjercicio[id] = (this.intentosPorEjercicio[id] || 0) + 1;
+          this.saveProgressState();
           const fb = document.getElementById('fb_' + id);
 
           try {
             const resultado = await API.validarRespuesta(id, respuesta);
             fb.innerHTML = `<div class="feedback ${resultado.correcto ? 'ok' : 'bad'}">${resultado.correcto ? '🎉 ' : '🔍 '}${this.formatMathText(resultado.mensaje)}</div>`;
 
-            if (resultado.correcto) {
+            if (resultado.correcto || resultado.yaCompletado) {
+              this.completedExerciseIds = [...new Set([...this.completedExerciseIds, id])];
+              this.completeTask(this.currentTaskView?.id);
+              if (!resultado.yaCompletado) {
+                this.toast('✅ Tarea completada');
+              }
               resultado.nuevasPrendas.forEach(p => {
                 this.toast(`🎁 ¡Nueva prenda! ${Personaje.ICONS_CATEGORIA[p.categoria][p.shape]} ${p.nombre}`);
               });

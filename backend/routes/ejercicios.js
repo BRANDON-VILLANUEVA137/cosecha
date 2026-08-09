@@ -143,13 +143,21 @@ router.post('/:id/validar', requireRole('estudiante'), async (req, res) => {
       intentos: 0,
       desbloqueadas: ['camiseta-basica', 'pantalon-basico', 'tenis-basico'],
       equipo: { cabeza: null, torso: 'camiseta-basica', piernas: 'pantalon-basico', calzado: 'tenis-basico', accesorio: null },
-      historial: []
+      historial: [],
+      ejerciciosCompletados: []
     };
 
     const logro = logroSnap.exists ? { ...defaultLogro, ...logroSnap.data() } : defaultLogro;
+    const yaCompletado = (logro.ejerciciosCompletados || []).includes(ejercicio.id);
+
+    if (yaCompletado) {
+      return res.json({ correcto: true, yaCompletado: true, mensaje: 'Este ejercicio ya estaba resuelto.', nuevasPrendas: [] });
+    }
+
     logro.intentos += 1;
 
     if (resultado.correcto) {
+      logro.ejerciciosCompletados.push(ejercicio.id);
       if (ejercicio.materia === 'matematicas') logro.aciertosMatematicas += 1;
       else logro.aciertosIngles += 1;
     }
