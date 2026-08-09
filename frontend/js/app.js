@@ -369,15 +369,15 @@ const App = {
     this.render();
   },
 
-  async startTask(task) {
-    if (!task || !task.id) {
+  async startTask(taskId) {
+    if (!taskId) {
       this.toast('⚠️ Error: Tarea sin ID válido');
       return;
     }
     
     try {
       // Cargar la tarea completa desde el backend
-      const tareaCompleta = await API.getTarea(task.id);
+      const tareaCompleta = await API.getTarea(taskId);
       this.currentTaskView = tareaCompleta;
       this.currentTaskExercises = tareaCompleta.ejercicios || [];
       this.render();
