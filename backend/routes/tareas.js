@@ -39,12 +39,31 @@ router.get('/:id', authMiddleware, async (req, res) => {
       .orderBy('orden')
       .get();
     
-    const ejercicios = ejerciciosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const ejerciciosTarea = ejerciciosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    // Obtener los datos completos de cada ejercicio desde la colección principal
+    const ejercicios = await Promise.all(
+      ejerciciosTarea.map(async (ejTarea) => {
+        const ejercicioDoc = await db.collection('ejercicios').doc(ejTarea.ejercicioId).get();
+        if (!ejercicioDoc.exists) {
+          return null;
+        }
+        const ejercicioData = ejercicioDoc.data();
+        return {
+          id: ejTarea.ejercicioId,
+          ...ejercicioData,
+          orden: ejTarea.orden
+        };
+      })
+    );
+    
+    // Filtrar ejercicios nulos y ordenar
+    const ejerciciosFiltrados = ejercicios.filter(ej => ej !== null).sort((a, b) => (a.orden || 0) - (b.orden || 0));
     
     // Si es estudiante, ocultar respuestas correctas
     const ejerciciosPublicos = req.user?.rol === 'docente'
-      ? ejercicios
-      : ejercicios.map(ej => {
+      ? ejerciciosFiltrados
+      : ejerciciosFiltrados.map(ej => {
           const { respuestaCorrecta, ...pub } = ej;
           return pub;
         });
