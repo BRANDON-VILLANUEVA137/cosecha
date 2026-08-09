@@ -1103,37 +1103,269 @@ const App = {
 
   /* ---------- DOCENTE: progreso ---------- */
   async renderDocenteProgreso() {
-    const logro = await API.getLogros();
-    const historial = logro.historial.slice(-12).reverse();
+    // Cargar datos de analytics
+    const [analyticsGrupo] = await Promise.all([
+      API.getAnalyticsGrupo()
+    ]);
+
+    // Selector de vista
+    const viewTabs = `
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <button class="${this.analyticsView === 'grupo' ? 'primary' : 'ghost'}" onclick="App.cambiarAnalyticsView('grupo')">
+            📊 Vista General del Grupo
+          </button>
+          <button class="${this.analyticsView === 'estudiante' ? 'primary' : 'ghost'}" onclick="App.cambiarAnalyticsView('estudiante')">
+            👤 Por Estudiante
+          </button>
+        </div>
+      </div>
+    `;
+
+    if (this.analyticsView === 'grupo') {
+      return viewTabs + await this.renderAnalyticsGrupo(analyticsGrupo);
+    } else {
+      return viewTabs + await this.renderAnalyticsEstudiante();
+    }
+  },
+
+  async renderAnalyticsGrupo(data) {
+    if (!data) return '<p class="empty">Error al cargar datos</p>';
+
+    const estudiantes = data.estudiantes || [];
+    const estudiantesActivos = estudiantes.filter(e => e.totalIntentos > 0);
+    
+    // Calcular distribución de rendimiento
+    const excelente = estudiantes.filter(e => e.tasaAcierto >= 80).length;
+    const bueno = estudiantes.filter(e => e.tasaAcierto >= 60 && e.tasaAcierto < 80).length;
+    const regular = estudiantes.filter(e => e.tasaAcierto >= 40 && e.tasaAcierto < 60).length;
+    const bajo = estudiantes.filter(e => e.tasaAcierto < 40).length;
+
     return `
+      <!-- KPIs del Grupo -->
       <div class="card">
         <div class="module-header">
           <div class="badge" style="background:var(--acento);">📊</div>
-          <div><h2>Progreso general</h2><p>Aciertos, intentos y prendas desbloqueadas</p></div>
+          <div><h2>Dashboard Analítico - Vista General</h2><p>Métricas agregadas del grupo completo</p></div>
         </div>
+        
         <div class="stat-row">
-          <div class="stat"><b>${logro.aciertosMatematicas}</b><span>ACIERTOS MATE</span></div>
-          <div class="stat"><b>${logro.aciertosIngles}</b><span>ACIERTOS INGLÉS</span></div>
-          <div class="stat"><b>${logro.intentos}</b><span>INTENTOS TOTALES</span></div>
-          <div class="stat"><b>${logro.desbloqueadas.length}</b><span>PRENDAS</span></div>
+          <div class="stat"><b>${data.totalEstudiantes}</b><span>TOTAL ESTUDIANTES</span></div>
+          <div class="stat"><b>${data.estudiantesActivos}</b><span>ESTUDIANTES ACTIVOS</span></div>
+          <div class="stat"><b>${data.promedioGrupo}%</b><span>PROMEDIO GRUPO</span></div>
         </div>
-        <div class="personaje-stage" style="margin-top:14px; max-width:220px;">${Personaje.renderSVG(logro.equipo, this.cachePrendas, 150)}</div>
-      </div>
-      <div class="card">
-        <h2>Historial de intentos</h2>
-        ${historial.length === 0 ? '<p class="empty">Aún no hay intentos registrados.</p>' : historial.map(h => `
-          <div class="ex-item" style="border-style:solid;">
-            <div class="top">
-              <div>
-                <span class="tag ${h.materia === 'matematicas' ? 'mat' : 'ing'}">${h.materia === 'matematicas' ? 'Matemáticas' : 'Inglés'}</span>
-                <div style="font-weight:700; margin-top:4px;">${this.formatMathText(h.enunciado)}</div>
-                <div style="font-size:13px; color:var(--texto-suave);">Respondió: <b>${this.formatMathText(h.respuesta)}</b> → Correcta: <b>${this.formatMathText(h.respuestaCorrecta)}</b></div>
-              </div>
-              <span class="tag" style="background:${h.correcto ? 'var(--secundario)' : 'var(--error-suave)'}">${h.correcto ? 'Correcto' : 'Incorrecto'}</span>
+
+        <!-- Distribución de Rendimiento -->
+        <div style="margin-top:20px;">
+          <h3>Distribución de Rendimiento</h3>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px; margin-top:10px;">
+            <div style="background:#4CAF50; color:white; padding:15px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:bold;">${excelente}</div>
+              <div style="font-size:12px;">Excelente (≥80%)</div>
             </div>
-          </div>`).join('')}
+            <div style="background:#8BC34A; color:white; padding:15px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:bold;">${bueno}</div>
+              <div style="font-size:12px;">Bueno (60-79%)</div>
+            </div>
+            <div style="background:#FFC107; color:white; padding:15px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:bold;">${regular}</div>
+              <div style="font-size:12px;">Regular (40-59%)</div>
+            </div>
+            <div style="background:#F44336; color:white; padding:15px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:bold;">${bajo}</div>
+              <div style="font-size:12px;">Bajo (<40%)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de Estudiantes -->
+      <div class="card">
+        <h2>Rendimiento por Estudiante</h2>
+        ${estudiantes.length === 0 ? '<p class="empty">No hay estudiantes registrados</p>' : `
+          <div style="overflow-x:auto; margin-top:10px;">
+            <table style="width:100%; border-collapse:collapse;">
+              <thead>
+                <tr style="background:var(--fondo-2);">
+                  <th style="padding:10px; text-align:left; border-bottom:2px solid var(--borde);">Estudiante</th>
+                  <th style="padding:10px; text-align:center; border-bottom:2px solid var(--borde);">Intentos</th>
+                  <th style="padding:10px; text-align:center; border-bottom:2px solid var(--borde);">Correctos</th>
+                  <th style="padding:10px; text-align:center; border-bottom:2px solid var(--borde);">Tasa Acierto</th>
+                  <th style="padding:10px; text-align:center; border-bottom:2px solid var(--borde);">Rendimiento</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${estudiantes.map(e => {
+                  const rendimiento = e.tasaAcierto >= 80 ? 'Excelente' : e.tasaAcierto >= 60 ? 'Bueno' : e.tasaAcierto >= 40 ? 'Regular' : 'Bajo';
+                  const colorRendimiento = e.tasaAcierto >= 80 ? '#4CAF50' : e.tasaAcierto >= 60 ? '#8BC34A' : e.tasaAcierto >= 40 ? '#FFC107' : '#F44336';
+                  return `
+                    <tr style="border-bottom:1px solid var(--borde);">
+                      <td style="padding:10px;">
+                        <div style="font-weight:600;">${e.nombre || e.email}</div>
+                        ${e.ultimoAcceso ? `<div style="font-size:11px; color:var(--texto-suave);">Último acceso: ${new Date(e.ultimoAcceso).toLocaleDateString()}</div>` : ''}
+                      </td>
+                      <td style="padding:10px; text-align:center;">${e.totalIntentos}</td>
+                      <td style="padding:10px; text-align:center;">${e.intentosCorrectos}</td>
+                      <td style="padding:10px; text-align:center; font-weight:bold;">${e.tasaAcierto}%</td>
+                      <td style="padding:10px; text-align:center;">
+                        <span style="background:${colorRendimiento}; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${rendimiento}</span>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `}
       </div>
     `;
+  },
+
+  async renderAnalyticsEstudiante() {
+    // Si no hay estudiante seleccionado, mostrar selector
+    if (!this.selectedEstudianteId) {
+      return `
+        <div class="card">
+          <h2>Seleccionar Estudiante</h2>
+          <p style="color:var(--texto-suave); margin-bottom:14px;">Elige un estudiante para ver su análisis detallado de desempeño.</p>
+          <div id="listaEstudiantes">
+            <p class="empty">Cargando estudiantes...</p>
+          </div>
+        </div>
+      `;
+    }
+
+    try {
+      const analytics = await API.getAnalyticsEstudiante(this.selectedEstudianteId, this.analyticsFiltros);
+      
+      if (!analytics) {
+        return '<p class="empty">Error al cargar analytics del estudiante</p>';
+      }
+
+      const metrics = analytics.metrics || {};
+      const porMetodologia = analytics.porMetodologia || {};
+      const porTema = analytics.porTema || {};
+      const criticos = analytics.criticos || {};
+      const historial = analytics.historial || [];
+
+      // Métricas principales
+      const kpis = `
+        <div class="stat-row">
+          <div class="stat"><b>${metrics.totalIntentos || 0}</b><span>TOTAL INTENTOS</span></div>
+          <div class="stat"><b>${metrics.intentosCorrectos || 0}</b><span>CORRECTOS</span></div>
+          <div class="stat"><b>${metrics.tasaAcierto || 0}%</b><span>TASA ACIERTO</span></div>
+          <div class="stat"><b>${metrics.pistasTotales || 0}</b><span>PISTAS USADAS</span></div>
+        </div>
+      `;
+
+      // Alertas de metodologías/temas críticos
+      const alertas = [];
+      if (criticos.metodologia && criticos.metodologia.porcentaje < 60) {
+        alertas.push(`⚠️ Requiere refuerzo en: ${criticos.metodologia.nombre} (${criticos.metodologia.porcentaje}%)`);
+      }
+      if (criticos.tema && criticos.tema.porcentaje < 60) {
+        alertas.push(`⚠️ Tema crítico: ${criticos.tema.nombre} (${criticos.tema.porcentaje}%)`);
+      }
+
+      const alertasHtml = alertas.length > 0 ? `
+        <div style="background:var(--error-suave); color:white; padding:12px; border-radius:8px; margin-bottom:14px;">
+          <strong>Alertas Pedagógicas:</strong>
+          <ul style="margin:8px 0 0 0; padding-left:20px;">
+            ${alertas.map(a => `<li>${a}</li>`).join('')}
+          </ul>
+        </div>
+      ` : '';
+
+      // Rendimiento por metodología
+      const metodologiasHtml = Object.keys(porMetodologia).length > 0 ? `
+        <div style="margin-top:20px;">
+          <h3>Rendimiento por Metodología</h3>
+          <div style="display:grid; gap:10px; margin-top:10px;">
+            ${Object.entries(porMetodologia).map(([nombre, data]) => {
+              const color = data.porcentaje >= 80 ? '#4CAF50' : data.porcentaje >= 60 ? '#8BC34A' : data.porcentaje >= 40 ? '#FFC107' : '#F44336';
+              return `
+                <div style="background:var(--fondo-2); padding:12px; border-radius:8px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <strong>${nombre}</strong>
+                    <span style="background:${color}; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${data.porcentaje}%</span>
+                  </div>
+                  <div style="background:var(--borde); height:8px; border-radius:4px; overflow:hidden;">
+                    <div style="background:${color}; height:100%; width:${data.porcentaje}%; transition:width 0.3s;"></div>
+                  </div>
+                  <div style="font-size:12px; color:var(--texto-suave); margin-top:4px;">
+                    ${data.total} ejercicios · ${data.pistasUsadas} pistas usadas
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      ` : '';
+
+      // Tabla de historial
+      const historialHtml = historial.length > 0 ? `
+        <div style="margin-top:20px;">
+          <h3>Historial Reciente (Últimos ${historial.length} intentos)</h3>
+          <div style="overflow-x:auto; margin-top:10px;">
+            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+              <thead>
+                <tr style="background:var(--fondo-2);">
+                  <th style="padding:8px; text-align:left; border-bottom:2px solid var(--borde);">Fecha</th>
+                  <th style="padding:8px; text-align:left; border-bottom:2px solid var(--borde);">Ejercicio</th>
+                  <th style="padding:8px; text-align:center; border-bottom:2px solid var(--borde);">Intentos</th>
+                  <th style="padding:8px; text-align:center; border-bottom:2px solid var(--borde);">Pistas</th>
+                  <th style="padding:8px; text-align:center; border-bottom:2px solid var(--borde);">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${historial.map(h => `
+                  <tr style="border-bottom:1px solid var(--borde);">
+                    <td style="padding:8px;">${h.fecha ? new Date(h.fecha).toLocaleDateString() : 'N/A'}</td>
+                    <td style="padding:8px;">${this.formatMathText(h.enunciado || 'N/A')}</td>
+                    <td style="padding:8px; text-align:center;">${h.intentos || 1}</td>
+                    <td style="padding:8px; text-align:center;">${h.pistasUsadas || 0}</td>
+                    <td style="padding:8px; text-align:center;">
+                      <span class="tag" style="background:${h.correcto ? 'var(--secundario)' : 'var(--error-suave)'}; color:white;">
+                        ${h.correcto ? '✓ Correcto' : '✗ Incorrecto'}
+                      </span>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ` : '<p class="empty">No hay historial disponible</p>';
+
+      return `
+        <div class="card">
+          <div class="module-header">
+            <div class="badge" style="background:var(--acento);">👤</div>
+            <div>
+              <h2>Análisis Individual del Estudiante</h2>
+              <p>Diagnóstico detallado de desempeño pedagógico</p>
+            </div>
+          </div>
+
+          ${alertasHtml}
+          ${kpis}
+          ${metodologiasHtml}
+          ${historialHtml}
+
+          <div style="margin-top:14px;">
+            <button class="ghost" onclick="App.selectedEstudianteId = null; App.render();">← Volver a seleccionar estudiante</button>
+          </div>
+        </div>
+      `;
+    } catch (e) {
+      return `<p class="empty">⚠️ Error: ${e.message}</p>`;
+    }
+  },
+
+  cambiarAnalyticsView(view) {
+    this.analyticsView = view;
+    this.selectedEstudianteId = null;
+    this.render();
   },
 
   /* ---------- EVENTOS ---------- */
