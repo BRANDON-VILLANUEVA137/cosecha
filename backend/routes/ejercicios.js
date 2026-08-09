@@ -59,7 +59,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/ejercicios  (docente crea ejercicio)
 router.post('/', requireRole('docente'), async (req, res) => {
   try {
-    const { materia, tema, tipo, enunciado, respuestaCorrecta, pistaError } = req.body;
+    const { materia, tema, tipo, enunciado, respuestaCorrecta, pistaError, metodologia } = req.body;
     if (!materia || !enunciado || !respuestaCorrecta) {
       return res.status(400).json({ error: 'Faltan campos obligatorios' });
     }
@@ -71,7 +71,8 @@ router.post('/', requireRole('docente'), async (req, res) => {
       tipo: tipo || 'texto',
       enunciado,
       respuestaCorrecta,
-      pistaError: pistaError || 'Vuelve a revisar el procedimiento paso a paso.'
+      pistaError: pistaError || 'Vuelve a revisar el procedimiento paso a paso.',
+      metodologia: metodologia || 'Estándar / Directo'
     };
 
     await ref.set(payload);

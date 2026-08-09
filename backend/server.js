@@ -28,6 +28,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 Backend Cosecha corriendo en http://localhost:${PORT}`);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ El puerto ${PORT} ya está en uso. Cierra el proceso anterior o usa otro puerto.`);
+  } else {
+    console.error('❌ Error al iniciar el servidor:', err);
+  }
+  process.exit(1);
 });

@@ -11,12 +11,74 @@ const App = {
   cachePrendas: [],
   authUser: null,
   authReady: false,
+  currentFractionPreview: { numerador: 2, denominador: 5, tipo: 'rectangulo' },
+  currentDynamicMode: 'paso',
+  currentTaskView: null,
+  currentTaskExercises: [],
 
   formatMathText(texto) {
     if (typeof texto !== 'string' || !texto) return '';
     return texto.replace(/(\d+)\s*\/\s*(\d+)/g, (match, num, den) => {
       return `<span class="fraccion" aria-label="${num}/${den}"><span class="num">${num}</span><span class="den">${den}</span></span>`;
     });
+  },
+
+  renderFractionGraphic(numerador, denominador, tipoFigura = 'rectangulo') {
+    const safeNum = Math.max(1, Math.floor(Number(numerador) || 0));
+    const safeDen = Math.max(1, Math.floor(Number(denominador) || 0));
+    const totalFigures = Math.ceil(safeNum / safeDen);
+    const fullFigures = Math.floor(safeNum / safeDen);
+    const remainder = safeNum % safeDen;
+
+    const figuras = [];
+    for (let i = 0; i < totalFigures; i += 1) {
+      const filled = i < fullFigures ? safeDen : (i === fullFigures ? remainder : 0);
+      const isCircle = tipoFigura === 'circulo';
+      const pieces = [];
+
+      if (isCircle) {
+        const pct = safeDen > 0 ? (filled / safeDen) * 100 : 0;
+        pieces.push(`<div class="shape-circle-fill" style="background:conic-gradient(var(--primario) ${pct}%, rgba(255,140,51,.18) ${pct}% 100%);"></div>`);
+      } else {
+        for (let index = 0; index < safeDen; index += 1) {
+          pieces.push(`<div class="shape-slice ${index < filled ? 'filled' : ''}"></div>`);
+        }
+      }
+
+      figuras.push(`
+        <div class="fraction-figure-card">
+          <div class="shape-container ${isCircle ? 'circle' : 'rectangle'}">${pieces.join('')}</div>
+          <div class="figure-label">${isCircle ? 'Círculo' : 'Rectángulo'} ${i + 1}</div>
+        </div>`);
+    }
+
+    return `<div class="fraction-canvas">${figuras.join('')}</div>`;
+  },
+
+  renderFractionPreview() {
+    const area = document.getElementById('fractionGraphicArea');
+    if (!area) return;
+
+    const preview = this.currentFractionPreview || { numerador: 2, denominador: 5, tipo: 'rectangulo' };
+    const title = `${preview.numerador}/${preview.denominador}`;
+    area.innerHTML = `
+      <div class="fraction-preview-card">
+        <div class="fraction-preview-title">
+          <strong>${title}</strong>
+          <span>${preview.tipo === 'circulo' ? 'Vista circular' : 'Vista rectangular'}</span>
+        </div>
+        ${this.renderFractionGraphic(preview.numerador, preview.denominador, preview.tipo)}
+      </div>`;
+  },
+
+  getDynamicModeHint(mode) {
+    const hints = {
+      paso: 'Muestra la estrategia de la carita sonriente paso a paso para que el estudiante entienda el procedimiento.',
+      grafico: 'Combina la visualización con rectángulos y círculos para reforzar el concepto de fracciones.',
+      desafio: 'Convierte la clase en un reto rápido con tiempo límite y preguntas breves.',
+      gramatica: 'Enfoca la actividad en completar verbos y pronombres con apoyo visual.'
+    };
+    return hints[mode] || hints.paso;
   },
 
   /* ---------- Inicialización ---------- */
@@ -265,7 +327,15 @@ const App = {
 
   goModule(mod) {
     this.currentModule = mod;
+    this.currentTaskView = null;
+    this.currentTaskExercises = [];
     this.renderNav();
+    this.render();
+  },
+
+  startTask(task) {
+    this.currentTaskView = task;
+    this.currentTaskExercises = task.ejercicios || [];
     this.render();
   },
 
@@ -358,20 +428,110 @@ const App = {
     const esMat = materia === 'matematicas';
     const aciertos = esMat ? logro.aciertosMatematicas : logro.aciertosIngles;
 
-    const tareas = ejercicios.map(e => {
-      const intentos = this.intentosPorEjercicio[e.id] || 0;
+    const tareasBase = Array.isArray(ejercicios) ? ejercicios : [];
+    const tareasAsignadas = tareasBase.length > 0 ? Object.values(
+      tareasBase.reduce((acc, e) => {
+        const metodologia = (e.metodologia || 'Estándar / Directo').trim();
+        const key = metodologia.toLowerCase();
+        if (!acc[key]) {
+          const estilo = metodologia.toLowerCase().includes('grafic')
+            ? { titulo: esMat ? 'Tarea de graficación' : 'Tarea visual', descripcion: esMat ? 'Explora el concepto con figuras y ejemplos visuales.' : 'Observa ejemplos visuales y completa el reto.' }
+            : metodologia.toLowerCase().includes('desafío') || metodologia.toLowerCase().includes('contrarreloj')
+              ? { titulo: esMat ? 'Desafío rápido' : 'Reto rápido', descripcion: esMat ? 'Resuelve con ritmo y precisión.' : 'Responde con rapidez y precisión.' }
+              : metodologia.toLowerCase().includes('paso')
+                ? { titulo: esMat ? 'Ruta paso a paso' : 'Paso a paso', descripcion: esMat ? 'Sigue cada paso con apoyo guiado.' : 'Completa cada paso con apoyo del tutor.' }
+                : { titulo: esMat ? 'Práctica guiada' : 'Práctica guiada', descripcion: esMat ? 'Refuerza el contenido con ejercicios claros.' : 'Consolida el tema con indicaciones sencillas.' };
+
+          acc[key] = {
+            id: `tarea-${key}`,
+            titulo: estilo.titulo,
+            descripcion: estilo.descripcion,
+            estado: 'Pendiente',
+            ejercicios: [],
+            metodologia
+          };
+        }
+
+        acc[key].ejercicios.push(e);
+        return acc;
+      }, {})
+    ) : [{
+      id: 'tarea-base',
+      titulo: esMat ? 'Tarea de inicio' : 'Tarea inicial',
+      descripcion: esMat ? 'Comienza con una práctica breve y clara.' : 'Inicia con una práctica breve y clara.',
+      estado: 'Pendiente',
+      ejercicios: [],
+      metodologia: 'Estándar / Directo'
+    }];
+
+    if (this.currentTaskView) {
+      const ejerciciosTask = this.currentTaskExercises || [];
+      const tareas = ejerciciosTask.map(e => {
+        const intentos = this.intentosPorEjercicio[e.id] || 0;
+        return `
+        <div class="task-card">
+          <span class="tag ${esMat ? 'mat' : 'ing'}">${e.tema}</span>
+          <div class="enun">${this.formatMathText(e.enunciado)}</div>
+          <div class="answer-row">
+            <input type="text" placeholder="Tu respuesta" id="resp_${e.id}">
+            <button class="primary" data-check="${e.id}" data-materia="${materia}">Comprobar</button>
+          </div>
+          <div class="attempts">Intentos: ${intentos}</div>
+          <div id="fb_${e.id}"></div>
+        </div>`;
+      }).join('') || '<p class="empty">No hay ejercicios en esta tarea todavía.</p>';
+
       return `
-      <div class="task-card">
-        <span class="tag ${esMat ? 'mat' : 'ing'}">${e.tema}</span>
-        <div class="enun">${this.formatMathText(e.enunciado)}</div>
-        <div class="answer-row">
-          <input type="text" placeholder="Tu respuesta" id="resp_${e.id}">
-          <button class="primary" data-check="${e.id}" data-materia="${materia}">Comprobar</button>
+        <div class="card">
+          <div class="module-header">
+            <div class="badge ${esMat ? 'mat' : 'ing'}">${esMat ? '📘' : '🌈'}</div>
+            <div>
+              <h2>${this.currentTaskView.titulo}</h2>
+              <p>${this.currentTaskView.descripcion}</p>
+            </div>
+          </div>
+          <div class="hint-preview">Metodología: ${this.currentTaskView.metodologia || 'Estándar / Directo'}</div>
+          ${tareas}
+        </div>`;
+    }
+
+    const taskCards = tareasAsignadas.map(task => `
+      <div class="task-card task-module-card">
+        <div class="task-module-head">
+          <div>
+            <span class="tag ${esMat ? 'mat' : 'ing'}">Tutor</span>
+            <h3>${task.titulo}</h3>
+          </div>
+          <span class="task-status">${task.estado}</span>
         </div>
-        <div class="attempts">Intentos: ${intentos}</div>
-        <div id="fb_${e.id}"></div>
-      </div>`;
-    }).join('') || '<p class="empty">No hay ejercicios en este módulo todavía.</p>';
+        <p>${task.descripcion}</p>
+        <div class="task-meta">${task.ejercicios.length} ejercicios · ${task.metodologia}</div>
+        <button class="primary" onclick="App.startTask(${JSON.stringify(task).replace(/"/g, '&quot;')})">Comenzar Tarea</button>
+      </div>`).join('');
+
+    const graficacion = esMat ? `
+      <div class="card">
+        <div class="module-header">
+          <div class="badge mat">📐</div>
+          <div>
+            <h2>Graficar fracciones</h2>
+            <p>Explora fracciones propias e impropias con rectángulos y círculos.</p>
+          </div>
+        </div>
+        <div class="graph-controls">
+          <select id="fractionGraphType">
+            <option value="rectangulo">Rectángulos</option>
+            <option value="circulo">Círculos</option>
+          </select>
+          <div class="graph-pills">
+            <button class="ghost" data-frac-demo="2/5">2/5</button>
+            <button class="ghost" data-frac-demo="21/8">21/8</button>
+            <button class="ghost" data-frac-demo="16/9">16/9</button>
+            <button class="ghost" data-frac-demo="10/7">10/7</button>
+          </div>
+        </div>
+        <div id="fractionGraphicArea"></div>
+      </div>` : '';
 
     return `
       <div class="card">
@@ -384,7 +544,8 @@ const App = {
         </div>
         <div class="stat-row"><div class="stat"><b>${aciertos}</b><span>ACIERTOS EN ESTA MATERIA</span></div></div>
       </div>
-      ${tareas}
+      ${taskCards}
+      ${graficacion}
     `;
   },
 
@@ -441,6 +602,7 @@ const App = {
           <div>
             <span class="tag ${esMat ? 'mat' : 'ing'}">${e.tema}</span>
             <div class="ex-enun">${this.formatMathText(e.enunciado)}</div>
+            <div class="hint-preview">Metodología: ${e.metodologia || 'Estándar / Directo'}</div>
           </div>
           <button class="ghost" data-delete-ex="${e.id}" style="color:var(--error-suave); border-color:rgba(255,107,107,.35);">🗑️ Eliminar</button>
         </div>
@@ -457,6 +619,14 @@ const App = {
           <div class="badge ${esMat ? 'mat' : 'ing'}">${esMat ? '🍊' : '🌴'}</div>
           <div><h2>${esMat ? 'Matemáticas' : 'Inglés'}</h2><p>Banco de ejercicios de este módulo</p></div>
         </div>
+        <label>Modo de clase</label>
+        <select id="dynamicModeSelect">
+          <option value="paso">Paso a paso (Carita Sonriente)</option>
+          <option value="grafico">Graficación Geométrica</option>
+          <option value="desafio">Desafío Contrarreloj</option>
+          <option value="gramatica">Opción Múltiple / Gramática</option>
+        </select>
+        <div class="hint-preview" id="dynamicModeHint">${this.getDynamicModeHint(this.currentDynamicMode)}</div>
         ${lista}
       </div>
 
@@ -468,6 +638,13 @@ const App = {
             <input type="text" id="newTema" placeholder="Ej: Fracciones · Carita Sonriente">
             <label>Tipo</label>
             <select id="newTipo"><option value="fraccion">Fracción (a/b)</option><option value="texto">Texto corto</option></select>
+            <label>Metodología</label>
+            <select id="newMetodologia">
+              <option value="Estándar / Directo">Estándar / Directo</option>
+              <option value="Paso a Paso (Carita Sonriente)">Paso a Paso (Carita Sonriente)</option>
+              <option value="Graficación Interactiva">Graficación Interactiva</option>
+              <option value="Desafío Contrarreloj">Desafío Contrarreloj</option>
+            </select>
           </div>
           <div>
             <label>Enunciado</label>
@@ -526,12 +703,13 @@ const App = {
         const materia = addBtn.dataset.materia;
         const tema = document.getElementById('newTema').value || 'General';
         const tipo = document.getElementById('newTipo').value;
+        const metodologia = document.getElementById('newMetodologia').value;
         const enunciado = document.getElementById('newEnun').value.trim();
         const respuestaCorrecta = document.getElementById('newResp').value.trim();
         const pistaError = document.getElementById('newPista').value.trim() || 'Vuelve a revisar el procedimiento paso a paso.';
         if (!enunciado || !respuestaCorrecta) { this.toast('⚠️ Completa enunciado y respuesta'); return; }
         try {
-          await API.crearEjercicio({ materia, tema, tipo, enunciado, respuestaCorrecta, pistaError });
+          await API.crearEjercicio({ materia, tema, tipo, enunciado, respuestaCorrecta, pistaError, metodologia });
           this.toast('✅ Ejercicio guardado');
           this.render();
         } catch (e) { this.toast('⚠️ ' + e.message); }
@@ -587,6 +765,35 @@ const App = {
           }
         };
       });
+
+      document.querySelectorAll('[data-frac-demo]').forEach(btn => {
+        btn.onclick = () => {
+          const [numerador, denominador] = btn.dataset.fracDemo.split('/');
+          this.currentFractionPreview = { numerador: Number(numerador), denominador: Number(denominador), tipo: this.currentFractionPreview?.tipo || 'rectangulo' };
+          this.renderFractionPreview();
+        };
+      });
+
+      const fractionGraphType = document.getElementById('fractionGraphType');
+      if (fractionGraphType) {
+        fractionGraphType.value = this.currentFractionPreview?.tipo || 'rectangulo';
+        fractionGraphType.onchange = (e) => {
+          this.currentFractionPreview = { ...this.currentFractionPreview, tipo: e.target.value };
+          this.renderFractionPreview();
+        };
+      }
+
+      const dynamicModeSelect = document.getElementById('dynamicModeSelect');
+      if (dynamicModeSelect) {
+        dynamicModeSelect.value = this.currentDynamicMode;
+        dynamicModeSelect.onchange = (e) => {
+          this.currentDynamicMode = e.target.value;
+          const hint = document.getElementById('dynamicModeHint');
+          if (hint) hint.textContent = this.getDynamicModeHint(this.currentDynamicMode);
+        };
+      }
+
+      this.renderFractionPreview();
 
       document.querySelectorAll('[data-cattab]').forEach(btn => {
         btn.onclick = () => { this.currentArmarioTab = btn.dataset.cattab; this.render(); };

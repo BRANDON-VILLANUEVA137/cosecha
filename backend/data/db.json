@@ -40,6 +40,46 @@
       "respuestaCorrecta": "6/35",
       "pistaError": "En la multiplicación no se busca denominador común: numerador por numerador, denominador por denominador."
     },
+    "m6": {
+      "materia": "matematicas",
+      "tema": "Fracciones · mismo denominador",
+      "enunciado": "25/25 + 15/25 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "40/25",
+      "pistaError": "Suma solo los numeradores y conserva el denominador si es igual."
+    },
+    "m7": {
+      "materia": "matematicas",
+      "tema": "Fracciones · mismo denominador",
+      "enunciado": "170/100 + 80/100 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "250/100",
+      "pistaError": "Revisa si el denominador se mantiene igual en la suma con el mismo denominador."
+    },
+    "m8": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Carita Sonriente",
+      "enunciado": "5/2 + 7/9 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "59/18",
+      "pistaError": "Aplica la regla de la carita sonriente: multiplica en cruz y luego suma los resultados."
+    },
+    "m9": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Carita Sonriente",
+      "enunciado": "8/3 + 6/4 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "50/12",
+      "pistaError": "Recuerda encontrar un denominador común antes de sumar."
+    },
+    "m10": {
+      "materia": "matematicas",
+      "tema": "Graficar fracciones",
+      "enunciado": "Grafica la fracción 2/5.",
+      "tipo": "grafico",
+      "respuestaCorrecta": "2/5",
+      "pistaError": "Divide una figura en 5 partes y colorea 2."
+    },
     "i1": {
       "materia": "ingles",
       "tema": "Verbo to be",

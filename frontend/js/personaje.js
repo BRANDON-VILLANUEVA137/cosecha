@@ -55,6 +55,7 @@ const Personaje = {
       svg += `<ellipse cx="131" cy="304" rx="21" ry="11" fill="${calzado.color}" stroke="#00000018" stroke-width="2"/>`;
     }
     // torso
+    svg += `<ellipse cx="110" cy="292" rx="54" ry="12" fill="#00000010"/>`;
     svg += `<rect x="62" y="118" width="96" height="112" rx="26" fill="${torso.color}" stroke="#00000012" stroke-width="2"/>`;
     // sleeves overlay
     const sleeveH = mangaLarga ? 74 : 36;
@@ -68,6 +69,8 @@ const Personaje = {
     // head + face
     svg += `<circle cx="110" cy="66" r="40" fill="${skin}" stroke="#E8A96B" stroke-width="2"/>`;
     svg += `<circle cx="95" cy="66" r="4.5" fill="#3A2A1E"/><circle cx="125" cy="66" r="4.5" fill="#3A2A1E"/>`;
+    svg += `<rect x="96" y="96" width="28" height="10" rx="5" fill="#F4C79A"/>`;
+    svg += `<circle cx="88" cy="74" r="3" fill="#F6A97A" opacity="0.35"/><circle cx="132" cy="74" r="3" fill="#F6A97A" opacity="0.35"/>`;
     svg += `<path d="M95 80 Q110 90 125 80" stroke="#B5651D" stroke-width="3" fill="none" stroke-linecap="round"/>`;
     // hair fringe
     svg += `<path d="M70 48 Q76 22 110 21 Q144 22 150 48 Q140 34 110 34 Q80 34 70 48 Z" fill="${hair}"/>`;

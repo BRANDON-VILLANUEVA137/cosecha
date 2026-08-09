@@ -1,0 +1,214 @@
+¡Analicé los dos documentos cargados! En ellos se cubren **Matemáticas** (operaciones de fracciones y graficación) e **Inglés / Tecnología** (verbo To Be, pronombres personales y tutoriales de uso de WhatsApp Web).
+
+Aquí tienes una propuesta completa con el análisis de los contenidos, un catálogo de dinámicas interactivas para que el tutor escoja la modalidad pedagógica, y el nuevo módulo interactivo para **graficar fracciones**.
+
+---
+
+## 📚 1. Banco de Ejercicios Extraídos de las Tutorías
+
+### ➕ 1.1 Matemáticas: Fracciones
+
+#### A. Suma con Mismo Denominador
+
+* $\frac{6}{6} + \frac{9}{6} = \frac{15}{6}$
+
+* $\frac{25}{25} + \frac{15}{25} = \frac{40}{25}$
+
+* $\frac{9}{8} + \frac{7}{8} = \frac{16}{8}$
+
+* $\frac{12}{15} + \frac{18}{15} = \frac{30}{15}$
+
+* $\frac{18}{25} + \frac{32}{25} = \frac{50}{25}$
+
+* $\frac{45}{60} + \frac{15}{60} = \frac{60}{60}$
+
+* $\frac{90}{120} + \frac{30}{120} = \frac{120}{120}$
+
+* $\frac{170}{100} + \frac{80}{100} = \frac{250}{100}$
+
+* $\frac{35}{50} + \frac{25}{50} = \frac{60}{50}$
+
+* $\frac{14}{30} + \frac{16}{30} = \frac{30}{30}$
+
+* $\frac{85}{100} + \frac{40}{100} = \frac{125}{100}$
+
+* $\frac{500}{1000} + \frac{350}{1000} = \frac{850}{1000}$
+
+* $\frac{300}{500} + \frac{150}{500} = \frac{450}{500}$
+
+
+#### B. Suma con Diferente Denominador (Regla de la Carita Sonriente)
+
+
+
+* $\frac{5}{2} + \frac{7}{9} = \frac{45 + 14}{18} = \frac{59}{18}$
+
+* $\frac{8}{3} + \frac{6}{4} = \frac{32 + 18}{12} = \frac{50}{12}$
+
+* $\frac{6}{15} + \frac{4}{5} = \frac{30 + 60}{75} = \frac{90}{75}$
+
+* $\frac{5}{8} + \frac{3}{4} = \frac{20 + 24}{32} = \frac{44}{32}$
+
+* $\frac{5}{18} + \frac{1}{6} = \frac{30 + 18}{108} = \frac{48}{108}$
+
+* $\frac{7}{10} + \frac{7}{5} = \frac{35 + 70}{50} = \frac{105}{50}$
+
+* $\frac{7}{8} + \frac{5}{12} = \frac{84 + 40}{96} = \frac{124}{96}$
+
+* $\frac{9}{12} + \frac{5}{6} = \frac{54 + 60}{72} = \frac{114}{72}$
+
+* $\frac{3}{10} + \frac{4}{15} = \frac{45 + 40}{150} = \frac{85}{150}$
+
+* $\frac{4}{9} + \frac{2}{3} = \frac{12 + 18}{27} = \frac{30}{27}$
+
+* $\frac{8}{21} + \frac{2}{7} = \frac{56 + 42}{147} = \frac{98}{147}$
+
+* $\frac{5}{14} + \frac{3}{7} = \frac{35 + 42}{98} = \frac{77}{98}$
+
+* $\frac{9}{6} + \frac{3}{8} = \frac{72 + 18}{48} = \frac{90}{48}$
+
+
+#### C. Multiplicación de Fracciones
+
+* $\frac{5}{11} \times \frac{9}{19} = \frac{45}{209}$
+
+* $\frac{3}{5} \times \frac{2}{7} = \frac{6}{35}$
+
+* $\frac{9}{9} \times \frac{5}{6} = \frac{45}{54}$
+
+* $\frac{7}{10} \times \frac{3}{8} = \frac{21}{80}$
+
+* $\frac{12}{15} \times \frac{5}{4} = \frac{60}{60} = 1$
+
+* $\frac{8}{11} \times \frac{2}{3} = \frac{16}{33}$
+
+* $\frac{6}{20} \times \frac{10}{3} = \frac{60}{60} = 1$
+
+
+#### D. Ejercicios de Graficación Solicitados
+
+
+
+* $\frac{2}{5}$ (Propia)
+
+
+* $\frac{21}{8}$ (Impropia: 2 enteros y $\frac{5}{8}$)
+
+
+* $\frac{16}{9}$ (Impropia: 1 entero y $\frac{7}{9}$)
+
+
+* $\frac{10}{7}$ (Impropia: 1 entero y $\frac{3}{7}$)
+
+
+* $\frac{36}{6}$ (Entera: 6 enteros exactos)
+
+
+
+---
+
+### 🇬🇧 2.2 Inglés y Tecnología
+
+#### A. Verbo To Be (am / is / are)
+
+
+
+* `My brother ____ happy.` $\rightarrow$ **is**
+
+* `The dogs ____ playing.` $\rightarrow$ **are**
+
+* `I ____ a student.` $\rightarrow$ **am**
+
+* `London ____ a big city.` $\rightarrow$ **is**
+
+* `Sofia and Pedro ____ friends.` $\rightarrow$ **are**
+
+
+#### B. Reemplazo por Pronombres (He, She, It, We, They, You)
+
+
+
+* `Carlos` $\rightarrow$ **He**
+
+* `The dog and the cat` $\rightarrow$ **They**
+
+* `Maria and I` $\rightarrow$ **We**
+
+* `The school` $\rightarrow$ **It**
+
+* `Camilo and you` $\rightarrow$ **You (plural / ustedes)**
+
+
+---
+
+## 🎮 2. Dinámicas de Aprendizaje Configurables por el Tutor
+
+Para que el docente/tutor seleccione en la plataforma según el ritmo del estudiante, proponemos los siguientes **4 modos de dinámica**:
+
+| Modo de Dinámica | Descripción / Mecánica | Beneficio pedagógico |
+| --- | --- | --- |
+| **1. Modo Paso a Paso** *(Carita Sonriente)*<br> | Muestra las multiplicaciones cruzadas paso a paso para denominadores diferentes.
+
+ | Ideal para explicaciones iniciales y estudiantes que se frustran con operaciones complejas. |
+| **2. Modo Gráfico Interactivo** | El estudiante debe colorear/seleccionar las partes de las figuras geométricas (círculos o rectángulos) según el numerador y denominador. | Refuerza el concepto espacial de las fracciones propias e impropias.
+
+ |
+| **3. Modo Contrarreloj / Desafío** | Resolver la mayor cantidad de ejercicios en un tiempo límite (ej. 60 segundos). | Fomenta la agilidad mental y la automatización de la "carita sonriente" o las reglas sintácticas.
+
+ |
+| **4. Selección Múltiple y Arrastrar** | Para reemplazar pronombres o completar con `am/is/are` mediante tarjetas interactivas.
+
+ | Mejora la retención de la gramática en inglés.
+
+ |
+
+---
+
+## 🎨 3. Prompts para GitHub Copilot
+
+Para implementar estas características en el proyecto **Cosecha**, puedes copiar y pasarle los siguientes prompts a Copilot en tu entorno de desarrollo:
+
+### 🎯 Prompt 1: Módulo para Graficar Fracciones (Círculos y Rectángulos)
+
+```markdown
+# OBJETIVO
+Implementar un componente interactivo en el frontend para graficar fracciones usando formas geométricas (Círculos o Rectángulos), soportando fracciones propias e impropias.
+
+# INSTRUCCIONES
+
+1. EN `frontend/js/app.js`:
+   - Crear un renderizador gráfico `renderFractionGraphic(numerador, denominador, tipoFigura = 'rectangulo')`.
+   - Si la fracción es propia (ej. 2/5): dibujar 1 figura dividida en `denominador` partes iguales y colorear `numerador` partes.
+   - Si es impropia (ej. 10/7 o 21/8): calcular cuántas figuras completas se necesitan `Math.ceil(numerador / denominador)` y dibujarlas consecutivamente, rellenando las partes correspondientes.
+   - Permitir al usuario alternar entre vista de "Círculos" (SVG/CSS pie-chart) y "Rectángulos" (grilla interactiva).
+
+2. ESTILOS CSS (`frontend/css/styles.css`):
+   - Agregar estilos para `.fraction-canvas`, `.shape-container`, `.shape-slice.filled` con colores acordes al tema activo (Cítrico/Piña).
+
+```
+
+---
+
+### 🎛️ Prompt 2: Selector de Dinámicas para el Tutor y Nuevos Ejercicios
+
+```markdown
+# OBJETIVO
+Añadir el selector de dinámicas de clase en el panel de control del docente y actualizar la base de ejercicios con el contenido de las tutorías de matemáticas e inglés.
+
+# INSTRUCCIONES
+
+1. EN EL PANEL DE DOCENTE (`frontend/index.html` y `app.js`):
+   - Crear un menú desplegable para que el tutor seleccione el modo de juego antes de iniciar la sesión con el estudiante:
+     - `Paso a paso (Carita Sonriente)`
+     - `Graficación Geométrica`
+     - `Desafío Contrarreloj`
+     - `Opción Múltiple / Gramática`
+
+2. ACTUALIZAR EJERCICIOS (`backend/seed.js` o base de datos simulada):
+   - Agregar los ejercicios extraídos del documento:
+     - Suma mismo denominador (ej: 6/6 + 9/6, 25/25 + 15/25, 170/100 + 80/100).
+     - Suma diferente denominador con Carita Sonriente (ej: 5/2 + 7/9, 8/3 + 6/4).
+     - Graficar fracciones: 2/5, 21/8, 16/9, 10/7, 36/6.
+     - Inglés (Verbo To Be y Pronombres): "My brother ___ happy", "Sofia and Pedro ___ friends", "The dog and the cat" -> "They".
+
+```
