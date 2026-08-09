@@ -397,6 +397,60 @@ const App = {
     this.render();
   },
 
+  // ---- Métodos de gestión de tareas (docente) ----
+  mostrarFormTarea(materia) {
+    const form = document.getElementById('formTarea');
+    if (form) form.style.display = 'block';
+  },
+
+  ocultarFormTarea() {
+    const form = document.getElementById('formTarea');
+    if (form) form.style.display = 'none';
+  },
+
+  async crearTarea(materia) {
+    const titulo = document.getElementById('tareaTitulo').value.trim();
+    const descripcion = document.getElementById('tareaDescripcion').value.trim();
+    
+    if (!titulo) {
+      this.toast('⚠️ Ingresa un título para la tarea');
+      return;
+    }
+
+    try {
+      await API.crearTarea({ titulo, descripcion, materia });
+      this.toast('✅ Tarea creada');
+      this.ocultarFormTarea();
+      this.render();
+    } catch (e) {
+      this.toast('⚠️ ' + e.message);
+    }
+  },
+
+  async eliminarTarea(id) {
+    const confirmar = window.confirm('¿Seguro que quieres eliminar esta tarea y todos sus ejercicios?');
+    if (!confirmar) return;
+
+    try {
+      await API.eliminarTarea(id);
+      this.toast('🗑️ Tarea eliminada');
+      this.render();
+    } catch (e) {
+      this.toast('⚠️ ' + e.message);
+    }
+  },
+
+  async verTareaDocente(id) {
+    try {
+      const tarea = await API.getTarea(id);
+      this.currentTaskView = tarea;
+      this.currentTaskExercises = tarea.ejercicios || [];
+      this.render();
+    } catch (e) {
+      this.toast('⚠️ ' + e.message);
+    }
+  },
+
   /* ---------- Navegación ---------- */
   renderNav() {
     const tabsEstudiante = [
@@ -578,7 +632,7 @@ const App = {
         </div>
         <p>${task.descripcion}</p>
         <div class="task-meta">${task.ejercicios.length} ejercicios · ${task.metodologia}${task.ejercicios[0]?.tema ? ` · ${task.ejercicios[0].tema}` : ''}</div>
-        <button class="${completed ? 'ghost' : 'primary'}" onclick="App.startTask(${JSON.stringify(task).replace(/"/g, '&quot;')})">${buttonLabel}</button>
+        <button class="${completed ? 'ghost' : 'primary'}" onclick="App.startTask(${JSON.stringify(task).replace(/"/g, '"')})">${buttonLabel}</button>
       </div>`;
     }).join('');
 
@@ -667,8 +721,33 @@ const App = {
   /* ---------- DOCENTE: módulo por materia ---------- */
   async renderDocenteMateria(materia) {
     const esMat = materia === 'matematicas';
-    const ejercicios = await API.getEjercicios(materia);
+    const [ejercicios, tareas] = await Promise.all([
+      API.getEjercicios(materia),
+      API.getTareas()
+    ]);
 
+    const tareasFiltradas = tareas.filter(t => t.materia === materia);
+
+    // Sección de Tareas
+    const tareasHtml = tareasFiltradas.map(t => `
+      <div class="task-card task-module-card">
+        <div class="task-module-head">
+          <div>
+            <span class="tag ${esMat ? 'mat' : 'ing'}">Tarea</span>
+            <h3>${t.titulo}</h3>
+          </div>
+          <span class="task-status" style="background:${t.activa ? 'var(--secundario)' : 'var(--texto-suave)'}; color:white;">${t.activa ? 'Activa' : 'Inactiva'}</span>
+        </div>
+        <p>${t.descripcion || 'Sin descripción'}</p>
+        <div class="task-meta">${t.ejercicios?.length || 0} ejercicios</div>
+        <div class="task-actions">
+          <button class="ghost" onclick="App.verTareaDocente('${t.id}')">📋 Ver/Editar</button>
+          <button class="ghost" onclick="App.eliminarTarea('${t.id}')" style="color:var(--error-suave);">🗑️ Eliminar</button>
+        </div>
+      </div>
+    `).join('') || '<p class="empty">No hay tareas creadas.</p>';
+
+    // Lista de ejercicios
     const lista = ejercicios.map(e => `
       <div class="ex-item">
         <div class="top">
@@ -687,6 +766,32 @@ const App = {
       </div>`).join('') || '<p class="empty">Sin ejercicios todavía.</p>';
 
     return `
+      <!-- SECCIÓN DE TAREAS -->
+      <div class="card">
+        <div class="module-header">
+          <div class="badge" style="background:var(--acento);">📚</div>
+          <div><h2>Mis Tareas</h2><p>Crea y gestiona tareas para tus estudiantes</p></div>
+        </div>
+        <button class="primary" onclick="App.mostrarFormTarea('${materia}')">➕ Nueva Tarea</button>
+        <div id="formTarea" style="display:none; margin-top:14px;">
+          <div class="card" style="background:var(--fondo-2);">
+            <h3>Nueva Tarea</h3>
+            <label>Título</label>
+            <input type="text" id="tareaTitulo" placeholder="Ej: Práctica de fracciones">
+            <label>Descripción</label>
+            <input type="text" id="tareaDescripcion" placeholder="Ej: Ejercicios de suma de fracciones">
+            <label>Materia</label>
+            <input type="text" value="${esMat ? 'Matemáticas' : 'Inglés'}" disabled>
+            <div style="margin-top:10px;">
+              <button class="primary" onclick="App.crearTarea('${materia}')">Guardar Tarea</button>
+              <button class="ghost" onclick="App.ocultarFormTarea()">Cancelar</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:14px;">${tareasHtml}</div>
+      </div>
+
+      <!-- SECCIÓN DE EJERCICIOS -->
       <div class="card">
         <div class="module-header">
           <div class="badge ${esMat ? 'mat' : 'ing'}">${esMat ? '🍊' : '🌴'}</div>
@@ -703,6 +808,7 @@ const App = {
         ${lista}
       </div>
 
+      <!-- FORMULARIO NUEVO EJERCICIO -->
       <div class="card">
         <h2>➕ Nuevo ejercicio de ${esMat ? 'Matemáticas' : 'Inglés'}</h2>
         <div class="grid2">

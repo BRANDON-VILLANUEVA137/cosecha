@@ -16,6 +16,7 @@ app.use(express.static(path.join(__dirname, '..', 'frontend')));
 // Rutas de la API
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/ejercicios', authMiddleware, require('./routes/ejercicios'));
+app.use('/api/tareas', authMiddleware, require('./routes/tareas'));
 app.use('/api/logros', authMiddleware, require('./routes/logros'));
 app.use('/api/prendas', authMiddleware, require('./routes/prendas'));
 

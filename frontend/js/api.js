@@ -95,5 +95,33 @@ const API = {
   getPrendas(categoria) {
     const q = categoria ? `?categoria=${categoria}` : '';
     return this.request('/prendas' + q);
+  },
+
+  // ---- Tareas ----
+  getTareas() {
+    return this.request('/tareas');
+  },
+  getTarea(id) {
+    return this.request('/tareas/' + id);
+  },
+  crearTarea(data) {
+    return this.request('/tareas', { method: 'POST', body: JSON.stringify(data) });
+  },
+  editarTarea(id, data) {
+    return this.request('/tareas/' + id, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  eliminarTarea(id) {
+    return this.request('/tareas/' + id, { method: 'DELETE' });
+  },
+  agregarEjercicioATarea(tareaId, ejercicioId) {
+    return this.request('/tareas/' + tareaId + '/ejercicios', {
+      method: 'POST',
+      body: JSON.stringify({ ejercicioId })
+    });
+  },
+  eliminarEjercicioDeTarea(tareaId, ejercicioId) {
+    return this.request('/tareas/' + tareaId + '/ejercicios/' + ejercicioId, {
+      method: 'DELETE'
+    });
   }
 };
