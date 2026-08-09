@@ -1133,14 +1133,21 @@ const App = {
   async renderAnalyticsGrupo(data) {
     if (!data) return '<p class="empty">Error al cargar datos</p>';
 
-    const estudiantes = data.estudiantes || [];
+    // Normalizar: el backend puede devolver { estudiantes: [...] } o directamente un array
+    const estudiantes = Array.isArray(data) ? data : (data.estudiantes || []);
     const estudiantesActivos = estudiantes.filter(e => e.totalIntentos > 0);
+    const promedioCalculado = estudiantesActivos.length > 0
+      ? Math.round(estudiantesActivos.reduce((sum, e) => sum + (e.tasaAcierto || 0), 0) / estudiantesActivos.length)
+      : 0;
+    const totalEstudiantes = data.totalEstudiantes ?? estudiantes.length;
+    const estudiantesActivosCount = data.estudiantesActivos ?? estudiantesActivos.length;
+    const promedioGrupo = data.promedioGrupo ?? promedioCalculado;
     
     // Calcular distribución de rendimiento
-    const excelente = estudiantes.filter(e => e.tasaAcierto >= 80).length;
-    const bueno = estudiantes.filter(e => e.tasaAcierto >= 60 && e.tasaAcierto < 80).length;
-    const regular = estudiantes.filter(e => e.tasaAcierto >= 40 && e.tasaAcierto < 60).length;
-    const bajo = estudiantes.filter(e => e.tasaAcierto < 40).length;
+    const excelente = estudiantes.filter(e => (e.tasaAcierto || 0) >= 80).length;
+    const bueno = estudiantes.filter(e => (e.tasaAcierto || 0) >= 60 && (e.tasaAcierto || 0) < 80).length;
+    const regular = estudiantes.filter(e => (e.tasaAcierto || 0) >= 40 && (e.tasaAcierto || 0) < 60).length;
+    const bajo = estudiantes.filter(e => (e.tasaAcierto || 0) < 40).length;
 
     return `
       <!-- KPIs del Grupo -->
@@ -1151,9 +1158,9 @@ const App = {
         </div>
         
         <div class="stat-row">
-          <div class="stat"><b>${data.totalEstudiantes}</b><span>TOTAL ESTUDIANTES</span></div>
-          <div class="stat"><b>${data.estudiantesActivos}</b><span>ESTUDIANTES ACTIVOS</span></div>
-          <div class="stat"><b>${data.promedioGrupo}%</b><span>PROMEDIO GRUPO</span></div>
+          <div class="stat"><b>${totalEstudiantes}</b><span>TOTAL ESTUDIANTES</span></div>
+          <div class="stat"><b>${estudiantesActivosCount}</b><span>ESTUDIANTES ACTIVOS</span></div>
+          <div class="stat"><b>${promedioGrupo}%</b><span>PROMEDIO GRUPO</span></div>
         </div>
 
         <!-- Distribución de Rendimiento -->
@@ -1197,17 +1204,20 @@ const App = {
               </thead>
               <tbody>
                 ${estudiantes.map(e => {
-                  const rendimiento = e.tasaAcierto >= 80 ? 'Excelente' : e.tasaAcierto >= 60 ? 'Bueno' : e.tasaAcierto >= 40 ? 'Regular' : 'Bajo';
-                  const colorRendimiento = e.tasaAcierto >= 80 ? '#4CAF50' : e.tasaAcierto >= 60 ? '#8BC34A' : e.tasaAcierto >= 40 ? '#FFC107' : '#F44336';
+                  const tasaAcierto = e.tasaAcierto || 0;
+                  const totalIntentos = e.totalIntentos || 0;
+                  const intentosCorrectos = e.intentosCorrectos || 0;
+                  const rendimiento = tasaAcierto >= 80 ? 'Excelente' : tasaAcierto >= 60 ? 'Bueno' : tasaAcierto >= 40 ? 'Regular' : 'Bajo';
+                  const colorRendimiento = tasaAcierto >= 80 ? '#4CAF50' : tasaAcierto >= 60 ? '#8BC34A' : tasaAcierto >= 40 ? '#FFC107' : '#F44336';
                   return `
                     <tr style="border-bottom:1px solid var(--borde);">
                       <td style="padding:10px;">
-                        <div style="font-weight:600;">${e.nombre || e.email}</div>
+                        <div style="font-weight:600;">${e.nombre || e.email || 'Sin nombre'}</div>
                         ${e.ultimoAcceso ? `<div style="font-size:11px; color:var(--texto-suave);">Último acceso: ${new Date(e.ultimoAcceso).toLocaleDateString()}</div>` : ''}
                       </td>
-                      <td style="padding:10px; text-align:center;">${e.totalIntentos}</td>
-                      <td style="padding:10px; text-align:center;">${e.intentosCorrectos}</td>
-                      <td style="padding:10px; text-align:center; font-weight:bold;">${e.tasaAcierto}%</td>
+                      <td style="padding:10px; text-align:center;">${totalIntentos}</td>
+                      <td style="padding:10px; text-align:center;">${intentosCorrectos}</td>
+                      <td style="padding:10px; text-align:center; font-weight:bold;">${tasaAcierto}%</td>
                       <td style="padding:10px; text-align:center;">
                         <span style="background:${colorRendimiento}; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${rendimiento}</span>
                       </td>
@@ -1227,7 +1237,8 @@ const App = {
     let estudiantes = [];
     try {
       const analyticsGrupo = await API.getAnalyticsGrupo();
-      estudiantes = analyticsGrupo.estudiantes || [];
+      // Normalizar: puede llegar como { estudiantes: [...] } o directamente un array
+      estudiantes = Array.isArray(analyticsGrupo) ? analyticsGrupo : (analyticsGrupo.estudiantes || []);
     } catch (e) {
       console.error('Error cargando estudiantes:', e);
     }
@@ -1318,7 +1329,7 @@ const App = {
           <h3>📊 Diagnóstico por Metodología</h3>
           <div style="display:grid; gap:10px; margin-top:10px;">
             ${Object.entries(porMetodologia).map(([nombre, data]) => {
-              const pct = data.porcentaje || 0;
+              const pct = data?.porcentaje || 0;
               const color = pct >= 80 ? '#4CAF50' : pct >= 60 ? '#8BC34A' : pct >= 40 ? '#FFC107' : '#F44336';
               const emoji = pct >= 80 ? '🟩' : pct >= 60 ? '🟨' : pct >= 40 ? '🟧' : '🟥';
               const alerta = pct < 60 ? `<div style="font-size:12px; color:#F44336; margin-top:4px;">⚠️ Alerta: Requiere refuerzo</div>` : '';
@@ -1332,7 +1343,7 @@ const App = {
                     <div style="background:${color}; height:100%; width:${pct}%; transition:width 0.3s;"></div>
                   </div>
                   <div style="font-size:12px; color:var(--texto-suave); margin-top:4px;">
-                    ${data.total} ejercicios · ${data.correctos} correctos · ${data.pistasUsadas} pistas usadas
+                    ${data?.total || 0} ejercicios · ${data?.correctos || 0} correctos · ${data?.pistasUsadas || 0} pistas usadas
                   </div>
                   ${alerta}
                 </div>
@@ -1384,6 +1395,13 @@ const App = {
       }
       if (criticos.tema && criticos.tema.porcentaje < 60) {
         alertas.push(`⚠️ Tema crítico: ${criticos.tema.nombre} (${criticos.tema.porcentaje}%)`);
+      }
+      // Mapear porTema también para las alertas (el endpoint incluye ambos)
+      if (porTema && Object.keys(porTema).length > 0) {
+        const temaCritico = Object.entries(porTema).sort((a, b) => (a[1]?.porcentaje || 0) - (b[1]?.porcentaje || 0))[0];
+        if (temaCritico && (temaCritico[1]?.porcentaje || 0) < 60) {
+          alertas.push(`⚠️ Tema a reforzar: ${temaCritico[0]} (${temaCritico[1]?.porcentaje || 0}%)`);
+        }
       }
 
       const alertasHtml = alertas.length > 0 ? `
