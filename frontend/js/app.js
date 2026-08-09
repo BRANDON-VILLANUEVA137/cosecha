@@ -17,6 +17,7 @@ const App = {
   currentTaskExercises: [],
   completedTaskIds: [],
   completedExerciseIds: [],
+  allEjercicios: [], // Banco de ejercicios disponibles
 
   formatMathText(texto) {
     if (typeof texto !== 'string' || !texto) return '';
@@ -451,6 +452,102 @@ const App = {
     }
   },
 
+  async renderDetalleTarea() {
+    if (!this.currentTaskView) return '';
+    
+    const tarea = this.currentTaskView;
+    const ejerciciosEnTarea = this.currentTaskExercises || [];
+    const esMat = tarea.materia === 'matematicas';
+    
+    // Obtener ejercicios disponibles que no están en la tarea
+    const ejerciciosDisponibles = this.allEjercicios.filter(ej => 
+      !ejerciciosEnTarea.some(e => e.id === ej.id)
+    );
+
+    const ejerciciosHtml = ejerciciosEnTarea.map(ej => `
+      <div class="ex-item">
+        <div class="top">
+          <div>
+            <span class="tag ${esMat ? 'mat' : 'ing'}">${ej.tema}</span>
+            <div class="ex-enun">${this.formatMathText(ej.enunciado)}</div>
+          </div>
+          <button class="ghost" onclick="App.eliminarEjercicioDeTarea('${ej.id}')" style="color:var(--error-suave);">❌ Quitar</button>
+        </div>
+      </div>
+    `).join('') || '<p class="empty">No hay ejercicios en esta tarea.</p>';
+
+    const disponiblesHtml = ejerciciosDisponibles.map(ej => `
+      <div class="ex-item" style="border-style:dashed;">
+        <div class="top">
+          <div>
+            <span class="tag ${esMat ? 'mat' : 'ing'}">${ej.tema}</span>
+            <div class="ex-enun">${this.formatMathText(ej.enunciado)}</div>
+          </div>
+          <button class="primary" onclick="App.agregarEjercicioATarea('${ej.id}')">➕ Agregar</button>
+        </div>
+      </div>
+    `).join('') || '<p class="empty">Todos los ejercicios están en la tarea.</p>';
+
+    return `
+      <div class="card">
+        <div class="module-header">
+          <div class="badge" style="background:var(--acento);">📚</div>
+          <div>
+            <h2>${tarea.titulo}</h2>
+            <p>${tarea.descripcion || 'Sin descripción'}</p>
+          </div>
+        </div>
+        <div class="task-nav-row">
+          <button class="ghost" onclick="App.closeTaskView()">← Volver a tareas</button>
+          <button class="ghost" onclick="App.eliminarTarea('${tarea.id}')" style="color:var(--error-suave);">🗑️ Eliminar Tarea</button>
+        </div>
+        <div class="task-meta">${ejerciciosEnTarea.length} ejercicios en esta tarea</div>
+      </div>
+
+      <!-- Ejercicios en la tarea -->
+      <div class="card">
+        <h3>📋 Ejercicios de la tarea (${ejerciciosEnTarea.length})</h3>
+        <div style="margin-top:10px;">${ejerciciosHtml}</div>
+      </div>
+
+      <!-- Ejercicios disponibles para agregar -->
+      <div class="card">
+        <h3>➕ Agregar ejercicios desde el banco</h3>
+        <p style="color:var(--texto-suave); font-size:13px;">Ejercicios disponibles que puedes agregar a esta tarea:</p>
+        <div style="margin-top:10px;">${disponiblesHtml}</div>
+      </div>
+    `;
+  },
+
+  async agregarEjercicioATarea(ejercicioId) {
+    if (!this.currentTaskView) return;
+    
+    try {
+      await API.agregarEjercicioATarea(this.currentTaskView.id, ejercicioId);
+      this.toast('✅ Ejercicio agregado');
+      // Recargar la tarea
+      await this.verTareaDocente(this.currentTaskView.id);
+    } catch (e) {
+      this.toast('⚠️ ' + e.message);
+    }
+  },
+
+  async eliminarEjercicioDeTarea(ejercicioId) {
+    if (!this.currentTaskView) return;
+    
+    const confirmar = window.confirm('¿Quitar este ejercicio de la tarea?');
+    if (!confirmar) return;
+
+    try {
+      await API.eliminarEjercicioDeTarea(this.currentTaskView.id, ejercicioId);
+      this.toast('🗑️ Ejercicio removido');
+      // Recargar la tarea
+      await this.verTareaDocente(this.currentTaskView.id);
+    } catch (e) {
+      this.toast('⚠️ ' + e.message);
+    }
+  },
+
   /* ---------- Navegación ---------- */
   renderNav() {
     const tabsEstudiante = [
@@ -483,7 +580,10 @@ const App = {
     try {
       let html = '';
       if (this.currentRole === 'docente') {
-        if (this.currentModule === 'matematicas' || this.currentModule === 'ingles') {
+        // Si el docente está viendo una tarea en detalle, mostrar esa vista
+        if (this.currentTaskView && this.currentModule === 'matematicas' || this.currentTaskView && this.currentModule === 'ingles') {
+          html = await this.renderDetalleTarea();
+        } else if (this.currentModule === 'matematicas' || this.currentModule === 'ingles') {
           html = await this.renderDocenteMateria(this.currentModule);
         } else {
           html = await this.renderDocenteProgreso();
@@ -725,6 +825,8 @@ const App = {
       API.getEjercicios(materia),
       API.getTareas()
     ]);
+
+    this.allEjercicios = ejercicios; // Guardar para usar en la vista de detalle
 
     const tareasFiltradas = tareas.filter(t => t.materia === materia);
 
