@@ -658,48 +658,30 @@ const App = {
 
   /* ---------- MÓDULO POR MATERIA (estudiante) ---------- */
   async renderModuloEstudiante(materia) {
-    const [ejercicios, logro] = await Promise.all([
-      API.getEjercicios(materia),
+    const [tareas, logro] = await Promise.all([
+      API.getTareas(),
       API.getLogros()
     ]);
     const esMat = materia === 'matematicas';
     const aciertos = esMat ? logro.aciertosMatematicas : logro.aciertosIngles;
 
-    const tareasBase = Array.isArray(ejercicios) ? ejercicios : [];
-    const tareasAsignadas = tareasBase.length > 0 ? Object.values(
-      tareasBase.reduce((acc, e) => {
-        const metodologia = (e.metodologia || 'Estándar / Directo').trim();
-        const key = metodologia.toLowerCase();
-        if (!acc[key]) {
-          const estilo = metodologia.toLowerCase().includes('grafic')
-            ? { titulo: esMat ? 'Tarea de graficación' : 'Tarea visual', descripcion: esMat ? 'Explora el concepto con figuras y ejemplos visuales.' : 'Observa ejemplos visuales y completa el reto.' }
-            : metodologia.toLowerCase().includes('desafío') || metodologia.toLowerCase().includes('contrarreloj')
-              ? { titulo: esMat ? 'Desafío rápido' : 'Reto rápido', descripcion: esMat ? 'Resuelve con ritmo y precisión.' : 'Responde con rapidez y precisión.' }
-              : metodologia.toLowerCase().includes('paso')
-                ? { titulo: esMat ? 'Ruta paso a paso' : 'Paso a paso', descripcion: esMat ? 'Sigue cada paso con apoyo guiado.' : 'Completa cada paso con apoyo del tutor.' }
-                : { titulo: esMat ? 'Práctica guiada' : 'Práctica guiada', descripcion: esMat ? 'Refuerza el contenido con ejercicios claros.' : 'Consolida el tema con indicaciones sencillas.' };
-
-          acc[key] = {
-            id: `tarea-${key}`,
-            titulo: estilo.titulo,
-            descripcion: estilo.descripcion,
-            estado: 'Pendiente',
-            ejercicios: [],
-            metodologia
-          };
-        }
-
-        acc[key].ejercicios.push(e);
-        return acc;
-      }, {})
-    ) : [{
-      id: 'tarea-base',
-      titulo: esMat ? 'Tarea de inicio' : 'Tarea inicial',
-      descripcion: esMat ? 'Comienza con una práctica breve y clara.' : 'Inicia con una práctica breve y clara.',
-      estado: 'Pendiente',
-      ejercicios: [],
-      metodologia: 'Estándar / Directo'
-    }];
+    // Filtrar tareas por materia y que estén publicadas
+    const tareasFiltradas = Array.isArray(tareas) ? tareas.filter(t => t.materia === materia && t.estado === 'publicada') : [];
+    
+    // Obtener ejercicios de la materia para mostrarlos en las tareas
+    const ejercicios = await API.getEjercicios(materia);
+    const ejerciciosMap = new Map((Array.isArray(ejercicios) ? ejercicios : []).map(e => [e.id, e]));
+    
+    // Para cada tarea, cargar sus ejercicios completos
+    const tareasAsignadas = await Promise.all(
+      tareasFiltradas.map(async (tarea) => {
+        const tareaConEjercicios = await API.getTarea(tarea.id);
+        return {
+          ...tareaConEjercicios,
+          ejercicios: tareaConEjercicios.ejercicios || []
+        };
+      })
+    );
 
     if (this.currentTaskView) {
       const ejerciciosTask = this.currentTaskExercises || [];
