@@ -1,22 +1,35 @@
 /**
  * MOTOR DE RECOMPENSAS — desbloquea prendas por aciertos por materia.
  */
-const db = require('../db');
+const { db } = require('../config/firebase-admin');
 
-function evaluarRecompensas(materia) {
-  const logro = db.collection('logros').doc('estudiante_demo').get();
+async function evaluarRecompensas(uid, materia) {
+  const logroRef = db.collection('logros').doc(uid);
+  const logroSnap = await logroRef.get();
+
+  const defaultLogro = {
+    aciertosMatematicas: 0,
+    aciertosIngles: 0,
+    intentos: 0,
+    desbloqueadas: ['camiseta-basica', 'pantalon-basico', 'tenis-basico'],
+    equipo: { cabeza: null, torso: 'camiseta-basica', piernas: 'pantalon-basico', calzado: 'tenis-basico', accesorio: null },
+    historial: []
+  };
+
+  const logro = logroSnap.exists ? { ...defaultLogro, ...logroSnap.data() } : defaultLogro;
   const contador = materia === 'matematicas' ? logro.aciertosMatematicas : logro.aciertosIngles;
-  const catalogo = db.collection('prendas').where('origen', materia);
+  const catalogoSnap = await db.collection('prendas').where('origen', '==', materia).get();
   const nuevas = [];
 
-  catalogo.forEach(p => {
-    if (!logro.desbloqueadas.includes(p.id) && p.condicion && contador >= p.condicion.valor) {
-      logro.desbloqueadas.push(p.id);
-      nuevas.push(p);
+  for (const doc of catalogoSnap.docs) {
+    const prenda = { id: doc.id, ...doc.data() };
+    if (!logro.desbloqueadas.includes(prenda.id) && prenda.condicion && contador >= prenda.condicion.valor) {
+      logro.desbloqueadas.push(prenda.id);
+      nuevas.push(prenda);
     }
-  });
+  }
 
-  db.collection('logros').doc('estudiante_demo').set(logro);
+  await logroRef.set(logro);
   return nuevas;
 }
 

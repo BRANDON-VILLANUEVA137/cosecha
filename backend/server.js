@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { authMiddleware } = require('./middleware/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -13,9 +14,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 // Rutas de la API
-app.use('/api/ejercicios', require('./routes/ejercicios'));
-app.use('/api/logros', require('./routes/logros'));
-app.use('/api/prendas', require('./routes/prendas'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/ejercicios', authMiddleware, require('./routes/ejercicios'));
+app.use('/api/logros', authMiddleware, require('./routes/logros'));
+app.use('/api/prendas', authMiddleware, require('./routes/prendas'));
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: Date.now() }));

@@ -20,16 +20,35 @@
       </div>
     </div>
     <div class="controls" id="topControls" style="display:none;">
+      <div class="user-pill" id="userPill">
+        <span class="user-pill__label">Sin sesión</span>
+      </div>
       <select id="themeSelect">
         <option value="citrico">Tema Cítrico 🍊</option>
         <option value="pina">Tema Piña 🍍</option>
       </select>
       <span class="tag mat" id="roleTag"></span>
       <button class="ghost" id="switchRoleBtn">Cambiar de rol</button>
+      <button class="ghost" id="logoutBtn">Cerrar sesión</button>
     </div>
   </div>
 
-  <div id="roleSelectScreen" class="role-select">
+  <div id="loginScreen" class="login-screen" style="display:flex;">
+    <div class="card login-card">
+      <h2>Inicia sesión en Cosecha</h2>
+      <p>Usa tu correo y contraseña de Firebase Auth para entrar.</p>
+      <form id="loginForm">
+        <label for="loginEmail">Correo</label>
+        <input type="text" id="loginEmail" placeholder="estudiante@cosecha.com">
+        <label for="loginPassword">Contraseña</label>
+        <input type="password" id="loginPassword" placeholder="********">
+        <button class="primary" type="submit">Entrar</button>
+      </form>
+      <p id="loginError" class="login-error"></p>
+    </div>
+  </div>
+
+  <div id="roleSelectScreen" class="role-select" style="display:none;">
     <div class="role-card" onclick="App.enterRole('docente')">
       <span class="emoji">🧑‍🏫</span>
       <h3>Soy Docente</h3>
@@ -48,6 +67,18 @@
   <footer class="note">Prototipo de demostración · datos servidos por API REST (backend) simulando Firestore.</footer>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+  window.COSECHA_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDWdA2A4AQbc9MwrHy4qWqffOGjaVn86Tg",
+    authDomain: "tutorias-f46e5.firebaseapp.com",
+    projectId: "tutorias-f46e5",
+    storageBucket: "tutorias-f46e5.firebasestorage.app",
+    messagingSenderId: "490355920927",
+    appId: "1:490355920927:web:16e0f8a8ac07f38109c52a"
+  };
+</script>
 <script src="js/api.js"></script>
 <script src="js/personaje.js"></script>
 <script src="js/app.js"></script>

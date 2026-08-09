@@ -4,10 +4,43 @@
  */
 const API = {
   base: '/api',
+  authToken: null,
+
+  setAuthToken(token) {
+    this.authToken = token;
+  },
+
+  clearAuthToken() {
+    this.authToken = null;
+  },
+
+  async getAuthHeaders() {
+    if (typeof firebase === 'undefined' || !firebase.auth) {
+      return {};
+    }
+
+    if (this.authToken) {
+      return { Authorization: `Bearer ${this.authToken}` };
+    }
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      return {};
+    }
+
+    const token = await user.getIdToken();
+    this.authToken = token;
+    return { Authorization: `Bearer ${token}` };
+  },
 
   async request(path, options = {}) {
+    const authHeaders = await this.getAuthHeaders();
     const res = await fetch(this.base + path, {
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders,
+        ...(options.headers || {})
+      },
       ...options
     });
     if (!res.ok) {
@@ -15,6 +48,10 @@ const API = {
       throw new Error(err.error || 'Error en la petición');
     }
     return res.json();
+  },
+
+  async getSession() {
+    return this.request('/auth/me');
   },
 
   // ---- Ejercicios ----
@@ -27,6 +64,9 @@ const API = {
   },
   editarEjercicio(id, data) {
     return this.request('/ejercicios/' + id, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  eliminarEjercicio(id) {
+    return this.request('/ejercicios/' + id, { method: 'DELETE' });
   },
   validarRespuesta(id, respuesta) {
     return this.request('/ejercicios/' + id + '/validar', {

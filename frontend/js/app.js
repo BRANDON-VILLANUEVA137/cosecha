@@ -9,15 +9,190 @@ const App = {
   currentTheme: 'citrico',
   intentosPorEjercicio: {},
   cachePrendas: [],
+  authUser: null,
+  authReady: false,
+
+  formatMathText(texto) {
+    if (typeof texto !== 'string' || !texto) return '';
+    return texto.replace(/(\d+)\s*\/\s*(\d+)/g, (match, num, den) => {
+      return `<span class="fraccion" aria-label="${num}/${den}"><span class="num">${num}</span><span class="den">${den}</span></span>`;
+    });
+  },
 
   /* ---------- Inicialización ---------- */
   init() {
-    document.getElementById('switchRoleBtn').onclick = () => this.switchRole();
-    document.getElementById('themeSelect').onchange = (e) => this.setTheme(e.target.value);
-    this.cargarPrendas();
+    const switchRoleBtn = document.getElementById('switchRoleBtn');
+    if (switchRoleBtn) {
+      switchRoleBtn.onclick = () => this.switchRole();
+    }
+
+    const themeSelect = document.getElementById('themeSelect');
+    if (themeSelect) {
+      themeSelect.onchange = (e) => this.setTheme(e.target.value);
+    }
+
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+      loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+    }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.onclick = () => this.handleLogout();
+    }
+
+    const config = window.COSECHA_FIREBASE_CONFIG || window.firebaseConfig || null;
+    const hasValidConfig = config && config.apiKey && config.projectId && config.appId
+      && !String(config.apiKey).includes('...')
+      && !String(config.projectId).includes('...')
+      && !String(config.appId).includes('...')
+      && !String(config.apiKey).includes('TU_')
+      && !String(config.projectId).includes('TU_')
+      && !String(config.appId).includes('TU_');
+
+    if (!hasValidConfig) {
+      this.showLoginScreen('Configura tus claves reales de Firebase en window.COSECHA_FIREBASE_CONFIG para usar Auth.');
+      return;
+    }
+
+    try {
+      if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length === 0) {
+        firebase.initializeApp(config);
+      }
+
+      if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().onAuthStateChanged((user) => this.onAuthStateChanged(user));
+      } else {
+        this.showLoginScreen('Firebase Auth no está disponible');
+      }
+    } catch (error) {
+      this.showLoginScreen(error.message || 'No se pudo inicializar Firebase');
+    }
+  },
+
+  async onAuthStateChanged(user) {
+    this.authUser = user;
+    this.authReady = true;
+
+    if (!user) {
+      API.clearAuthToken();
+      this.currentRole = null;
+      this.showLoginScreen();
+      return;
+    }
+
+    try {
+      const token = await user.getIdToken();
+      API.setAuthToken(token);
+      const session = await API.getSession();
+      this.currentRole = session.rol || 'estudiante';
+      this.updateUserPill();
+      this.hideLoginScreen();
+      this.render();
+    } catch (error) {
+      console.error(error);
+      API.clearAuthToken();
+      this.showLoginScreen(error.message || 'No se pudo iniciar sesión');
+    }
+  },
+
+  async handleLogin(event) {
+    event.preventDefault();
+    const emailInput = document.getElementById('loginEmail');
+    const passwordInput = document.getElementById('loginPassword');
+    const errorBox = document.getElementById('loginError');
+
+    if (!emailInput || !passwordInput || !errorBox) {
+      return;
+    }
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!email || !password) {
+      errorBox.textContent = 'Ingresa correo y contraseña.';
+      return;
+    }
+
+    if (typeof firebase === 'undefined' || !firebase.auth || !firebase.apps.length) {
+      errorBox.textContent = 'Firebase no está inicializado con tus claves reales.';
+      return;
+    }
+
+    try {
+      errorBox.textContent = '';
+      const credential = await firebase.auth().signInWithEmailAndPassword(email, password);
+      await credential.user.getIdToken();
+    } catch (error) {
+      errorBox.textContent = error.message || 'No se pudo iniciar sesión';
+    }
+  },
+
+  async handleLogout() {
+    try {
+      await firebase.auth().signOut();
+      API.clearAuthToken();
+      this.currentRole = null;
+      this.showLoginScreen();
+    } catch (error) {
+      this.toast('⚠️ ' + error.message);
+    }
+  },
+
+  updateUserPill() {
+    const userPill = document.getElementById('userPill');
+    if (!userPill) return;
+
+    if (!this.authUser) {
+      userPill.innerHTML = '<span class="user-pill__label">Sin sesión</span>';
+      return;
+    }
+
+    const email = this.authUser.email || 'Usuario';
+    const rol = this.currentRole || 'sin rol';
+    userPill.innerHTML = `<span class="user-pill__label">${email}</span><span class="tag ${rol === 'docente' ? 'mat' : 'ing'}">${rol}</span>`;
+  },
+
+  showLoginScreen(message = '') {
+    const errorBox = document.getElementById('loginError');
+    if (errorBox) {
+      errorBox.textContent = message;
+    }
+
+    this.updateUserPill();
+
+    const roleSelect = document.getElementById('roleSelectScreen');
+    const topControls = document.getElementById('topControls');
+    const navBar = document.getElementById('navBar');
+    const appScreen = document.getElementById('appScreen');
+    const loginScreen = document.getElementById('loginScreen');
+
+    if (roleSelect) roleSelect.style.display = 'none';
+    if (topControls) topControls.style.display = 'none';
+    if (navBar) navBar.style.display = 'none';
+    if (appScreen) appScreen.style.display = 'none';
+    if (loginScreen) loginScreen.style.display = 'flex';
+  },
+
+  hideLoginScreen() {
+    const loginScreen = document.getElementById('loginScreen');
+    const topControls = document.getElementById('topControls');
+    const navBar = document.getElementById('navBar');
+    const appScreen = document.getElementById('appScreen');
+
+    if (loginScreen) loginScreen.style.display = 'none';
+    if (topControls) topControls.style.display = 'flex';
+    if (navBar) navBar.style.display = 'flex';
+    if (appScreen) appScreen.style.display = 'block';
+    this.updateUserPill();
+    this.renderNav();
   },
 
   async cargarPrendas() {
+    if (!this.authReady || !this.authUser) {
+      return;
+    }
+
     try {
       this.cachePrendas = await API.getPrendas();
     } catch (e) {
@@ -36,24 +211,47 @@ const App = {
 
   /* ---------- Roles ---------- */
   enterRole(role) {
-    this.currentRole = role;
-    this.currentModule = role === 'docente' ? 'matematicas' : 'inicio';
-    document.getElementById('roleSelectScreen').style.display = 'none';
-    document.getElementById('topControls').style.display = 'flex';
-    document.getElementById('navBar').style.display = 'flex';
-    document.getElementById('appScreen').style.display = 'block';
-    document.getElementById('roleTag').className = 'tag ' + (role === 'docente' ? 'mat' : 'ing');
-    document.getElementById('roleTag').textContent = role === 'docente' ? '🧑‍🏫 Docente' : '🧒 Estudiante';
+    if (!this.authUser) {
+      this.showLoginScreen('Inicia sesión para entrar a la plataforma.');
+      return;
+    }
+
+    const allowedRole = this.currentRole || role;
+    this.currentRole = allowedRole;
+    this.currentModule = allowedRole === 'docente' ? 'matematicas' : 'inicio';
+
+    const roleSelect = document.getElementById('roleSelectScreen');
+    const topControls = document.getElementById('topControls');
+    const navBar = document.getElementById('navBar');
+    const appScreen = document.getElementById('appScreen');
+    const roleTag = document.getElementById('roleTag');
+
+    if (roleSelect) roleSelect.style.display = 'none';
+    if (topControls) topControls.style.display = 'flex';
+    if (navBar) navBar.style.display = 'flex';
+    if (appScreen) appScreen.style.display = 'block';
+    if (roleTag) {
+      roleTag.className = 'tag ' + (allowedRole === 'docente' ? 'mat' : 'ing');
+      roleTag.textContent = allowedRole === 'docente' ? '🧑‍🏫 Docente' : '🧒 Estudiante';
+    }
+
+    this.updateUserPill();
     this.renderNav();
     this.render();
   },
 
   switchRole() {
-    this.currentRole = null;
-    document.getElementById('roleSelectScreen').style.display = 'flex';
-    document.getElementById('topControls').style.display = 'none';
-    document.getElementById('navBar').style.display = 'none';
-    document.getElementById('appScreen').style.display = 'none';
+    if (!this.authUser) {
+      this.showLoginScreen('Inicia sesión para usar la plataforma.');
+      return;
+    }
+
+    if (this.currentRole === 'docente') {
+      this.toast('Tu cuenta está configurada como docente.');
+      return;
+    }
+
+    this.toast('Tu cuenta está configurada como estudiante.');
   },
 
   /* ---------- Utilidades ---------- */
@@ -93,6 +291,10 @@ const App = {
 
   /* ---------- Render principal ---------- */
   async render() {
+    if (!this.authReady || !this.authUser) {
+      return;
+    }
+
     const screen = document.getElementById('appScreen');
     screen.innerHTML = '<p class="empty">Cargando…</p>';
 
@@ -161,7 +363,7 @@ const App = {
       return `
       <div class="task-card">
         <span class="tag ${esMat ? 'mat' : 'ing'}">${e.tema}</span>
-        <div class="enun">${e.enunciado}</div>
+        <div class="enun">${this.formatMathText(e.enunciado)}</div>
         <div class="answer-row">
           <input type="text" placeholder="Tu respuesta" id="resp_${e.id}">
           <button class="primary" data-check="${e.id}" data-materia="${materia}">Comprobar</button>
@@ -238,13 +440,15 @@ const App = {
         <div class="top">
           <div>
             <span class="tag ${esMat ? 'mat' : 'ing'}">${e.tema}</span>
-            <div class="ex-enun">${e.enunciado}</div>
+            <div class="ex-enun">${this.formatMathText(e.enunciado)}</div>
           </div>
+          <button class="ghost" data-delete-ex="${e.id}" style="color:var(--error-suave); border-color:rgba(255,107,107,.35);">🗑️ Eliminar</button>
         </div>
         <label>Respuesta correcta (oculta para la estudiante)</label>
         <input type="text" value="${e.respuestaCorrecta}" data-ex="${e.id}" class="ans-edit">
         <label>Pista si falla</label>
         <input type="text" value="${e.pistaError}" data-ex="${e.id}" class="hint-edit">
+        <div class="hint-preview"><strong>Pista:</strong> ${this.formatMathText(e.pistaError || 'Sin pista')}</div>
       </div>`).join('') || '<p class="empty">Sin ejercicios todavía.</p>';
 
     return `
@@ -304,8 +508,8 @@ const App = {
             <div class="top">
               <div>
                 <span class="tag ${h.materia === 'matematicas' ? 'mat' : 'ing'}">${h.materia === 'matematicas' ? 'Matemáticas' : 'Inglés'}</span>
-                <div style="font-weight:700; margin-top:4px;">${h.enunciado}</div>
-                <div style="font-size:13px; color:var(--texto-suave);">Respondió: <b>${h.respuesta}</b> → Correcta: <b>${h.respuestaCorrecta}</b></div>
+                <div style="font-weight:700; margin-top:4px;">${this.formatMathText(h.enunciado)}</div>
+                <div style="font-size:13px; color:var(--texto-suave);">Respondió: <b>${this.formatMathText(h.respuesta)}</b> → Correcta: <b>${this.formatMathText(h.respuestaCorrecta)}</b></div>
               </div>
               <span class="tag" style="background:${h.correcto ? 'var(--secundario)' : 'var(--error-suave)'}">${h.correcto ? 'Correcto' : 'Incorrecto'}</span>
             </div>
@@ -339,6 +543,22 @@ const App = {
       document.querySelectorAll('.hint-edit').forEach(inp => inp.onchange = async (e) => {
         await API.editarEjercicio(e.target.dataset.ex, { pistaError: e.target.value });
       });
+
+      document.querySelectorAll('[data-delete-ex]').forEach(btn => {
+        btn.onclick = async () => {
+          const id = btn.dataset.deleteEx;
+          const confirmar = window.confirm('¿Seguro que quieres eliminar este ejercicio?');
+          if (!confirmar) return;
+
+          try {
+            await API.eliminarEjercicio(id);
+            this.toast('🗑️ Ejercicio eliminado');
+            this.render();
+          } catch (e) {
+            this.toast('⚠️ ' + e.message);
+          }
+        };
+      });
     } else {
       document.querySelectorAll('[data-check]').forEach(btn => {
         btn.onclick = async () => {
@@ -353,7 +573,7 @@ const App = {
 
           try {
             const resultado = await API.validarRespuesta(id, respuesta);
-            fb.innerHTML = `<div class="feedback ${resultado.correcto ? 'ok' : 'bad'}">${resultado.correcto ? '🎉 ' : '🔍 '}${resultado.mensaje}</div>`;
+            fb.innerHTML = `<div class="feedback ${resultado.correcto ? 'ok' : 'bad'}">${resultado.correcto ? '🎉 ' : '🔍 '}${this.formatMathText(resultado.mensaje)}</div>`;
 
             if (resultado.correcto) {
               resultado.nuevasPrendas.forEach(p => {
