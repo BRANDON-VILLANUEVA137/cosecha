@@ -1570,12 +1570,26 @@ const App = {
           const respuesta = input.value.trim();
           if (!respuesta) return;
 
+          // Deshabilitar botón mientras valida (evita doble envío)
+          btn.disabled = true;
+          btn.textContent = 'Validando…';
+
           this.intentosPorEjercicio[id] = (this.intentosPorEjercicio[id] || 0) + 1;
           this.saveProgressState();
           const fb = document.getElementById('fb_' + id);
+          const card = btn.closest('.task-card');
 
           try {
             const resultado = await API.validarRespuesta(id, respuesta, this.currentTaskView?.id || null);
+
+            // Actualizar SOLO esta tarjeta (manipulación local del DOM, sin re-render global)
+            if (card) {
+              // Actualizar contador de intentos en el footer de la tarjeta
+              const attemptsEl = card.querySelector('.attempts');
+              if (attemptsEl) attemptsEl.textContent = `Intentos: ${this.intentosPorEjercicio[id]}`;
+            }
+
+            // Mostrar feedback en la tarjeta
             fb.innerHTML = `<div class="feedback ${resultado.correcto ? 'ok' : 'bad'}">${resultado.correcto ? '🎉 ' : '🔍 '}${this.formatMathText(resultado.mensaje)}</div>`;
 
             if (resultado.correcto || resultado.yaCompletado) {
@@ -1588,10 +1602,24 @@ const App = {
                 this.toast(`🎁 ¡Nueva prenda! ${Personaje.ICONS_CATEGORIA[p.categoria][p.shape]} ${p.nombre}`);
               });
               await this.cargarPrendas();
-              setTimeout(() => this.render(), 700);
+
+              // Ocultar input y botón "Comprobar" solo si fue correcto
+              if (card) {
+                const answerRow = card.querySelector('.answer-row');
+                if (answerRow) answerRow.style.display = 'none';
+                // Asegurar badge verde de éxito
+                fb.innerHTML = `<div class="feedback ok">✅ Resuelto correctamente</div>`;
+              }
+            } else {
+              // Si fue incorrecto, re-habilitar botón para reintentar
+              btn.disabled = false;
+              btn.textContent = 'Comprobar';
             }
           } catch (e) {
             fb.innerHTML = `<div class="feedback bad">⚠️ ${e.message}</div>`;
+            // Re-habilitar botón si falló la petición
+            btn.disabled = false;
+            btn.textContent = 'Comprobar';
           }
         };
       });
