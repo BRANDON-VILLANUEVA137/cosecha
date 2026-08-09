@@ -1,15 +1,62 @@
-# Configuración de Netlify para el proyecto "cosecha"
-# Publica el frontend desde la carpeta "frontend"
+# ============================================
+# Configuración de Netlify para "cosecha"
+# ============================================
+# Frontend estático publicado desde "frontend"
+# Backend Express desplegado en Render: https://cosecha.onrender.com
 
 [build]
-  # Directorio donde se encuentra el index.html
   publish = "frontend"
-  # Comando de build (vacío porque es un sitio estático sin framework)
   command = ""
 
-# Redirección: todas las rutas apuntan al index.html
-# Esto es útil si el frontend usa rutas del lado del cliente
+# ============================================
+# REDIRECTS
+# ============================================
+
+# --- Rutas del backend /api/* → Render ---
+# Todas las llamadas a /api/* se redirigen al backend de Render
+[[redirects]]
+  from = "/api/auth/*"
+  to = "https://cosecha.onrender.com/api/auth/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/ejercicios/*"
+  to = "https://cosecha.onrender.com/api/ejercicios/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/logros/*"
+  to = "https://cosecha.onrender.com/api/logros/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/prendas/*"
+  to = "https://cosecha.onrender.com/api/prendas/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/health"
+  to = "https://cosecha.onrender.com/api/health"
+  status = 200
+  force = true
+
+# --- SPA Fallback ---
+# Cualquier ruta del frontend (que no empiece por /api) apunta a index.html
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# ============================================
+# HEADERS DE SEGURIDAD
+# ============================================
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

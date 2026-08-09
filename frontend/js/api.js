@@ -3,7 +3,12 @@
  * Todas las llamadas son asíncronas y devuelven Promesas.
  */
 const API = {
-  base: '/api',
+  // En producción apunta directamente al backend de Render
+  // En desarrollo usa el proxy local (/api)
+  base: (() => {
+    const isProd = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    return isProd ? 'https://cosecha.onrender.com/api' : '/api';
+  })(),
   authToken: null,
 
   setAuthToken(token) {
