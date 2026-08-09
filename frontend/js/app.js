@@ -18,6 +18,7 @@ const App = {
   completedTaskIds: [],
   completedExerciseIds: [],
   allEjercicios: [], // Banco de ejercicios disponibles
+  currentDocenteTab: 'tareas', // 'tareas' | 'banco' | 'crear'
 
   formatMathText(texto) {
     if (typeof texto !== 'string' || !texto) return '';
@@ -673,6 +674,11 @@ const App = {
     }
   },
 
+  cambiarTabDocente(tab) {
+    this.currentDocenteTab = tab;
+    this.render();
+  },
+
   /* ---------- Navegación ---------- */
   renderNav() {
     const tabsEstudiante = [
@@ -954,25 +960,6 @@ const App = {
       })
     );
 
-    // Sección de Tareas
-    const tareasHtml = tareasConEjercicios.map(t => `
-      <div class="task-card task-module-card">
-        <div class="task-module-head">
-          <div>
-            <span class="tag ${esMat ? 'mat' : 'ing'}">Tarea</span>
-            <h3>${t.titulo}</h3>
-          </div>
-          <span class="task-status" style="background:${t.estado === 'publicada' ? 'var(--secundario)' : 'var(--texto-suave)'}; color:white;">${t.estado === 'publicada' ? 'Publicada' : 'Borrador'}</span>
-        </div>
-        <p>${t.descripcion || 'Sin descripción'}</p>
-        <div class="task-meta">${t.ejercicios?.length || 0} ejercicios</div>
-        <div class="task-actions">
-          <button class="ghost" onclick="App.verTareaDocente('${t.id}')">📋 Ver/Editar</button>
-          <button class="ghost" onclick="App.eliminarTarea('${t.id}')" style="color:var(--error-suave);">🗑️ Eliminar</button>
-        </div>
-      </div>
-    `).join('') || '<p class="empty">No hay tareas creadas.</p>';
-
     // Lista de ejercicios
     const lista = ejercicios.map(e => `
       <div class="ex-item">
@@ -991,34 +978,54 @@ const App = {
         <div class="hint-preview"><strong>Pista:</strong> ${this.formatMathText(e.pistaError || 'Sin pista')}</div>
       </div>`).join('') || '<p class="empty">Sin ejercicios todavía.</p>';
 
-    return `
-      <!-- SECCIÓN DE TAREAS -->
-      <div class="card">
-        <div class="module-header">
-          <div class="badge" style="background:var(--acento);">📚</div>
-          <div><h2>Mis Tareas</h2><p>Crea y gestiona tareas para tus estudiantes</p></div>
+    // Determinar qué pestaña mostrar
+    const tabActiva = this.currentDocenteTab || 'tareas';
+    
+    let contenidoTab = '';
+    if (tabActiva === 'tareas') {
+      // Sección de Tareas
+      const tareasHtml = tareasConEjercicios.map(t => `
+        <div class="task-card task-module-card">
+          <div class="task-module-head">
+            <div>
+              <span class="tag ${esMat ? 'mat' : 'ing'}">Tarea</span>
+              <h3>${t.titulo}</h3>
+            </div>
+            <span class="task-status" style="background:${t.estado === 'publicada' ? 'var(--secundario)' : 'var(--texto-suave)'}; color:white;">${t.estado === 'publicada' ? 'Publicada' : 'Borrador'}</span>
+          </div>
+          <p>${t.descripcion || 'Sin descripción'}</p>
+          <div class="task-meta">${t.ejercicios?.length || 0} ejercicios</div>
+          <div class="task-actions">
+            <button class="ghost" onclick="App.verTareaDocente('${t.id}')">📋 Ver/Editar</button>
+            <button class="ghost" onclick="App.eliminarTarea('${t.id}')" style="color:var(--error-suave);">🗑️ Eliminar</button>
+          </div>
         </div>
-        <button class="primary" onclick="App.mostrarFormTarea('${materia}')">➕ Nueva Tarea</button>
-        <div id="formTarea" style="display:none; margin-top:14px;">
-          <div class="card" style="background:var(--fondo-2);">
-            <h3>Nueva Tarea</h3>
-            <label>Título</label>
-            <input type="text" id="tareaTitulo" placeholder="Ej: Práctica de fracciones">
-            <label>Descripción</label>
-            <input type="text" id="tareaDescripcion" placeholder="Ej: Ejercicios de suma de fracciones">
-            <label>Materia</label>
-            <input type="text" value="${esMat ? 'Matemáticas' : 'Inglés'}" disabled>
-            <div style="margin-top:10px;">
-              <button class="primary" onclick="App.crearTarea('${materia}')">Guardar Tarea</button>
-              <button class="ghost" onclick="App.ocultarFormTarea()">Cancelar</button>
+      `).join('') || '<p class="empty">No hay tareas creadas.</p>';
+
+      contenidoTab = `
+        <div style="margin-bottom:14px;">
+          <button class="primary" onclick="App.mostrarFormTarea('${materia}')">➕ Nueva Tarea</button>
+          <div id="formTarea" style="display:none; margin-top:14px;">
+            <div class="card" style="background:var(--fondo-2);">
+              <h3>Nueva Tarea</h3>
+              <label>Título</label>
+              <input type="text" id="tareaTitulo" placeholder="Ej: Práctica de fracciones">
+              <label>Descripción</label>
+              <input type="text" id="tareaDescripcion" placeholder="Ej: Ejercicios de suma de fracciones">
+              <label>Materia</label>
+              <input type="text" value="${esMat ? 'Matemáticas' : 'Inglés'}" disabled>
+              <div style="margin-top:10px;">
+                <button class="primary" onclick="App.crearTarea('${materia}')">Guardar Tarea</button>
+                <button class="ghost" onclick="App.ocultarFormTarea()">Cancelar</button>
+              </div>
             </div>
           </div>
         </div>
-        <div style="margin-top:14px;">${tareasHtml}</div>
-      </div>
-
-      <!-- SECCIÓN DE EJERCICIOS -->
-      <div class="card">
+        <div>${tareasHtml}</div>
+      `;
+    } else if (tabActiva === 'banco') {
+      // Sección de Banco de Ejercicios
+      contenidoTab = `
         <div class="module-header">
           <div class="badge ${esMat ? 'mat' : 'ing'}">${esMat ? '🍊' : '🌴'}</div>
           <div><h2>${esMat ? 'Matemáticas' : 'Inglés'}</h2><p>Banco de ejercicios de este módulo</p></div>
@@ -1031,11 +1038,11 @@ const App = {
           <option value="gramatica">Opción Múltiple / Gramática</option>
         </select>
         <div class="hint-preview" id="dynamicModeHint">${this.getDynamicModeHint(this.currentDynamicMode)}</div>
-        ${lista}
-      </div>
-
-      <!-- FORMULARIO NUEVO EJERCICIO -->
-      <div class="card">
+        <div style="margin-top:14px;">${lista}</div>
+      `;
+    } else if (tabActiva === 'crear') {
+      // Formulario de crear ejercicio
+      contenidoTab = `
         <h2>➕ Nuevo ejercicio de ${esMat ? 'Matemáticas' : 'Inglés'}</h2>
         <div class="grid2">
           <div>
@@ -1061,6 +1068,28 @@ const App = {
           </div>
         </div>
         <div style="margin-top:14px;"><button class="primary" id="addExBtn" data-materia="${materia}">Guardar ejercicio</button></div>
+      `;
+    }
+
+    return `
+      <!-- PESTAÑAS DE NAVEGACIÓN -->
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="${tabActiva === 'tareas' ? 'primary' : 'ghost'}" onclick="App.cambiarTabDocente('tareas')">
+            📋 Mis Tareas
+          </button>
+          <button class="${tabActiva === 'banco' ? 'primary' : 'ghost'}" onclick="App.cambiarTabDocente('banco')">
+            📦 Banco de Ejercicios
+          </button>
+          <button class="${tabActiva === 'crear' ? 'primary' : 'ghost'}" onclick="App.cambiarTabDocente('crear')">
+            ➕ Crear Ejercicio
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTENIDO DE LA PESTAña ACTIVA -->
+      <div class="card">
+        ${contenidoTab}
       </div>
     `;
   },
