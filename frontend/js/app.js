@@ -750,7 +750,7 @@ const App = {
         </div>
         <p>${task.descripcion}</p>
         <div class="task-meta">${task.ejercicios.length} ejercicios · ${task.metodologia}${task.ejercicios[0]?.tema ? ` · ${task.ejercicios[0].tema}` : ''}</div>
-        <button class="${completed ? 'ghost' : 'primary'}" onclick="App.startTask(${JSON.stringify(task).replace(/"/g, '"')})">${buttonLabel}</button>
+        <button class="${completed ? 'ghost' : 'primary'}" onclick="App.startTask('${task.id}')">${buttonLabel}</button>
       </div>`;
     }).join('');
 
