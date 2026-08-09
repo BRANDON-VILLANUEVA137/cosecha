@@ -51,20 +51,15 @@
   force = true
 
 [[redirects]]
-  from = "/api/health"
-  to = "https://cosecha.onrender.com/api/health"
+  from = "/api/estudiantes/*"
+  to = "https://cosecha.onrender.com/api/estudiantes/:splat"
   status = 200
   force = true
 
-# --- SPA Fallback ---
-# Cualquier ruta del frontend (que no empiece por /api) apunta a index.html
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
 
-# ============================================
-# HEADERS DE SEGURIDAD
+[[redirects]]
+  from = "/api/health"
+  to = "https://cosecha.onrender.com/api/health
 # ============================================
 [[headers]]
   for = "/*"
