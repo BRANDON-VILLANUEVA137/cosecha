@@ -94,5 +94,108 @@ const Personaje = {
     }
     svg += `</svg>`;
     return svg;
+  },
+
+  /* ================= Cosecha 2.0 ================= */
+
+  // ---------- Rangos / Tier de marco ----------
+  RANGOS: [
+    { nombre: 'madera', nivel: 1, icono: '🪵', color: '#8B5A2B' },
+    { nombre: 'bronce', nivel: 3, icono: '🟤', color: '#CD7F32' },
+    { nombre: 'plata', nivel: 5, icono: '🏅', color: '#C0C0C0' },
+    { nombre: 'oro', nivel: 8, icono: '🟡', color: '#FFD700' },
+    { nombre: 'cristal', nivel: 12, icono: '🔮', color: '#87CEEB' },
+    { nombre: 'citrico-legendario', nivel: 18, icono: '🍊✨', color: '#FF8C33' }
+  ],
+
+  rangoDeNivel(nivel) {
+    let rango = this.RANGOS[0];
+    for (const r of this.RANGOS) if (nivel >= r.nivel) rango = r;
+    return rango;
+  },
+
+  // ---------- DiceBear (personaje principal) ----------
+  generarUrlDiceBear(equipo, prendas, extra = {}) {
+    const seed = (extra.seed || 'cosecha').toString().replace(/[^a-zA-Z0-9_-]+/g, '');
+    const params = new URLSearchParams({ seed });
+    const dias = (extra.racha && extra.racha.dias) || 0;
+    if (dias >= 7) params.set('facialExpression', 'smile');
+    else if (dias >= 3) params.set('facialExpression', 'serious');
+    const orden = ['torso', 'cabeza', 'accesorio'];
+    orden.forEach(cat => {
+      const id = equipo && equipo[cat];
+      if (!id) return;
+      const prenda = (prendas || []).find(p => p.id === id);
+      if (prenda && prenda.dicebearOptions) {
+        Object.entries(prenda.dicebearOptions).forEach(([k, v]) => {
+          if (v !== undefined && v !== null && v !== '') params.set(k, v);
+        });
+      }
+    });
+    return `https://api.dicebear.com/7.x/adventurer/svg?${params.toString()}`;
+  },
+
+  // ---------- OpenPeeps (foto de perfil, inline) ----------
+  OPENPEEPS_VARIANTES: {
+    p1: { skin: '#FFD9A8', hair: '#6B4226', camisa: '#FF8C33', pelo: 'corto', glasses: false },
+    p2: { skin: '#E8B88D', hair: '#3A2A1E', camisa: '#2FA88A', pelo: 'largo', glasses: false },
+    p3: { skin: '#FFD9A8', hair: '#D4AF37', camisa: '#4A6FA5', pelo: 'rizado', glasses: true },
+    p4: { skin: '#F8C89D', hair: '#5D4037', camisa: '#FFC93C', pelo: 'corto', glasses: false },
+    p5: { skin: '#FFD9A8', hair: '#1E3A40', camisa: '#E8631B', pelo: 'largo', glasses: false },
+    p6: { skin: '#E8B88D', hair: '#8B5A2B', camisa: '#6B6B8A', pelo: 'rizado', glasses: true }
+  },
+
+  renderOpenPeeps(variante, size = 120) {
+    const s = this.OPENPEEPS_VARIANTES[variante] || this.OPENPEEPS_VARIANTES.p1;
+    const largo = s.pelo === 'largo';
+    const rizado = s.pelo === 'rizado';
+    let svg = `<svg viewBox="0 0 120 150" width="${size}" height="${(size * 150) / 120}" xmlns="http://www.w3.org/2000/svg">`;
+    if (largo) svg += `<path d="M26 52 Q18 90 40 104 L40 60 Q60 40 80 60 L80 104 Q102 90 94 52 Q60 30 26 52Z" fill="${s.hair}"/>`;
+    else if (rizado) svg += `<path d="M24 50 Q20 30 40 26 Q60 22 80 26 Q100 30 96 50 Q100 40 80 42 Q60 44 40 42 Q20 40 24 50Z" fill="${s.hair}"/>`;
+    else svg += `<path d="M26 52 Q30 26 60 24 Q90 26 94 52 Q80 34 60 34 Q40 34 26 52Z" fill="${s.hair}"/>`;
+    svg += `<rect x="34" y="96" width="52" height="44" rx="16" fill="${s.camisa}"/>`;
+    svg += `<rect x="22" y="104" width="12" height="24" rx="6" fill="${s.camisa}"/>`;
+    svg += `<rect x="86" y="104" width="12" height="24" rx="6" fill="${s.camisa}"/>`;
+    svg += `<circle cx="60" cy="62" r="34" fill="${s.skin}"/>`;
+    svg += `<circle cx="26" cy="62" r="6" fill="${s.skin}"/><circle cx="94" cy="62" r="6" fill="${s.skin}"/>`;
+    svg += `<circle cx="48" cy="60" r="3" fill="#3A2A1E"/><circle cx="72" cy="60" r="3" fill="#3A2A1E"/>`;
+    svg += `<path d="M50 74 Q60 82 70 74" stroke="#B5651D" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+    if (s.glasses) {
+      svg += `<circle cx="48" cy="60" r="8" fill="none" stroke="#1E3A40" stroke-width="2"/><circle cx="72" cy="60" r="8" fill="none" stroke="#1E3A40" stroke-width="2"/><line x1="56" y1="60" x2="64" y2="60" stroke="#1E3A40" stroke-width="2"/>`;
+    }
+    svg += `</svg>`;
+    return svg;
+  },
+
+  // ---------- Tabs del armario (combina categorías) ----------
+  TABS_ARMARIO: [
+    { id: 'perfil', ico: '👤', label: 'Avatar Base' },
+    { id: 'marco', ico: '🖼️', label: 'Marcos de Perfil' },
+    { id: 'cabeza', ico: '🧢', label: 'Cabeza / Acceso' },
+    { id: 'torso', ico: '👕', label: 'Torso / Ropa' },
+    { id: 'fondo', ico: '🌅', label: 'Fondos de Tarjeta' }
+  ],
+  CATEGORIAS_POR_TAB: {
+    perfil: ['perfil'],
+    marco: ['marco'],
+    cabeza: ['cabeza', 'accesorio'],
+    torso: ['torso'],
+    fondo: ['fondo']
+  },
+
+  // ---------- Vista previa de la prenda en el grid ----------
+  preview(prendas, prenda) {
+    switch (prenda.tipo) {
+      case 'dicebear':
+        return `<img class="swatch-img" src="${this.generarUrlDiceBear({ [prenda.categoria]: prenda.id }, prendas)}" alt="${prenda.nombre}" loading="lazy" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=cosecha&clothing=shirt'">`;
+      case 'openpeeps':
+        return `<div class="swatch-inline">${this.renderOpenPeeps(prenda.variante, 60)}</div>`;
+      case 'frame':
+        return `<div class="swatch-frame" style="--fc:${prenda.color}"><span>▣</span></div>`;
+      case 'fondo':
+        return `<div class="swatch-fondo" style="background:${prenda.gradiente}"></div>`;
+      default:
+        return `<div class="swatch-inline" style="background:${prenda.color}"><span>?</span></div>`;
+    }
   }
 };

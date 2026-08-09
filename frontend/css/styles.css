@@ -157,3 +157,126 @@ textarea{min-height:60px; resize:vertical;}
 .toast{position:fixed; top:16px; right:16px; background:var(--secundario); color:#fff; padding:12px 18px; border-radius:14px; font-weight:800; box-shadow:var(--sombra); z-index:99; animation:pop .25s ease;}
 @keyframes pop{from{transform:scale(.85); opacity:0;} to{transform:scale(1); opacity:1;}}
 footer.note{text-align:center; color:var(--texto-suave); font-size:12px; margin-top:30px;}
+
+/* ==================================================================
+   COSECHA 2.0 — Gamificación UI
+   ================================================================== */
+
+/* ---------- Hero (Inicio) ---------- */
+.hero-gamifica{display:flex; gap:24px; align-items:center; flex-wrap:wrap;}
+.profile-avatar{position:relative; flex-shrink:0;}
+
+/* ---------- Marco / avatar DiceBear (tier de nivel) ---------- */
+.avatar-frame{
+  width:170px; height:170px; border-radius:26px; overflow:hidden; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(180deg,#FFF7E6,#FFE9C4); border:6px solid var(--borde);
+}
+.avatar-dicebear{width:100%; height:100%; display:block;}
+.avatar-frame__badge{
+  position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+  background:rgba(255,255,255,.94); border-radius:999px; padding:3px 12px;
+  font-size:11px; font-weight:800; color:var(--texto); white-space:nowrap;
+  box-shadow:0 2px 8px rgba(31,58,61,.18);
+}
+.avatar-frame--madera{border-color:#8B5A2B; box-shadow:0 10px 22px rgba(139,90,43,.28);}
+.avatar-frame--bronce{border-color:#CD7F32; box-shadow:0 10px 24px rgba(205,127,50,.32);}
+.avatar-frame--plata{border-color:#AEB6C0; box-shadow:0 10px 24px rgba(174,182,192,.35), inset 0 0 0 2px #E6EAEF;}
+.avatar-frame--oro{
+  border-color:#FFD700; box-shadow:0 8px 26px rgba(255,215,0,.5), inset 0 0 0 2px #FFF0A6;
+  background:linear-gradient(180deg,#FFFBE8,#FFF3C4);
+}
+.avatar-frame--cristal{
+  border-color:#7FD4F5; box-shadow:0 10px 30px rgba(135,206,235,.45);
+  background:linear-gradient(180deg,#EAF8FF,#FFFFFF);
+}
+.avatar-frame--citrico-legendario{
+  border-color:#FF8C33; background:radial-gradient(circle at 50% 18%, #FFE9C4, #FFC93C55);
+  box-shadow:0 0 20px rgba(255,140,51,.6), 0 12px 34px rgba(255,140,51,.4);
+}
+
+/* ---------- Foto de perfil (OpenPeeps) ---------- */
+.profile-photo{
+  position:absolute; right:-12px; top:-12px; width:64px; height:80px; overflow:hidden;
+  border:3px solid #fff; border-radius:16px; background:#fff;
+  box-shadow:0 4px 12px rgba(31,58,61,.22);
+}
+.profile-photo svg{width:100%; height:100%;}
+
+/* ---------- Barra de XP ---------- */
+.xp-block{width:100%;}
+.xp-bar{
+  height:14px; border-radius:999px; overflow:hidden; position:relative;
+  background:var(--fondo); border:2px solid var(--borde);
+}
+.xp-bar__fill{
+  height:100%; width:0; border-radius:999px;
+  background:linear-gradient(90deg, var(--primario), #FFC93C);
+  transition:width .5s ease;
+}
+.xp-bar__labels{display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:var(--texto-suave); margin-top:5px;}
+
+/* ---------- Tarjeta de Perfil (armario) ---------- */
+.armario-layout{grid-template-columns:300px 1fr;}
+.perfil-card{
+  border-radius:26px; padding:22px 18px; text-align:center;
+  background:linear-gradient(135deg,#FFE9C4,#FFF6DC); box-shadow:var(--sombra);
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+  min-height:340px; justify-content:center;
+}
+.perfil-card .avatar-frame{width:150px; height:150px;}
+.perfil-card__info{width:100%; display:flex; flex-direction:column; align-items:center; gap:8px;}
+.perfil-card__photo{width:52px; height:64px; overflow:hidden; border-radius:12px; border:3px solid #fff; background:#fff; box-shadow:0 3px 8px rgba(31,58,61,.18);}
+.perfil-card__photo svg{width:100%; height:100%;}
+.perfil-card__info h3{margin:2px 0 0; font-size:20px;}
+.perfil-card__stats{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;}
+.perfil-card__stats .pill{
+  background:#fff; border:2px solid var(--borde); border-radius:999px; padding:4px 12px;
+  font-weight:800; font-size:12px; color:var(--texto);
+}
+
+/* ---------- Grid de tienda / armario (Cosecha 2.0) ---------- */
+.prenda-grid{grid-template-columns:repeat(auto-fill, minmax(132px,1fr));}
+.prenda{
+  border:2px solid var(--borde); border-radius:18px; padding:10px 8px 12px; text-align:center;
+  background:var(--panel); position:relative; display:flex; flex-direction:column; gap:6px;
+  cursor:default;
+}
+.prenda.locked{opacity:.55;}
+.prenda.equipped{border-color:var(--secundario); box-shadow:0 0 0 3px rgba(47,168,138,.22);}
+.prenda__badge{position:absolute; top:6px; left:8px; font-size:13px; z-index:2;}
+.prenda__badge.equipped{color:var(--secundario-oscuro);}
+.prenda__badge.buy{color:var(--primario-oscuro);}
+.prenda__badge.locked{color:var(--texto-suave);}
+.prenda__badge.own{color:var(--secundario);}
+.prenda__preview{
+  height:78px; display:flex; align-items:center; justify-content:center; overflow:hidden;
+  border-radius:12px; background:var(--fondo); border:1px solid var(--borde);
+}
+.swatch-img{height:100%; width:auto; object-fit:contain;}
+.swatch-inline svg{max-height:64px;}
+.swatch-frame{
+  width:54px; height:54px; border:4px solid var(--fc); border-radius:14px;
+  display:flex; align-items:center; justify-content:center; color:var(--fc); font-size:22px;
+  background:linear-gradient(135deg,#fff, var(--fc)2e);
+}
+.swatch-fondo{width:60px; height:60px; border-radius:14px; border:2px solid rgba(0,0,0,.08);}
+.prenda small{display:block; font-size:11px; font-weight:800; color:var(--texto); line-height:1.2;}
+.prenda__cond{font-size:10px; color:var(--texto-suave); font-weight:700;}
+.prenda__btn{
+  border-radius:999px; padding:6px 10px; font-size:11px; font-weight:800; cursor:pointer;
+  border:2px solid var(--borde); background:var(--fondo); color:var(--texto); width:100%;
+}
+.prenda__btn:hover:not(:disabled){border-color:var(--primario-oscuro);}
+.prenda__btn.buy{background:var(--acento); border-color:var(--primario-oscuro); color:var(--texto);}
+.prenda__btn.buy:hover:not(:disabled){background:var(--primario); color:#fff;}
+.prenda__btn.equipped{background:var(--secundario); border-color:var(--secundario-oscuro); color:#fff;}
+.prenda__btn.equipped:hover{background:var(--secundario-oscuro);}
+.prenda__btn.locked, .prenda__btn:disabled{opacity:.55; cursor:not-allowed;}
+
+/* ---------- Mobile: pila de columnas ---------- */
+@media(max-width:760px){
+  .armario-layout{grid-template-columns:1fr;}
+  .hero-gamifica{justify-content:center;}
+  .perfil-card{min-height:auto;}
+}

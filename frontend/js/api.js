@@ -105,6 +105,18 @@ const API = {
       body: JSON.stringify({ categoria, prendaId })
     });
   },
+  comprarItem(itemId) {
+    return this.request('/logros/comprar', {
+      method: 'POST',
+      body: JSON.stringify({ itemId })
+    });
+  },
+  completarTarea(tareaId) {
+    return this.request('/logros/completar-tarea', {
+      method: 'POST',
+      body: JSON.stringify({ tareaId })
+    });
+  },
 
   // ---- Prendas ----
   getPrendas(categoria) {

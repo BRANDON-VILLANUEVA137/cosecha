@@ -3,6 +3,7 @@ const router = express.Router();
 const { db } = require('../config/firebase-admin');
 const { validarRespuesta } = require('../services/validacion');
 const { evaluarRecompensas } = require('../services/recompensas');
+const gamificacion = require('../services/gamificacion');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 
 router.use(authMiddleware);
@@ -137,33 +138,28 @@ router.post('/:id/validar', requireRole('estudiante'), async (req, res) => {
 
     const logroRef = db.collection('logros').doc(req.user.uid);
     const logroSnap = await logroRef.get();
-    const defaultLogro = {
-      aciertosMatematicas: 0,
-      aciertosIngles: 0,
-      intentos: 0,
-      desbloqueadas: ['camiseta-basica', 'pantalon-basico', 'tenis-basico'],
-      equipo: { cabeza: null, torso: 'camiseta-basica', piernas: 'pantalon-basico', calzado: 'tenis-basico', accesorio: null },
-      historial: [],
-      ejerciciosCompletados: []
-    };
+    const defaultLogro = gamificacion.defaultsLogro(req.user.uid);
+    const logro = logroSnap.exists
+      ? { ...defaultLogro, ...logroSnap.data(),
+          equipo: { ...defaultLogro.equipo, ...(logroSnap.data().equipo || {}) } }
+      : defaultLogro;
 
-    const logro = logroSnap.exists ? { ...defaultLogro, ...logroSnap.data() } : defaultLogro;
-    // Clave compuesta: tareaId_ejercicioId para desvincular progreso entre tareas que comparten ejercicios
+    // Clave compuesta: tareaId_ejercicioId — desvincula progreso entre tareas que comparten ejercicios
     const claveCompletado = `${tareaId || 'libre'}_${ejercicio.id}`;
     const yaCompletado = (logro.ejerciciosCompletados || []).includes(claveCompletado);
 
     if (yaCompletado) {
-      return res.json({ correcto: true, yaCompletado: true, mensaje: 'Este ejercicio ya estaba resuelto.', nuevasPrendas: [] });
+      return res.json({
+        ...resultado,
+        yaCompletado: true,
+        mensaje: 'Este ejercicio ya estaba resuelto.',
+        xpGanada: 0,
+        naranjasGanadas: 0,
+        nuevasPrendas: []
+      });
     }
 
-    logro.intentos += 1;
-
-    if (resultado.correcto) {
-      logro.ejerciciosCompletados.push(claveCompletado);
-      if (ejercicio.materia === 'matematicas') logro.aciertosMatematicas += 1;
-      else logro.aciertosIngles += 1;
-    }
-
+    // 1) Registrar intento en el historial (independiente del XP)
     logro.historial.push({
       ejercicioId: ejercicio.id,
       materia: ejercicio.materia,
@@ -177,14 +173,54 @@ router.post('/:id/validar', requireRole('estudiante'), async (req, res) => {
       fecha: new Date().toISOString()
     });
 
-    await logroRef.set(logro);
-
-    let nuevasPrendas = [];
+    // 2) Marcar ejercicio completado (solo si es correcto)
     if (resultado.correcto) {
-      nuevasPrendas = await evaluarRecompensas(req.user.uid, ejercicio.materia);
+      logro.ejerciciosCompletados = [...(logro.ejerciciosCompletados || []), claveCompletado];
     }
 
-    return res.json({ ...resultado, nuevasPrendas });
+    await logroRef.set(logro);
+
+    // 3) Otorgar XP / Naranjas / Racha / Nivel (evento de ejercicio)
+    const recompensa = await evaluarRecompensas(req.user.uid, ejercicio.materia, resultado);
+
+    // 4) Si completó una tarea → +100 XP (lección / tutoría completada)
+    let leccionRes = null;
+    if (resultado.correcto && tareaId) {
+      const tareaDoc = await db.collection('tareas').doc(tareaId).get();
+      if (tareaDoc.exists) {
+        const ejSnap = await db.collection('tareas').doc(tareaId)
+          .collection('ejercicios').get();
+        const ejIds = ejSnap.docs.map((d) => d.data().ejercicioId);
+        const todoOK = ejIds.length > 0 && ejIds.every((eid) =>
+          (logro.ejerciciosCompletados || []).includes(`${tareaId}_${eid}`)
+        );
+        if (todoOK) {
+          leccionRes = await gamificacion.completarTarea(req.user.uid, tareaId);
+        }
+      }
+    }
+
+    const payload = {
+      ...resultado,
+      xpGanada: recompensa.xpGanada,
+      rachaBonus: recompensa.rachaBonus,
+      naranjasGanadas: recompensa.naranjasGanadas,
+      nuevoNivel: recompensa.nuevoNivel,
+      nivelAnterior: recompensa.nivelAnterior,
+      subioNivel: recompensa.subioNivel,
+      rango: recompensa.rango,
+      racha: recompensa.racha,
+      nuevasPrendas: recompensa.nuevasPrendas
+    };
+
+    if (leccionRes && leccionRes.xpGanada) {
+      payload.leccionCumplida = true;
+      payload.xpGanada += leccionRes.xpGanada;
+      payload.naranjasGanadas += leccionRes.naranjasGanadas;
+      payload.nuevasPrendas = [...(payload.nuevasPrendas || []), ...(leccionRes.nuevasPrendas || [])];
+    }
+
+    return res.json(payload);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'No se pudo validar la respuesta' });

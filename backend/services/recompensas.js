@@ -1,36 +1,46 @@
 /**
- * MOTOR DE RECOMPENSAS — desbloquea prendas por aciertos por materia.
+ * MOTOR DE RECOMPENSAS — Cosecha 2.0 (XP + Naranjas + Rachas + Niveles)
+ * =====================================================================
+ * Ya no se desbloquean prendas por "conteo rígido de aciertos".
+ * La recompensa ahora es dinámica y se delega al motor de gamificación
+ * (`gamificacion.js`), que otorga XP, Naranjas, gestión de rachas y
+ * controla la subida de nivel y la apertura progresiva de la tienda.
+ *
+ * Mantiene `evaluarRecompensas` como punto de entrada con firma
+ * compatible con lo que consumía `ejercicios.js`.
  */
-const { db } = require('../config/firebase-admin');
+const gamificacion = require('./gamificacion');
 
-async function evaluarRecompensas(uid, materia) {
-  const logroRef = db.collection('logros').doc(uid);
-  const logroSnap = await logroRef.get();
+/**
+ * Evalúa una respuesta de ejercicio y otorga la recompensa correspondiente:
+ *   - correcto     → +10 XP (+1 naranja)  y bonificación de racha si aplica
+ *   - incorrecto   → +2 XP (premio a la constancia)
+ *
+ * @param {string} uid
+ * @param {string} materia      'matematicas' | 'ingles'
+ * @param {object} resultado    { correcto: boolean, mensaje: string }
+ * @returns {Promise<object>}   resultado ampliado con xpGanada,
+ *   naranjasGanadas, rachaBonus, nivelAnterior, nuevoNivel, subioNivel,
+ *   rango, racha y nuevasPrendas (ítems recién visibles por subir de nivel).
+ */
+async function evaluarRecompensas(uid, materia, resultado) {
+  const tipo = resultado && resultado.correcto ? 'correcto' : 'perseverancia';
+  const res = await gamificacion.otorgarXP(uid, { tipo, materia });
 
-  const defaultLogro = {
-    aciertosMatematicas: 0,
-    aciertosIngles: 0,
-    intentos: 0,
-    desbloqueadas: ['camiseta-basica', 'pantalon-basico', 'tenis-basico'],
-    equipo: { cabeza: null, torso: 'camiseta-basica', piernas: 'pantalon-basico', calzado: 'tenis-basico', accesorio: null },
-    historial: []
+  return {
+    ...resultado,
+    xpGanada: res.xpGanada,
+    rachaBonus: res.rachaBonus,
+    naranjasGanadas: res.naranjasGanadas,
+    nivelAnterior: res.nivelAnterior,
+    nuevoNivel: res.nuevoNivel,
+    subioNivel: res.subioNivel,
+    rango: res.rango,
+    racha: res.racha,
+    xpTotal: res.xpTotal,
+    naranjasTotales: res.naranjasTotales,
+    nuevasPrendas: res.nuevasPrendas
   };
-
-  const logro = logroSnap.exists ? { ...defaultLogro, ...logroSnap.data() } : defaultLogro;
-  const contador = materia === 'matematicas' ? logro.aciertosMatematicas : logro.aciertosIngles;
-  const catalogoSnap = await db.collection('prendas').where('origen', '==', materia).get();
-  const nuevas = [];
-
-  for (const doc of catalogoSnap.docs) {
-    const prenda = { id: doc.id, ...doc.data() };
-    if (!logro.desbloqueadas.includes(prenda.id) && prenda.condicion && contador >= prenda.condicion.valor) {
-      logro.desbloqueadas.push(prenda.id);
-      nuevas.push(prenda);
-    }
-  }
-
-  await logroRef.set(logro);
-  return nuevas;
 }
 
 module.exports = { evaluarRecompensas };

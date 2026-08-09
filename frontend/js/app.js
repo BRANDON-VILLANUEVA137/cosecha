@@ -5,7 +5,7 @@
 const App = {
   currentRole: null,
   currentModule: 'inicio',
-  currentArmarioTab: 'cabeza',
+  currentArmarioTab: 'perfil',
   currentTheme: 'citrico',
   intentosPorEjercicio: {},
   cachePrendas: [],
@@ -203,6 +203,7 @@ const App = {
       this.currentRole = session.rol || 'estudiante';
       this.updateUserPill();
       this.hideLoginScreen();
+      await this.cargarPrendas();
       this.render();
     } catch (error) {
       console.error(error);
@@ -448,9 +449,21 @@ const App = {
     this.saveProgressState();
   },
 
-  finishTask() {
+    async finishTask() {
     this.completeTask();
-    if (this.currentTaskView?.id) {
+    const tareaId = this.currentTaskView?.id;
+    if (tareaId) {
+      try {
+        const res = await API.completarTarea(tareaId);
+        if (!res.yaCompletada) {
+          const xp = res.xpGanada || 100;
+          if (res.subioNivel) this.toast(`🎓 Lección completada! +${xp} XP · ⬆️ Nivel ${res.nuevoNivel}`);
+          else this.toast(`🎓 Lección completada! +${xp} XP`);
+        }
+      } catch (e) {
+        this.toast('⚠️ No se pudo registrar la lección: ' + e.message);
+      }
+    } else {
       this.toast('✅ Tarea finalizada');
     }
     this.currentTaskView = null;
@@ -782,19 +795,60 @@ const App = {
     }
   },
 
+  cap(str) {
+    return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+  },
+
+  /** Progresión de nivel para la barra de XP (espejo de la curva backend). */
+  calcularProgreso(logro) {
+    const xp = Math.max(0, Math.floor(Number(logro?.xp) || 0));
+    const xpParaNivel = (k) => (k <= 1 ? 0 : Math.round(100 * k * (k - 1) / 2));
+    let n = 1;
+    while (xpParaNivel(n + 1) <= xp) n++;
+    const nivelFinal = n;
+    const xpEnNivel = xp - xpParaNivel(nivelFinal);
+    const xpParaSiguiente = xpParaNivel(nivelFinal + 1);
+    const ventana = xpParaSiguiente - xpParaNivel(nivelFinal);
+    const progreso = ventana > 0 ? Math.round((xpEnNivel / ventana) * 100) : 0;
+    return {
+      nivel: nivelFinal,
+      xpEnNivel,
+      xpParaSiguiente,
+      progreso: Math.min(100, Math.max(0, progreso)),
+      xpTotal: xp
+    };
+  },
+
   /* ---------- INICIO (estudiante) ---------- */
   async renderInicio() {
     const logro = await API.getLogros();
+    const rango = Personaje.rangoDeNivel(logro.nivel || 1);
+    const prog = this.calcularProgreso(logro);
+    const urlAvatar = Personaje.generarUrlDiceBear(logro.equipo, this.cachePrendas, { seed: this.authUser?.uid || 'cosecha', racha: logro.racha });
+    const perfilOpt = (logro.equipo && logro.equipo.perfil) || 'perfil-1';
+
     return `
       <div class="card hero">
-        <div class="personaje-mini">${Personaje.renderSVG(logro.equipo, this.cachePrendas, 140)}</div>
-        <div class="hero-text">
-          <h2>¡Hola! 👋</h2>
-          <p>Resuelve ejercicios para desbloquear prendas nuevas para tu personaje.</p>
-          <div class="stat-row">
-            <div class="stat"><b>${logro.aciertosMatematicas}</b><span>ACIERTOS MATE</span></div>
-            <div class="stat"><b>${logro.aciertosIngles}</b><span>ACIERTOS INGLÉS</span></div>
-            <div class="stat"><b>${logro.desbloqueadas.length}</b><span>PRENDAS</span></div>
+        <div class="hero-gamifica">
+          <div class="profile-avatar">
+            <div class="avatar-frame avatar-frame--${rango.nombre}">
+              <img src="${urlAvatar}" alt="Tu personaje" class="avatar-dicebear" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=cosecha&clothing=shirt'">
+              <div class="avatar-frame__badge">${rango.icono} ${this.cap(rango.nombre)}</div>
+            </div>
+            <div class="profile-photo">${Personaje.renderOpenPeeps(perfilOpt, 64)}</div>
+          </div>
+          <div class="hero-text">
+            <h2>¡Hola, ${logro.nombre || 'Aventurero'}! 👋</h2>
+            <p>Gana <strong>XP</strong> y <strong>🍊 naranjas</strong> resolviendo ejercicios para personalizar tu personaje.</p>
+            <div class="xp-block">
+              <div class="xp-bar"><div class="xp-bar__fill" style="width:${prog.progreso}%"></div></div>
+              <div class="xp-bar__labels"><span>Nivel ${prog.nivel}</span><span>${prog.xpEnNivel} / ${prog.xpParaSiguiente} XP · ${prog.progreso}%</span></div>
+            </div>
+            <div class="stat-row">
+              <div class="stat"><b>${prog.xpTotal}</b><span>XP TOTAL</span></div>
+              <div class="stat"><b>${logro.naranjas || 0}</b><span>NARANJAS 🍊</span></div>
+              <div class="stat"><b>${logro.racha?.dias || 0}</b><span>RACHA 🔥</span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -936,49 +990,104 @@ const App = {
             <p>${esMat ? 'Fracciones: suma y multiplicación' : 'Verbo to be y pronombres'}</p>
           </div>
         </div>
-        <div class="stat-row"><div class="stat"><b>${aciertos}</b><span>ACIERTOS EN ESTA MATERIA</span></div></div>
+        <div class="stat-row">
+          <div class="stat"><b>Nv ${logro.nivel || 1}</b><span>NIVEL</span></div>
+          <div class="stat"><b>${logro.xp || 0}</b><span>XP</span></div>
+          <div class="stat"><b>${logro.naranjas || 0}</b><span>NARANJAS 🍊</span></div>
+          <div class="stat"><b>${logro.racha?.dias || 0}</b><span>RACHA 🔥</span></div>
+        </div>
       </div>
       ${taskCards}
       ${graficacion}
     `;
   },
 
-  /* ---------- ARMARIO (estudiante) ---------- */
+  /* ---------- ARMARIO Y PERFIL (estudiante) ---------- */
   async renderArmario() {
-    const [logro, prendas] = await Promise.all([
-      API.getLogros(),
-      API.getPrendas(this.currentArmarioTab)
-    ]);
-    const categorias = ['cabeza', 'torso', 'piernas', 'calzado', 'accesorio'];
+    const logro = await API.getLogros();
+    const prendas = this.cachePrendas || [];
+    const nivel = logro.nivel || 1;
+    const rango = Personaje.rangoDeNivel(nivel);
+    const prog = this.calcularProgreso(logro);
+    const urlAvatar = Personaje.generarUrlDiceBear(logro.equipo, prendas, { seed: this.authUser?.uid || 'cosecha', racha: logro.racha });
+    const perfilId = (logro.equipo && logro.equipo.perfil) || 'perfil-1';
+    const marcoId = logro.equipo && logro.equipo.marco;
+    const marcoPrenda = marcoId ? prendas.find(p => p.id === marcoId) : null;
+    const marcoRango = (marcoPrenda && marcoPrenda.rango) || rango.nombre;
+    const fondoId = logro.equipo && logro.equipo.fondo;
+    const fondoPrenda = fondoId ? prendas.find(p => p.id === fondoId) : null;
 
-    const grid = prendas.map(p => {
-      const desbloqueada = logro.desbloqueadas.includes(p.id);
-      const equipada = logro.equipo[p.categoria] === p.id;
-      const condTexto = p.condicion ? `${p.condicion.valor} aciertos en ${p.origen === 'matematicas' ? 'Matemáticas' : 'Inglés'}` : 'De fábrica';
+    const tab = Personaje.TABS_ARMARIO.find(t => t.id === this.currentArmarioTab) || Personaje.TABS_ARMARIO[0];
+    const cats = Personaje.CATEGORIAS_POR_TAB[tab.id] || [tab.id];
+    const gridPrendas = prendas.filter(p => cats.includes(p.categoria));
+
+    const grid = gridPrendas.map(p => {
+      const esDuena = (logro.inventario || []).includes(p.id);
+      const esEquipada = logro.equipo[p.categoria] === p.id;
+      const bloqueada = (p.nivelRequerido || 1) > nivel;
+      const precio = p.precio || 0;
+      const sinNaranjas = (logro.naranjas || 0) < precio;
+
+      let badge = '', boton = '';
+      if (esEquipada) {
+        badge = '<span class="prenda__badge equipped">✔️</span>';
+        boton = `<button class="prenda__btn equipped" data-equip="${p.id}" data-cat="${p.categoria}">✔️ Puesto</button>`;
+      } else if (esDuena) {
+        badge = '<span class="prenda__badge own">🤍</span>';
+        boton = `<button class="prenda__btn" data-equip="${p.id}" data-cat="${p.categoria}">Equipar</button>`;
+      } else if (bloqueada) {
+        badge = '<span class="prenda__badge locked">🔒</span>';
+        boton = `<button class="prenda__btn locked" disabled>Nivel ${p.nivelRequerido}</button>`;
+      } else {
+        badge = '<span class="prenda__badge buy">🍊</span>';
+        boton = `<button class="prenda__btn buy" data-compra="${p.id}" ${sinNaranjas ? 'disabled' : ''}>${precio} 🍊</button>`;
+      }
+
       return `
-        <div class="prenda ${desbloqueada ? '' : 'locked'} ${equipada ? 'equipped' : ''}" ${desbloqueada ? `data-equip="${p.id}" data-cat="${p.categoria}"` : ''}>
-          ${equipada ? '<span class="check">✔️</span>' : (desbloqueada ? '' : '<span class="lockicon">🔒</span>')}
-          <div class="swatch" style="background:${p.color}22; border:2px solid ${p.color};">${Personaje.ICONS_CATEGORIA[p.categoria][p.shape] || '❔'}</div>
+        <div class="prenda ${esEquipada ? 'equipped' : ''} ${bloqueada ? 'locked' : ''}">
+          ${badge}
+          <div class="prenda__preview">${Personaje.preview(prendas, p)}</div>
           <small>${p.nombre}</small>
-          <div class="cond">${desbloqueada ? (equipada ? 'Puesto' : 'Toca para usar') : condTexto}</div>
+          <div class="prenda__cond">${esEquipada ? 'Equipado' : esDuena ? 'Comprado' : bloqueada ? 'Bloqueado por nivel' : (sinNaranjas ? 'Faltan 🍊' : 'Disponible')}</div>
+          ${boton}
         </div>`;
     }).join('');
+
+    const fondoStyle = fondoPrenda && fondoPrenda.gradiente ? `background:${fondoPrenda.gradiente};` : '';
 
     return `
       <div class="card">
         <div class="module-header">
           <div class="badge" style="background:var(--acento);">👗</div>
-          <div><h2>Mi Armario</h2><p>Viste a tu personaje con lo que has desbloqueado</p></div>
+          <div><h2>Mi Armario y Perfil</h2><p>Personaliza tu personaje y compra con tus naranjas 🍊</p></div>
         </div>
         <div class="armario-layout">
-          <div class="personaje-stage">${Personaje.renderSVG(logro.equipo, this.cachePrendas, 190)}
-            <div class="hand" style="font-size:20px; margin-top:4px;">¡Tu personaje!</div>
+          <div>
+            <div class="perfil-card" style="${fondoStyle}">
+              <div class="avatar-frame avatar-frame--${marcoRango}">
+                <img src="${urlAvatar}" alt="Tu personaje" class="avatar-dicebear" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=cosecha&clothing=shirt'">
+                <div class="avatar-frame__badge">${rango.icono} ${this.cap(rango.nombre)}</div>
+              </div>
+              <div class="perfil-card__info">
+                <div class="perfil-card__photo">${Personaje.renderOpenPeeps(perfilId, 56)}</div>
+                <h3>${logro.nombre || 'Aventurero'}</h3>
+                <div class="xp-block">
+                  <div class="xp-bar"><div class="xp-bar__fill" style="width:${prog.progreso}%"></div></div>
+                  <div class="xp-bar__labels"><span>Nivel ${prog.nivel}</span><span>${prog.xpEnNivel} / ${prog.xpParaSiguiente} XP</span></div>
+                </div>
+                <div class="perfil-card__stats">
+                  <span class="pill">🍊 ${logro.naranjas || 0}</span>
+                  <span class="pill">🔥 ${logro.racha?.dias || 0} días</span>
+                  <span class="pill">⭐ ${prog.xpTotal} XP</span>
+                </div>
+              </div>
+            </div>
           </div>
           <div>
             <div class="cat-tabs">
-              ${categorias.map(c => `<button class="${this.currentArmarioTab === c ? 'active' : ''}" data-cattab="${c}">${Personaje.ICONS_CATEGORIA[c][Object.keys(Personaje.ICONS_CATEGORIA[c])[0]]} ${Personaje.NOMBRE_CATEGORIA[c]}</button>`).join('')}
+              ${Personaje.TABS_ARMARIO.map(t => `<button class="${this.currentArmarioTab === t.id ? 'active' : ''}" data-cattab="${t.id}">${t.ico} ${t.label}</button>`).join('')}
             </div>
-            <div class="prenda-grid">${grid}</div>
+            <div class="prenda-grid">${grid || '<p class="empty">Este armario aún no tiene ítems.</p>'}</div>
           </div>
         </div>
       </div>
@@ -1818,12 +1927,21 @@ const App = {
             if (resultado.correcto || resultado.yaCompletado) {
               this.completedExerciseIds = [...new Set([...this.completedExerciseIds, claveProgreso])];
               this.completeTask(this.currentTaskView?.id);
+
               if (!resultado.yaCompletado) {
-                this.toast('✅ Tarea completada');
+                const ganados = [];
+                if (resultado.xpGanada) ganados.push(`+${resultado.xpGanada} XP`);
+                if (resultado.naranjasGanadas) ganados.push(`+${resultado.naranjasGanadas} 🍊`);
+                if (resultado.rachaBonus) ganados.push(`🔥 +${resultado.rachaBonus} XP racha`);
+                if (resultado.leccionCumplida) ganados.push('🎓 Lección completada');
+                this.toast(`🎉 ${resultado.correcto ? '¡Correcto!' : '¡Completado!'} ${ganados.join(' · ')}`);
+                if (resultado.subioNivel) {
+                  this.toast(`⬆️ ¡Subiste al nivel ${resultado.nuevoNivel}! ${resultado.rango?.icono || ''} ${this.cap(resultado.rango?.nombre || '')}`);
+                }
+                (resultado.nuevasPrendas || []).forEach(p => {
+                  this.toast(`🛍️ ${p.nombre} disponible en la tienda`);
+                });
               }
-              resultado.nuevasPrendas.forEach(p => {
-                this.toast(`🎁 ¡Nueva prenda! ${Personaje.ICONS_CATEGORIA[p.categoria][p.shape]} ${p.nombre}`);
-              });
               await this.cargarPrendas();
 
               // Ocultar input y botón "Comprobar" solo si fue correcto
@@ -1834,6 +1952,8 @@ const App = {
                 fb.innerHTML = `<div class="feedback ok">✅ Resuelto correctamente</div>`;
               }
             } else {
+              // Premio a la perseverancia: el estudiante leyó la explicación
+              if (resultado.xpGanada) this.toast(`💪 +${resultado.xpGanada} XP por tu esfuerzo`);
               // Si fue incorrecto, re-habilitar botón para reintentar
               btn.disabled = false;
               btn.textContent = 'Comprobar';
@@ -1886,6 +2006,18 @@ const App = {
           const id = el.dataset.equip;
           try {
             await API.equiparPrenda(cat, id);
+            this.render();
+          } catch (e) { this.toast('⚠️ ' + e.message); }
+        };
+      });
+
+      document.querySelectorAll('[data-compra]').forEach(el => {
+        el.onclick = async () => {
+          const id = el.dataset.compra;
+          try {
+            const res = await API.comprarItem(id);
+            this.toast('🛒 ' + res.mensaje);
+            await this.cargarPrendas();
             this.render();
           } catch (e) { this.toast('⚠️ ' + e.message); }
         };

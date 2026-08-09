@@ -147,33 +147,61 @@
       "shape": "camiseta",
       "nombre": "Camiseta blanca",
       "color": "#F4F4F4",
+      "tipo": "dicebear",
       "origen": "base",
-      "condicion": null
-    },
-    "pantalon-basico": {
-      "categoria": "piernas",
-      "shape": "pantalon_largo",
-      "nombre": "Jean básico",
-      "color": "#4A6FA5",
-      "origen": "base",
-      "condicion": null
-    },
-    "tenis-basico": {
-      "categoria": "calzado",
-      "shape": "tenis",
-      "nombre": "Tenis blancos",
-      "color": "#EDEDED",
-      "origen": "base",
-      "condicion": null
+      "precio": 0,
+      "nivelRequerido": 1,
+      "dicebearOptions": {
+        "clothing": "shirt"
+      }
     },
     "buso-naranja": {
       "categoria": "torso",
       "shape": "buso",
       "nombre": "Buso Cosecha",
       "color": "#FF8C33",
+      "tipo": "dicebear",
       "origen": "matematicas",
-      "condicion": {
-        "valor": 2
+      "precio": 15,
+      "nivelRequerido": 2,
+      "dicebearOptions": {
+        "clothing": "hoodie"
+      }
+    },
+    "sueter-acolchado": {
+      "categoria": "torso",
+      "shape": "sueter",
+      "nombre": "Suéter Acolchado",
+      "color": "#2FA88A",
+      "tipo": "dicebear",
+      "precio": 25,
+      "nivelRequerido": 3,
+      "dicebearOptions": {
+        "clothing": "sweater"
+      }
+    },
+    "chaleco-aventura": {
+      "categoria": "torso",
+      "shape": "chaleco",
+      "nombre": "Chaleco Aventura",
+      "color": "#4A6FA5",
+      "tipo": "dicebear",
+      "precio": 35,
+      "nivelRequerido": 4,
+      "dicebearOptions": {
+        "clothing": "vest"
+      }
+    },
+    "camiseta-grafica": {
+      "categoria": "torso",
+      "shape": "camiseta",
+      "nombre": "Camiseta Gráfica",
+      "color": "#FF6B6B",
+      "tipo": "dicebear",
+      "precio": 45,
+      "nivelRequerido": 5,
+      "dicebearOptions": {
+        "clothing": "graphicShirt"
       }
     },
     "gorro-citrico": {
@@ -181,39 +209,11 @@
       "shape": "gorro",
       "nombre": "Gorro Cítrico",
       "color": "#FFC93C",
-      "origen": "matematicas",
-      "condicion": {
-        "valor": 4
-      }
-    },
-    "bolso-mandarina": {
-      "categoria": "accesorio",
-      "shape": "bolso",
-      "nombre": "Bolso Mandarina",
-      "color": "#E8631B",
-      "origen": "matematicas",
-      "condicion": {
-        "valor": 6
-      }
-    },
-    "botas-cosecha": {
-      "categoria": "calzado",
-      "shape": "botas",
-      "nombre": "Botas Cosecha",
-      "color": "#2FA88A",
-      "origen": "matematicas",
-      "condicion": {
-        "valor": 8
-      }
-    },
-    "camiseta-global": {
-      "categoria": "torso",
-      "shape": "camiseta",
-      "nombre": "Camiseta Global",
-      "color": "#2FA88A",
-      "origen": "ingles",
-      "condicion": {
-        "valor": 2
+      "tipo": "dicebear",
+      "precio": 15,
+      "nivelRequerido": 2,
+      "dicebearOptions": {
+        "hat": "beanie"
       }
     },
     "sombrero-explorador": {
@@ -221,9 +221,35 @@
       "shape": "sombrero",
       "nombre": "Sombrero Explorador",
       "color": "#C99A12",
-      "origen": "ingles",
-      "condicion": {
-        "valor": 4
+      "tipo": "dicebear",
+      "precio": 25,
+      "nivelRequerido": 3,
+      "dicebearOptions": {
+        "hat": "cap"
+      }
+    },
+    "rizeta-decorativa": {
+      "categoria": "cabeza",
+      "shape": "rizeta",
+      "nombre": "Ribeta Decorativa",
+      "color": "#E8631B",
+      "tipo": "dicebear",
+      "precio": 35,
+      "nivelRequerido": 4,
+      "dicebearOptions": {
+        "hat": "ribbon"
+      }
+    },
+    "tiara-estrella": {
+      "categoria": "cabeza",
+      "shape": "tiara",
+      "nombre": "Tiara de Estrella",
+      "color": "#FFD700",
+      "tipo": "dicebear",
+      "precio": 50,
+      "nivelRequerido": 6,
+      "dicebearOptions": {
+        "hat": "tiara"
       }
     },
     "lentes-sol": {
@@ -231,44 +257,258 @@
       "shape": "lentes",
       "nombre": "Lentes de Sol",
       "color": "#1E6E7C",
-      "origen": "ingles",
-      "condicion": {
-        "valor": 6
+      "tipo": "dicebear",
+      "precio": 20,
+      "nivelRequerido": 3,
+      "dicebearOptions": {
+        "accessories": "sunglasses"
       }
     },
-    "short-aventura": {
-      "categoria": "piernas",
-      "shape": "pantalon_corto",
-      "nombre": "Short Aventura",
+    "gafas-estudio": {
+      "categoria": "accesorio",
+      "shape": "lentes",
+      "nombre": "Gafas de Estudio",
       "color": "#1E6E7C",
-      "origen": "ingles",
-      "condicion": {
-        "valor": 8
+      "tipo": "dicebear",
+      "precio": 18,
+      "nivelRequerido": 2,
+      "dicebearOptions": {
+        "accessories": "glasses"
       }
+    },
+    "bigote-aventurero": {
+      "categoria": "accesorio",
+      "shape": "bigote",
+      "nombre": "Bigote Aventurero",
+      "color": "#6B4226",
+      "tipo": "dicebear",
+      "precio": 25,
+      "nivelRequerido": 4,
+      "dicebearOptions": {
+        "facialHair": "stubble"
+      }
+    },
+    "barba-ligera": {
+      "categoria": "accesorio",
+      "shape": "barba",
+      "nombre": "Barba Ligera",
+      "color": "#6B4226",
+      "tipo": "dicebear",
+      "precio": 30,
+      "nivelRequerido": 5,
+      "dicebearOptions": {
+        "facialHair": "beardLight"
+      }
+    },
+    "barba-sabia": {
+      "categoria": "accesorio",
+      "shape": "barba",
+      "nombre": "Barba de Sabio",
+      "color": "#6B4226",
+      "tipo": "dicebear",
+      "precio": 45,
+      "nivelRequerido": 6,
+      "dicebearOptions": {
+        "facialHair": "beardMedium"
+      }
+    },
+    "marco-madera": {
+      "categoria": "marco",
+      "nombre": "Marco Madera",
+      "color": "#8B5A2B",
+      "tipo": "frame",
+      "precio": 0,
+      "nivelRequerido": 1,
+      "rango": "madera"
+    },
+    "marco-bronce": {
+      "categoria": "marco",
+      "nombre": "Marco Bronce",
+      "color": "#CD7F32",
+      "tipo": "frame",
+      "precio": 15,
+      "nivelRequerido": 3,
+      "rango": "bronce"
+    },
+    "marco-plata": {
+      "categoria": "marco",
+      "nombre": "Marco Plata",
+      "color": "#C0C0C0",
+      "tipo": "frame",
+      "precio": 30,
+      "nivelRequerido": 5,
+      "rango": "plata"
+    },
+    "marco-oro": {
+      "categoria": "marco",
+      "nombre": "Marco Oro",
+      "color": "#FFD700",
+      "tipo": "frame",
+      "precio": 60,
+      "nivelRequerido": 8,
+      "rango": "oro"
+    },
+    "marco-cristal": {
+      "categoria": "marco",
+      "nombre": "Marco Cristal",
+      "color": "#87CEEB",
+      "tipo": "frame",
+      "precio": 120,
+      "nivelRequerido": 12,
+      "rango": "cristal"
+    },
+    "marco-citrico": {
+      "categoria": "marco",
+      "nombre": "Marco Cítrico Legendario",
+      "color": "#FF8C33",
+      "tipo": "frame",
+      "precio": 250,
+      "nivelRequerido": 18,
+      "rango": "citrico-legendario"
+    },
+    "perfil-1": {
+      "categoria": "perfil",
+      "nombre": "Michelle",
+      "color": "#FFD9A8",
+      "tipo": "openpeeps",
+      "precio": 0,
+      "nivelRequerido": 1,
+      "variante": "p1"
+    },
+    "perfil-2": {
+      "categoria": "perfil",
+      "nombre": "Alex",
+      "color": "#E8B88D",
+      "tipo": "openpeeps",
+      "precio": 0,
+      "nivelRequerido": 1,
+      "variante": "p2"
+    },
+    "perfil-3": {
+      "categoria": "perfil",
+      "nombre": "Sam",
+      "color": "#FFD9A8",
+      "tipo": "openpeeps",
+      "precio": 0,
+      "nivelRequerido": 1,
+      "variante": "p3"
+    },
+    "perfil-4": {
+      "categoria": "perfil",
+      "nombre": "Riley",
+      "color": "#F8C89D",
+      "tipo": "openpeeps",
+      "precio": 0,
+      "nivelRequerido": 1,
+      "variante": "p4"
+    },
+    "perfil-5": {
+      "categoria": "perfil",
+      "nombre": "Jordan",
+      "color": "#FFD9A8",
+      "tipo": "openpeeps",
+      "precio": 0,
+      "nivelRequerido": 1,
+      "variante": "p5"
+    },
+    "perfil-6": {
+      "categoria": "perfil",
+      "nombre": "Taylor",
+      "color": "#E8B88D",
+      "tipo": "openpeeps",
+      "precio": 0,
+      "nivelRequerido": 1,
+      "variante": "p6"
+    },
+    "fondo-campo": {
+      "categoria": "fondo",
+      "nombre": "Campo Cítrico",
+      "color": "#FF8C33",
+      "tipo": "fondo",
+      "precio": 20,
+      "nivelRequerido": 2,
+      "gradiente": "linear-gradient(135deg, #FF8C33, #FFC93C)"
+    },
+    "fondo-noche": {
+      "categoria": "fondo",
+      "nombre": "Noche Estelar",
+      "color": "#0B1F33",
+      "tipo": "fondo",
+      "precio": 40,
+      "nivelRequerido": 5,
+      "gradiente": "radial-gradient(circle at 50% 30%, #87CEEB 2px, #0B1F33 0)"
+    },
+    "fondo-aula": {
+      "categoria": "fondo",
+      "nombre": "Aula de Tutoría",
+      "color": "#2FA88A",
+      "tipo": "fondo",
+      "precio": 25,
+      "nivelRequerido": 3,
+      "gradiente": "linear-gradient(135deg, #2FA88A, #1E7D64)"
+    },
+    "fondo-atardecer": {
+      "categoria": "fondo",
+      "nombre": "Atardecer Dorado",
+      "color": "#FFD700",
+      "tipo": "fondo",
+      "precio": 30,
+      "nivelRequerido": 4,
+      "gradiente": "linear-gradient(135deg, #FFD700, #FF8C33)"
+    },
+    "fondo-nublado": {
+      "categoria": "fondo",
+      "nombre": "Día Nublado",
+      "color": "#A0B3C6",
+      "tipo": "fondo",
+      "precio": 15,
+      "nivelRequerido": 1,
+      "gradiente": "linear-gradient(135deg, #DBE6ED, #A0B3C6)"
     }
   },
   "logros": {
     "estudiante-001": {
       "email": "estudiante@cosecha.com",
       "nombre": "Michelle",
+      "nivel": 4,
+      "xp": 700,
+      "naranjas": 18,
       "aciertosMatematicas": 9,
       "aciertosIngles": 0,
       "intentos": 10,
-      "desbloqueadas": [
+      "racha": {
+        "dias": 3,
+        "ultimaFecha": "2026-08-09"
+      },
+      "inventario": [
         "camiseta-basica",
-        "pantalon-basico",
-        "tenis-basico",
-        "buso-naranja",
-        "gorro-citrico"
+        "marco-madera",
+        "gorro-citrico",
+        "gafas-estudio",
+        "fondo-campo",
+        "perfil-1"
       ],
+      "tareasCompletadas": [],
       "equipo": {
+        "perfil": "perfil-1",
+        "marco": "marco-madera",
         "cabeza": "gorro-citrico",
         "torso": "buso-naranja",
-        "piernas": "pantalon-basico",
-        "calzado": "tenis-basico",
-        "accesorio": null
+        "accesorio": "gafas-estudio",
+        "fondo": "fondo-campo"
       },
-      "ejerciciosCompletados": ["m1", "m2", "m3", "m4", "m5", "m6", "m7", "m8", "m9"],
+      "ejerciciosCompletados": [
+        "libre_m1",
+        "libre_m2",
+        "libre_m3",
+        "libre_m4",
+        "libre_m5",
+        "libre_m6",
+        "libre_m7",
+        "libre_m8",
+        "libre_m9",
+        "libre_m10"
+      ],
       "historial": [
         {
           "ejercicioId": "m1",
@@ -282,17 +522,6 @@
           "fecha": "2026-08-09T14:30:00.000Z"
         },
         {
-          "ejercicioId": "m2",
-          "materia": "matematicas",
-          "enunciado": "22/25 + 15/25 = ?",
-          "metodologia": "Estándar / Directo",
-          "tema": "Fracciones · mismo denominador",
-          "correcto": true,
-          "respuesta": "37/25",
-          "respuestaCorrecta": "37/25",
-          "fecha": "2026-08-09T14:31:00.000Z"
-        },
-        {
           "ejercicioId": "m3",
           "materia": "matematicas",
           "enunciado": "2/5 + 3/10 = ?",
@@ -304,61 +533,6 @@
           "fecha": "2026-08-09T14:32:00.000Z"
         },
         {
-          "ejercicioId": "m4",
-          "materia": "matematicas",
-          "enunciado": "3/8 + 5/4 = ?",
-          "metodologia": "Paso a Paso (Carita Sonriente)",
-          "tema": "Fracciones · Carita Sonriente",
-          "correcto": false,
-          "respuesta": "5/",
-          "respuestaCorrecta": "13/8",
-          "fecha": "2026-08-09T14:33:00.000Z"
-        },
-        {
-          "ejercicioId": "m5",
-          "materia": "matematicas",
-          "enunciado": "3/5 x 2/7 = ?",
-          "metodologia": "Estándar / Directo",
-          "tema": "Multiplicación de fracciones",
-          "correcto": true,
-          "respuesta": "6/35",
-          "respuestaCorrecta": "6/35",
-          "fecha": "2026-08-09T14:33:30.193Z"
-        },
-        {
-          "ejercicioId": "m6",
-          "materia": "matematicas",
-          "enunciado": "25/25 + 15/25 = ?",
-          "metodologia": "Estándar / Directo",
-          "tema": "Fracciones · mismo denominador",
-          "correcto": true,
-          "respuesta": "40/25",
-          "respuestaCorrecta": "40/25",
-          "fecha": "2026-08-09T14:34:00.000Z"
-        },
-        {
-          "ejercicioId": "m7",
-          "materia": "matematicas",
-          "enunciado": "170/100 + 80/100 = ?",
-          "metodologia": "Estándar / Directo",
-          "tema": "Fracciones · mismo denominador",
-          "correcto": true,
-          "respuesta": "250/100",
-          "respuestaCorrecta": "250/100",
-          "fecha": "2026-08-09T14:35:00.000Z"
-        },
-        {
-          "ejercicioId": "m8",
-          "materia": "matematicas",
-          "enunciado": "5/2 + 7/9 = ?",
-          "metodologia": "Paso a Paso (Carita Sonriente)",
-          "tema": "Fracciones · Carita Sonriente",
-          "correcto": true,
-          "respuesta": "59/18",
-          "respuestaCorrecta": "59/18",
-          "fecha": "2026-08-09T14:36:00.000Z"
-        },
-        {
           "ejercicioId": "m9",
           "materia": "matematicas",
           "enunciado": "8/3 + 6/4 = ?",
@@ -368,17 +542,6 @@
           "respuesta": "14/7",
           "respuestaCorrecta": "50/12",
           "fecha": "2026-08-09T14:37:00.000Z"
-        },
-        {
-          "ejercicioId": "m10",
-          "materia": "matematicas",
-          "enunciado": "Grafica la fracción 2/5.",
-          "metodologia": "Graficación Interactiva",
-          "tema": "Graficar fracciones",
-          "correcto": true,
-          "respuesta": "2/5",
-          "respuestaCorrecta": "2/5",
-          "fecha": "2026-08-09T14:38:00.000Z"
         }
       ]
     }

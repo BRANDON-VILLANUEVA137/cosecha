@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { auth, db } = require('../config/firebase-admin');
+const gamificacion = require('../services/gamificacion');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 
 // Todas las rutas requieren autenticación y rol docente
@@ -66,18 +67,10 @@ router.post('/', async (req, res) => {
         createdAt: new Date()
       });
 
-      // Crear logro predeterminado para el nuevo estudiante
-      await db.collection('logros').doc(userRecord.uid).set({
-        email,
-        nombre,
-        aciertosMatematicas: 0,
-        aciertosIngles: 0,
-        intentos: 0,
-        desbloqueadas: ['camiseta-basica', 'pantalon-basico', 'tenis-basico'],
-        equipo: { cabeza: null, torso: 'camiseta-basica', piernas: 'pantalon-basico', calzado: 'tenis-basico', accesorio: null },
-        historial: [],
-        ejerciciosCompletados: []
-      });
+                  // Crear logro predeterminado con la nueva estructura de gamificación
+      const nuevoLogro = gamificacion.defaultsLogro(userRecord.uid, nombre);
+      nuevoLogro.email = email;
+      await db.collection('logros').doc(userRecord.uid).set(nuevoLogro);
 
       return res.status(201).json({
         id: userRecord.uid,
