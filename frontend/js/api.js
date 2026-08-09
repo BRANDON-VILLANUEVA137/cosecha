@@ -129,5 +129,21 @@ const API = {
       method: 'PATCH',
       body: JSON.stringify({ estado })
     });
+  },
+  
+  // Analytics
+  getAnalyticsEstudiante(estudianteId, filtros = {}) {
+    const params = new URLSearchParams();
+    if (filtros.materia) params.append('materia', filtros.materia);
+    if (filtros.fechaInicio) params.append('fechaInicio', filtros.fechaInicio);
+    if (filtros.fechaFin) params.append('fechaFin', filtros.fechaFin);
+    const query = params.toString() ? '?' + params.toString() : '';
+    return this.request('/analytics/estudiante/' + estudianteId + query);
+  },
+  getAnalyticsGrupo(filtros = {}) {
+    const params = new URLSearchParams();
+    if (filtros.materia) params.append('materia', filtros.materia);
+    const query = params.toString() ? '?' + params.toString() : '';
+    return this.request('/analytics/grupo' + query);
   }
 };

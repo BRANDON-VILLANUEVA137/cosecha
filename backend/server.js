@@ -17,6 +17,7 @@ app.use(express.static(path.join(__dirname, '..', 'frontend')));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/ejercicios', authMiddleware, require('./routes/ejercicios'));
 app.use('/api/tareas', authMiddleware, require('./routes/tareas'));
+app.use('/api/analytics', authMiddleware, require('./routes/tareas')); // Usa el mismo router de tareas
 app.use('/api/logros', authMiddleware, require('./routes/logros'));
 app.use('/api/prendas', authMiddleware, require('./routes/prendas'));
 
