@@ -4,17 +4,44 @@ const { getAuth } = require('firebase-admin/auth');
 const fs = require('fs');
 const path = require('path');
 
+function normalizePrivateKey(rawKey) {
+  if (!rawKey) return '';
+
+  let normalized = rawKey.trim();
+
+  if (
+    (normalized.startsWith('"') && normalized.endsWith('"')) ||
+    (normalized.startsWith("'") && normalized.endsWith("'"))
+  ) {
+    normalized = normalized.slice(1, -1);
+  }
+
+  try {
+    const parsed = JSON.parse(normalized);
+    if (typeof parsed === 'string') {
+      normalized = parsed;
+    }
+  } catch (_) {}
+
+  return normalized
+    .replace(/\\r\\n/g, '\n')
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\n')
+    .replace(/\\t/g, '\t')
+    .trim();
+}
+
 function getServiceAccount() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  const privateKey = normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
 
-  if (projectId && clientEmail && privateKey) {
+  if (projectId && clientEmail && privateKey && /BEGIN [A-Z ]*PRIVATE KEY/.test(privateKey)) {
     return {
       type: 'service_account',
       project_id: projectId,
       private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID || '',
-      private_key: privateKey.replace(/\\n/g, '\n'),
+      private_key: privateKey,
       client_email: clientEmail,
       client_id: process.env.FIREBASE_CLIENT_ID || '',
       auth_uri: process.env.FIREBASE_AUTH_URI || 'https://accounts.google.com/o/oauth2/auth',
