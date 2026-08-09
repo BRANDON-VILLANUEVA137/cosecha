@@ -19,6 +19,13 @@ const App = {
   completedExerciseIds: [],
   allEjercicios: [], // Banco de ejercicios disponibles
   currentDocenteTab: 'tareas', // 'tareas' | 'banco' | 'crear'
+  analyticsView: 'grupo', // 'grupo' | 'estudiante'
+  selectedEstudianteId: null,
+  analyticsFiltros: {
+    materia: '',
+    fechaInicio: '',
+    fechaFin: ''
+  },
 
   formatMathText(texto) {
     if (typeof texto !== 'string' || !texto) return '';
