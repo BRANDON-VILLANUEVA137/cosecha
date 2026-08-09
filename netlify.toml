@@ -1,0 +1,15 @@
+# Configuración de Netlify para el proyecto "cosecha"
+# Publica el frontend desde la carpeta "frontend"
+
+[build]
+  # Directorio donde se encuentra el index.html
+  publish = "frontend"
+  # Comando de build (vacío porque es un sitio estático sin framework)
+  command = ""
+
+# Redirección: todas las rutas apuntan al index.html
+# Esto es útil si el frontend usa rutas del lado del cliente
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
