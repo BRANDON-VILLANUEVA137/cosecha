@@ -31,6 +31,9 @@ const App = {
   analyticsFilterTema: '',
   tareasDisponibles: [],
   temasDisponibles: [],
+  estudiantesGestion: [],
+  estudianteEditando: null,
+  estudianteFormVisible: false,
 
   formatMathText(texto) {
     if (typeof texto !== 'string' || !texto) return '';
@@ -736,6 +739,7 @@ const App = {
       { id: 'matematicas', ico: '🍊', label: 'Matemáticas' },
       { id: 'ingles', ico: '🌴', label: 'Inglés' },
       { id: 'progreso', ico: '📊', label: 'Progreso' },
+      { id: 'estudiantes', ico: '👥', label: 'Estudiantes' },
     ];
     const tabs = this.currentRole === 'docente' ? tabsDocente : tabsEstudiante;
     document.getElementById('navBar').innerHTML = tabs.map(t => `
@@ -761,6 +765,8 @@ const App = {
           html = await this.renderDetalleTarea();
         } else if (this.currentModule === 'matematicas' || this.currentModule === 'ingles') {
           html = await this.renderDocenteMateria(this.currentModule);
+        } else if (this.currentModule === 'estudiantes') {
+          html = await this.renderGestionEstudiantes();
         } else {
           html = await this.renderDocenteProgreso();
         }
@@ -1568,6 +1574,170 @@ const App = {
     this.analyticsFilterTarea = '';
     this.analyticsFilterTema = '';
     this.render();
+  },
+
+  /* ---------- DOCENTE: gestión de estudiantes ---------- */
+  async renderGestionEstudiantes() {
+    try {
+      // Cargar estudiantes y tareas para contar asignaciones
+      this.estudiantesGestion = await API.getEstudiantes();
+      if (!Array.isArray(this.estudiantesGestion)) this.estudiantesGestion = [];
+      const tareas = await API.getTareas();
+
+      const filas = this.estudiantesGestion.length > 0
+        ? this.estudiantesGestion.map(e => {
+            const estadoActivo = e.estado !== 'inactivo';
+            const tareasAsignadas = (Array.isArray(tareas) ? tareas : []).filter(t => t.estudianteId === e.id).length;
+            return `
+              <tr style="border-bottom:1px solid var(--borde);">
+                <td style="padding:10px; font-weight:600;">${e.nombre || 'Sin nombre'}</td>
+                <td style="padding:10px;">${e.email || ''}</td>
+                <td style="padding:10px; text-align:center;">
+                  <span class="tag" style="background:${estadoActivo ? 'var(--secundario)' : 'var(--texto-suave)'}; color:white;">
+                    ${estadoActivo ? 'Activo' : 'Inactivo'}
+                  </span>
+                </td>
+                <td style="padding:10px; text-align:center;">${tareasAsignadas}</td>
+                <td style="padding:10px; text-align:center; white-space:nowrap;">
+                  <button class="ghost" onclick="App.editarEstudianteForm('${e.id}')">✏️ Editar</button>
+                  <button class="ghost" onclick="App.eliminarEstudianteGestion('${e.id}')" style="color:var(--error-suave);">🗑️ Eliminar</button>
+                </td>
+              </tr>
+            `;
+          }).join('')
+        : '<tr><td colspan="5" style="padding:20px; text-align:center;">No hay estudiantes registrados</td></tr>';
+
+      // Estado del formulario
+      const editando = this.estudianteEditando;
+      const formVisible = this.estudianteFormVisible || !!editando;
+      const formHtml = formVisible ? `
+        <div class="card" style="background:var(--fondo-2); margin-bottom:14px;">
+          <h3>${editando ? '✏️ Editar Estudiante' : '➕ Registrar Nuevo Estudiante'}</h3>
+          <div class="grid2">
+            <div>
+              <label>Nombre completo</label>
+              <input type="text" id="estNombre" value="${editando ? (editando.nombre || '') : ''}" placeholder="Ej: Michelle Torres">
+              <label>Correo electrónico</label>
+              <input type="email" id="estEmail" value="${editando ? (editando.email || '') : ''}" placeholder="Ej: michelle@cosecha.edu">
+              <label>Grado / Grupo (opcional)</label>
+              <input type="text" id="estGrado" value="${editando ? (editando.grado || '') : ''}" placeholder="Ej: 5° Primaria">
+            </div>
+            <div>
+              <label>Contraseña ${editando ? '(dejar vacío para no cambiar)' : 'inicial'}</label>
+              <input type="password" id="estPassword" placeholder="${editando ? '••••••••' : 'Mínimo 6 caracteres'}">
+            </div>
+          </div>
+          <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="primary" onclick="App.guardarEstudiante()">${editando ? '💾 Guardar Cambios' : '✅ Registrar Estudiante'}</button>
+            <button class="ghost" onclick="App.cancelarEdicionEstudiante()">Cancelar</button>
+          </div>
+        </div>
+      ` : '';
+
+      return `
+        <div class="card" style="margin-bottom:14px;">
+          <div class="module-header">
+            <div class="badge" style="background:var(--acento);">👥</div>
+            <div>
+              <h2>Gestión de Estudiantes</h2>
+              <p>Registra, edita y administra las cuentas de tus estudiantes.</p>
+            </div>
+          </div>
+          <button class="primary" onclick="App.mostrarFormEstudiante()">➕ Registrar Estudiante</button>
+        </div>
+        ${formHtml}
+        <div class="card">
+          <h3>👩‍🎓 Lista de Estudiantes (${this.estudiantesGestion.length})</h3>
+          <div style="overflow-x:auto; margin-top:10px;">
+            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+              <thead>
+                <tr style="background:var(--fondo-2);">
+                  <th style="padding:10px; text-align:left; border-bottom:2px solid var(--borde);">Nombre</th>
+                  <th style="padding:10px; text-align:left; border-bottom:2px solid var(--borde);">Correo</th>
+                  <th style="padding:10px; text-align:center; border-bottom:2px solid var(--borde);">Estado</th>
+                  <th style="padding:10px; text-align:center; border-bottom:2px solid var(--borde);">Tareas</th>
+                  <th style="padding:10px; text-align:center; border-bottom:2px solid var(--borde);">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>${filas}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    } catch (e) {
+      console.error('Error cargando gestión de estudiantes:', e);
+      return `<p class="empty">⚠️ Error al cargar estudiantes: ${e.message}</p>`;
+    }
+  },
+
+  mostrarFormEstudiante() {
+    this.estudianteEditando = null;
+    this.estudianteFormVisible = true;
+    this.render();
+  },
+
+  cancelarEdicionEstudiante() {
+    this.estudianteEditando = null;
+    this.estudianteFormVisible = false;
+    this.render();
+  },
+
+  async editarEstudianteForm(id) {
+    const estudiante = this.estudiantesGestion.find(e => e.id === id);
+    if (!estudiante) return;
+    this.estudianteEditando = estudiante;
+    this.estudianteFormVisible = true;
+    this.render();
+  },
+
+  async guardarEstudiante() {
+    const nombre = document.getElementById('estNombre').value.trim();
+    const email = document.getElementById('estEmail').value.trim();
+    const password = document.getElementById('estPassword').value;
+    const grado = document.getElementById('estGrado')?.value.trim() || '';
+
+    if (!nombre || !email) {
+      this.toast('⚠️ Nombre y correo son obligatorios');
+      return;
+    }
+    if (!this.estudianteEditando && password.length < 6) {
+      this.toast('⚠️ La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    try {
+      if (this.estudianteEditando) {
+        // Editar
+        const data = { nombre, email, grado };
+        if (password) data.password = password;
+        await API.editarEstudiante(this.estudianteEditando.id, data);
+        this.toast('✅ Estudiante actualizado');
+      } else {
+        // Crear
+        await API.crearEstudiante({ nombre, email, password, grado });
+        this.toast('✅ Estudiante registrado');
+      }
+      this.estudianteEditando = null;
+      this.estudianteFormVisible = false;
+      this.render();
+    } catch (e) {
+      this.toast('⚠️ ' + e.message);
+    }
+  },
+
+  async eliminarEstudianteGestion(id) {
+    const estudiante = this.estudiantesGestion.find(e => e.id === id);
+    const nombre = estudiante ? (estudiante.nombre || estudiante.email) : 'este estudiante';
+    const confirmar = window.confirm(`¿Seguro que quieres dar de baja a ${nombre}? Se desactivará la cuenta pero se preservará su historial.`);
+    if (!confirmar) return;
+
+    try {
+      await API.eliminarEstudiante(id);
+      this.toast('🗑️ Estudiante dado de baja');
+      this.render();
+    } catch (e) {
+      this.toast('⚠️ ' + e.message);
+    }
   },
 
   /* ---------- EVENTOS ---------- */

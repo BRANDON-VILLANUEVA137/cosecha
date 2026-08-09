@@ -80,6 +80,21 @@ const API = {
     });
   },
 
+  // ---- Estudiantes (Docente) ----
+  getEstudiantes() {
+    return this.request('/estudiantes');
+  },
+  crearEstudiante(data) {
+    return this.request('/estudiantes', { method: 'POST', body: JSON.stringify(data) });
+  },
+  editarEstudiante(id, data) {
+    return this.request('/estudiantes/' + id, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  eliminarEstudiante(id, hardDelete = false) {
+    const q = hardDelete ? '?hardDelete=true' : '';
+    return this.request('/estudiantes/' + id + q, { method: 'DELETE' });
+  },
+
   // ---- Logros ----
   getLogros() {
     return this.request('/logros');
