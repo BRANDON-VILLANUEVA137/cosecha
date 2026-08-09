@@ -59,7 +59,7 @@
 
 [[redirects]]
   from = "/api/health"
-  to = "https://cosecha.onrender.com/api/health
+  to = "https://cosecha.onrender.com/api/health"
 # ============================================
 [[headers]]
   for = "/*"
