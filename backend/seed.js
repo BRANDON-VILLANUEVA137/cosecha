@@ -65,6 +65,7 @@ async function seedDatabase() {
   const data = JSON.parse(rawData);
 
   try {
+    await seedCollection('usuarios', data.usuarios);
     await seedCollection('ejercicios', data.ejercicios);
     await seedCollection('prendas', data.prendas);
     await seedCollection('logros', data.logros);

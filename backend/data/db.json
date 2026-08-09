@@ -1,4 +1,18 @@
 {
+  "usuarios": {
+    "estudiante-001": {
+      "email": "estudiante@cosecha.com",
+      "rol": "estudiante",
+      "nombre": "Michelle",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    "docente-001": {
+      "email": "docente@cosecha.com",
+      "rol": "docente",
+      "nombre": "Docente Prueba",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  },
   "ejercicios": {
     "m1": {
       "materia": "matematicas",
@@ -6,7 +20,8 @@
       "enunciado": "6/6 + 9/6 = ?",
       "tipo": "fraccion",
       "respuestaCorrecta": "15/6",
-      "pistaError": "Si el denominador es igual, se deja igual y solo se suman los numeradores."
+      "pistaError": "Si el denominador es igual, se deja igual y solo se suman los numeradores.",
+      "metodologia": "Estándar / Directo"
     },
     "m2": {
       "materia": "matematicas",
@@ -14,7 +29,8 @@
       "enunciado": "22/25 + 15/25 = ?",
       "tipo": "fraccion",
       "respuestaCorrecta": "37/25",
-      "pistaError": "Revisa si sumaste correctamente los numeradores (el denominador no cambia)."
+      "pistaError": "Revisa si sumaste correctamente los numeradores (el denominador no cambia).",
+      "metodologia": "Estándar / Directo"
     },
     "m3": {
       "materia": "matematicas",
@@ -22,7 +38,8 @@
       "enunciado": "2/5 + 3/10 = ?",
       "tipo": "fraccion",
       "respuestaCorrecta": "7/10",
-      "pistaError": "Denominador diferente: aplica la regla de la carita sonriente (multiplica en cruz) antes de sumar."
+      "pistaError": "Denominador diferente: aplica la regla de la carita sonriente (multiplica en cruz) antes de sumar.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
     },
     "m4": {
       "materia": "matematicas",
@@ -30,7 +47,8 @@
       "enunciado": "3/8 + 5/4 = ?",
       "tipo": "fraccion",
       "respuestaCorrecta": "13/8",
-      "pistaError": "Recuerda multiplicar en cruz los numeradores con el denominador contrario, y los denominadores entre sí."
+      "pistaError": "Recuerda multiplicar en cruz los numeradores con el denominador contrario, y los denominadores entre sí.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
     },
     "m5": {
       "materia": "matematicas",
@@ -38,7 +56,8 @@
       "enunciado": "3/5 x 2/7 = ?",
       "tipo": "fraccion",
       "respuestaCorrecta": "6/35",
-      "pistaError": "En la multiplicación no se busca denominador común: numerador por numerador, denominador por denominador."
+      "pistaError": "En la multiplicación no se busca denominador común: numerador por numerador, denominador por denominador.",
+      "metodologia": "Estándar / Directo"
     },
     "m6": {
       "materia": "matematicas",
@@ -46,7 +65,8 @@
       "enunciado": "25/25 + 15/25 = ?",
       "tipo": "fraccion",
       "respuestaCorrecta": "40/25",
-      "pistaError": "Suma solo los numeradores y conserva el denominador si es igual."
+      "pistaError": "Suma solo los numeradores y conserva el denominador si es igual.",
+      "metodologia": "Estándar / Directo"
     },
     "m7": {
       "materia": "matematicas",
@@ -54,7 +74,8 @@
       "enunciado": "170/100 + 80/100 = ?",
       "tipo": "fraccion",
       "respuestaCorrecta": "250/100",
-      "pistaError": "Revisa si el denominador se mantiene igual en la suma con el mismo denominador."
+      "pistaError": "Revisa si el denominador se mantiene igual en la suma con el mismo denominador.",
+      "metodologia": "Estándar / Directo"
     },
     "m8": {
       "materia": "matematicas",
@@ -62,7 +83,8 @@
       "enunciado": "5/2 + 7/9 = ?",
       "tipo": "fraccion",
       "respuestaCorrecta": "59/18",
-      "pistaError": "Aplica la regla de la carita sonriente: multiplica en cruz y luego suma los resultados."
+      "pistaError": "Aplica la regla de la carita sonriente: multiplica en cruz y luego suma los resultados.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
     },
     "m9": {
       "materia": "matematicas",
@@ -70,7 +92,8 @@
       "enunciado": "8/3 + 6/4 = ?",
       "tipo": "fraccion",
       "respuestaCorrecta": "50/12",
-      "pistaError": "Recuerda encontrar un denominador común antes de sumar."
+      "pistaError": "Recuerda encontrar un denominador común antes de sumar.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
     },
     "m10": {
       "materia": "matematicas",
@@ -78,7 +101,8 @@
       "enunciado": "Grafica la fracción 2/5.",
       "tipo": "grafico",
       "respuestaCorrecta": "2/5",
-      "pistaError": "Divide una figura en 5 partes y colorea 2."
+      "pistaError": "Divide una figura en 5 partes y colorea 2.",
+      "metodologia": "Graficación Interactiva"
     },
     "i1": {
       "materia": "ingles",
@@ -86,7 +110,8 @@
       "enunciado": "My brother ___ happy. (am / is / are)",
       "tipo": "texto",
       "respuestaCorrecta": "is",
-      "pistaError": "\"My brother\" es él (singular) → usa la forma para he/she/it."
+      "pistaError": "\"My brother\" es él (singular) → usa la forma para he/she/it.",
+      "metodologia": "Estándar / Directo"
     },
     "i2": {
       "materia": "ingles",
@@ -94,7 +119,8 @@
       "enunciado": "Sofía and Pedro ___ friends. (am / is / are)",
       "tipo": "texto",
       "respuestaCorrecta": "are",
-      "pistaError": "Cuando son varias personas (plural), el verbo to be usa la forma para we/they/you."
+      "pistaError": "Cuando son varias personas (plural), el verbo to be usa la forma para we/they/you.",
+      "metodologia": "Estándar / Directo"
     },
     "i3": {
       "materia": "ingles",
@@ -102,7 +128,8 @@
       "enunciado": "\"The dog and the cat\" → ¿qué pronombre los reemplaza?",
       "tipo": "texto",
       "respuestaCorrecta": "they",
-      "pistaError": "Son varios (animales/cosas en plural) → el pronombre para varios es \"they\"."
+      "pistaError": "Son varios (animales/cosas en plural) → el pronombre para varios es \"they\".",
+      "metodologia": "Estándar / Directo"
     },
     "i4": {
       "materia": "ingles",
@@ -110,7 +137,8 @@
       "enunciado": "\"Maria and I\" → ¿qué pronombre los reemplaza?",
       "tipo": "texto",
       "respuestaCorrecta": "we",
-      "pistaError": "Cuando \"yo\" está incluido junto con otra persona, el pronombre es \"we\" (nosotros)."
+      "pistaError": "Cuando \"yo\" está incluido junto con otra persona, el pronombre es \"we\" (nosotros).",
+      "metodologia": "Estándar / Directo"
     }
   },
   "prendas": {
@@ -220,23 +248,139 @@
     }
   },
   "logros": {
-    "estudiante_demo": {
-      "aciertosMatematicas": 0,
+    "estudiante-001": {
+      "email": "estudiante@cosecha.com",
+      "nombre": "Michelle",
+      "aciertosMatematicas": 9,
       "aciertosIngles": 0,
-      "intentos": 0,
+      "intentos": 10,
       "desbloqueadas": [
         "camiseta-basica",
         "pantalon-basico",
-        "tenis-basico"
+        "tenis-basico",
+        "buso-naranja",
+        "gorro-citrico"
       ],
       "equipo": {
-        "cabeza": null,
-        "torso": "camiseta-basica",
+        "cabeza": "gorro-citrico",
+        "torso": "buso-naranja",
         "piernas": "pantalon-basico",
         "calzado": "tenis-basico",
         "accesorio": null
       },
-      "historial": []
+      "ejerciciosCompletados": ["m1", "m2", "m3", "m4", "m5", "m6", "m7", "m8", "m9"],
+      "historial": [
+        {
+          "ejercicioId": "m1",
+          "materia": "matematicas",
+          "enunciado": "6/6 + 9/6 = ?",
+          "metodologia": "Estándar / Directo",
+          "tema": "Fracciones · mismo denominador",
+          "correcto": true,
+          "respuesta": "15/6",
+          "respuestaCorrecta": "15/6",
+          "fecha": "2026-08-09T14:30:00.000Z"
+        },
+        {
+          "ejercicioId": "m2",
+          "materia": "matematicas",
+          "enunciado": "22/25 + 15/25 = ?",
+          "metodologia": "Estándar / Directo",
+          "tema": "Fracciones · mismo denominador",
+          "correcto": true,
+          "respuesta": "37/25",
+          "respuestaCorrecta": "37/25",
+          "fecha": "2026-08-09T14:31:00.000Z"
+        },
+        {
+          "ejercicioId": "m3",
+          "materia": "matematicas",
+          "enunciado": "2/5 + 3/10 = ?",
+          "metodologia": "Paso a Paso (Carita Sonriente)",
+          "tema": "Fracciones · Carita Sonriente",
+          "correcto": true,
+          "respuesta": "7/10",
+          "respuestaCorrecta": "7/10",
+          "fecha": "2026-08-09T14:32:00.000Z"
+        },
+        {
+          "ejercicioId": "m4",
+          "materia": "matematicas",
+          "enunciado": "3/8 + 5/4 = ?",
+          "metodologia": "Paso a Paso (Carita Sonriente)",
+          "tema": "Fracciones · Carita Sonriente",
+          "correcto": false,
+          "respuesta": "5/",
+          "respuestaCorrecta": "13/8",
+          "fecha": "2026-08-09T14:33:00.000Z"
+        },
+        {
+          "ejercicioId": "m5",
+          "materia": "matematicas",
+          "enunciado": "3/5 x 2/7 = ?",
+          "metodologia": "Estándar / Directo",
+          "tema": "Multiplicación de fracciones",
+          "correcto": true,
+          "respuesta": "6/35",
+          "respuestaCorrecta": "6/35",
+          "fecha": "2026-08-09T14:33:30.193Z"
+        },
+        {
+          "ejercicioId": "m6",
+          "materia": "matematicas",
+          "enunciado": "25/25 + 15/25 = ?",
+          "metodologia": "Estándar / Directo",
+          "tema": "Fracciones · mismo denominador",
+          "correcto": true,
+          "respuesta": "40/25",
+          "respuestaCorrecta": "40/25",
+          "fecha": "2026-08-09T14:34:00.000Z"
+        },
+        {
+          "ejercicioId": "m7",
+          "materia": "matematicas",
+          "enunciado": "170/100 + 80/100 = ?",
+          "metodologia": "Estándar / Directo",
+          "tema": "Fracciones · mismo denominador",
+          "correcto": true,
+          "respuesta": "250/100",
+          "respuestaCorrecta": "250/100",
+          "fecha": "2026-08-09T14:35:00.000Z"
+        },
+        {
+          "ejercicioId": "m8",
+          "materia": "matematicas",
+          "enunciado": "5/2 + 7/9 = ?",
+          "metodologia": "Paso a Paso (Carita Sonriente)",
+          "tema": "Fracciones · Carita Sonriente",
+          "correcto": true,
+          "respuesta": "59/18",
+          "respuestaCorrecta": "59/18",
+          "fecha": "2026-08-09T14:36:00.000Z"
+        },
+        {
+          "ejercicioId": "m9",
+          "materia": "matematicas",
+          "enunciado": "8/3 + 6/4 = ?",
+          "metodologia": "Paso a Paso (Carita Sonriente)",
+          "tema": "Fracciones · Carita Sonriente",
+          "correcto": false,
+          "respuesta": "14/7",
+          "respuestaCorrecta": "50/12",
+          "fecha": "2026-08-09T14:37:00.000Z"
+        },
+        {
+          "ejercicioId": "m10",
+          "materia": "matematicas",
+          "enunciado": "Grafica la fracción 2/5.",
+          "metodologia": "Graficación Interactiva",
+          "tema": "Graficar fracciones",
+          "correcto": true,
+          "respuesta": "2/5",
+          "respuestaCorrecta": "2/5",
+          "fecha": "2026-08-09T14:38:00.000Z"
+        }
+      ]
     }
   }
 }

@@ -39,6 +39,18 @@
   force = true
 
 [[redirects]]
+  from = "/api/tareas/*"
+  to = "https://cosecha.onrender.com/api/tareas/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/analytics/*"
+  to = "https://cosecha.onrender.com/api/analytics/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/health"
   to = "https://cosecha.onrender.com/api/health"
   status = 200

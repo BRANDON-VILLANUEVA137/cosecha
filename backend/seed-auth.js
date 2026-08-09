@@ -20,7 +20,7 @@ const usuarios = [
     password: 'estudiante123',
     uid: 'estudiante-001',
     rol: 'estudiante',
-    nombre: 'Estudiante Prueba'
+    nombre: 'Michelle'
   }
 ];
 

@@ -163,11 +163,15 @@ router.post('/:id/validar', requireRole('estudiante'), async (req, res) => {
     }
 
     logro.historial.push({
+      ejercicioId: ejercicio.id,
       materia: ejercicio.materia,
       enunciado: ejercicio.enunciado,
+      metodologia: ejercicio.metodologia || 'Estándar / Directo',
+      tema: ejercicio.tema || 'General',
+      correcto: resultado.correcto,
       respuesta,
       respuestaCorrecta: ejercicio.respuestaCorrecta,
-      correcto: resultado.correcto
+      fecha: new Date().toISOString()
     });
 
     await logroRef.set(logro);
