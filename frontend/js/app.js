@@ -848,15 +848,32 @@ const App = {
 
     const tareasFiltradas = tareas.filter(t => t.materia === materia);
 
+    // Cargar los ejercicios de cada tarea para mostrar el conteo correcto
+    const tareasConEjercicios = await Promise.all(
+      tareasFiltradas.map(async (tarea) => {
+        try {
+          const tareaCompleta = await API.getTarea(tarea.id);
+          return {
+            ...tarea,
+            ejercicios: tareaCompleta.ejercicios || [],
+            estado: tareaCompleta.estado || 'borrador'
+          };
+        } catch (e) {
+          console.error('Error cargando tarea:', tarea.id, e);
+          return { ...tarea, ejercicios: [], estado: tarea.estado || 'borrador' };
+        }
+      })
+    );
+
     // Sección de Tareas
-    const tareasHtml = tareasFiltradas.map(t => `
+    const tareasHtml = tareasConEjercicios.map(t => `
       <div class="task-card task-module-card">
         <div class="task-module-head">
           <div>
             <span class="tag ${esMat ? 'mat' : 'ing'}">Tarea</span>
             <h3>${t.titulo}</h3>
           </div>
-          <span class="task-status" style="background:${t.activa ? 'var(--secundario)' : 'var(--texto-suave)'}; color:white;">${t.activa ? 'Activa' : 'Inactiva'}</span>
+          <span class="task-status" style="background:${t.estado === 'publicada' ? 'var(--secundario)' : 'var(--texto-suave)'}; color:white;">${t.estado === 'publicada' ? 'Publicada' : 'Borrador'}</span>
         </div>
         <p>${t.descripcion || 'Sin descripción'}</p>
         <div class="task-meta">${t.ejercicios?.length || 0} ejercicios</div>
