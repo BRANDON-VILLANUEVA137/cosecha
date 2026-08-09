@@ -525,8 +525,11 @@ const App = {
     try {
       await API.agregarEjercicioATarea(this.currentTaskView.id, ejercicioId);
       this.toast('✅ Ejercicio agregado');
-      // Recargar la tarea
-      await this.verTareaDocente(this.currentTaskView.id);
+      // Recargar la tarea para obtener los ejercicios actualizados
+      const tareaActualizada = await API.getTarea(this.currentTaskView.id);
+      this.currentTaskView = tareaActualizada;
+      this.currentTaskExercises = tareaActualizada.ejercicios || [];
+      this.render();
     } catch (e) {
       this.toast('⚠️ ' + e.message);
     }
