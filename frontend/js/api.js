@@ -123,5 +123,11 @@ const API = {
     return this.request('/tareas/' + tareaId + '/ejercicios/' + ejercicioId, {
       method: 'DELETE'
     });
+  },
+  publicarTarea(id, estado) {
+    return this.request('/tareas/' + id + '/publicar', {
+      method: 'PATCH',
+      body: JSON.stringify({ estado })
+    });
   }
 };

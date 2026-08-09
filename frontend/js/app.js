@@ -458,6 +458,7 @@ const App = {
     const tarea = this.currentTaskView;
     const ejerciciosEnTarea = this.currentTaskExercises || [];
     const esMat = tarea.materia === 'matematicas';
+    const estaPublicada = tarea.estado === 'publicada';
     
     // Obtener ejercicios disponibles que no están en la tarea
     const ejerciciosDisponibles = this.allEjercicios.filter(ej => 
@@ -501,7 +502,17 @@ const App = {
           <button class="ghost" onclick="App.closeTaskView()">← Volver a tareas</button>
           <button class="ghost" onclick="App.eliminarTarea('${tarea.id}')" style="color:var(--error-suave);">🗑️ Eliminar Tarea</button>
         </div>
-        <div class="task-meta">${ejerciciosEnTarea.length} ejercicios en esta tarea</div>
+        <div class="task-meta">
+          ${ejerciciosEnTarea.length} ejercicios · 
+          <span class="tag" style="background:${estaPublicada ? 'var(--secundario)' : 'var(--texto-suave)'}; color:white;">
+            ${estaPublicada ? 'Publicada' : 'Borrador'}
+          </span>
+        </div>
+        <div style="margin-top:10px;">
+          <button class="primary" onclick="App.publicarTarea('${tarea.id}', '${estaPublicada ? 'borrador' : 'publicada'}')">
+            ${estaPublicada ? '📝 Despublicar' : '🚀 Publicar Tarea'}
+          </button>
+        </div>
       </div>
 
       <!-- Ejercicios en la tarea -->
@@ -546,6 +557,17 @@ const App = {
       this.toast('🗑️ Ejercicio removido');
       // Recargar la tarea
       await this.verTareaDocente(this.currentTaskView.id);
+    } catch (e) {
+      this.toast('⚠️ ' + e.message);
+    }
+  },
+
+  async publicarTarea(id, estado) {
+    try {
+      await API.publicarTarea(id, estado);
+      this.toast(estado === 'publicada' ? '✅ Tarea publicada' : '📝 Tarea despublicada');
+      // Recargar la tarea
+      await this.verTareaDocente(id);
     } catch (e) {
       this.toast('⚠️ ' + e.message);
     }

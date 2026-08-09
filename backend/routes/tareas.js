@@ -3,16 +3,16 @@ const router = express.Router();
 const { db } = require('../config/firebase-admin');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 
-// GET /api/tareas - Obtener todas las tareas (docente ve todas, estudiante ve las públicas)
+// GET /api/tareas - Obtener todas las tareas (docente ve todas, estudiante ve las publicadas)
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const snapshot = await db.collection('tareas').orderBy('fechaCreacion', 'desc').get();
     const tareas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     
-    // Si es estudiante, filtrar solo tareas activas
+    // Si es estudiante, filtrar solo tareas publicadas
     const tareasFiltradas = req.user?.rol === 'docente' 
       ? tareas 
-      : tareas.filter(t => t.activa);
+      : tareas.filter(t => t.estado === 'publicada');
     
     return res.json(tareasFiltradas);
   } catch (error) {
@@ -89,7 +89,7 @@ router.post('/', authMiddleware, requireRole('docente'), async (req, res) => {
       titulo,
       descripcion: descripcion || '',
       materia,
-      activa: activa !== undefined ? activa : true,
+      estado: 'borrador', // Las tareas se crean como borrador
       docenteId: req.user.uid,
       fechaCreacion: new Date(),
       fechaActualizacion: new Date()
@@ -123,7 +123,7 @@ router.put('/:id', authMiddleware, requireRole('docente'), async (req, res) => {
       titulo: titulo || tareaDoc.data().titulo,
       descripcion: descripcion !== undefined ? descripcion : tareaDoc.data().descripcion,
       materia: materia || tareaDoc.data().materia,
-      activa: activa !== undefined ? activa : tareaDoc.data().activa,
+      estado: tareaDoc.data().estado || 'borrador',
       fechaActualizacion: new Date()
     });
     
@@ -131,6 +131,38 @@ router.put('/:id', authMiddleware, requireRole('docente'), async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'No se pudo actualizar la tarea' });
+  }
+});
+
+// PATCH /api/tareas/:id/publicar - Publicar/despublicar una tarea (solo docente)
+router.patch('/:id/publicar', authMiddleware, requireRole('docente'), async (req, res) => {
+  try {
+    const { estado } = req.body; // 'borrador' o 'publicada'
+    
+    if (!estado || !['borrador', 'publicada'].includes(estado)) {
+      return res.status(400).json({ error: 'Estado inválido. Debe ser "borrador" o "publicada"' });
+    }
+    
+    const tareaDoc = await db.collection('tareas').doc(req.params.id).get();
+    
+    if (!tareaDoc.exists) {
+      return res.status(404).json({ error: 'Tarea no encontrada' });
+    }
+    
+    // Verificar que la tarea pertenece al docente
+    if (tareaDoc.data().docenteId !== req.user.uid) {
+      return res.status(403).json({ error: 'No tienes permiso para modificar esta tarea' });
+    }
+    
+    await db.collection('tareas').doc(req.params.id).update({
+      estado,
+      fechaActualizacion: new Date()
+    });
+    
+    return res.json({ id: req.params.id, estado, message: `Tarea ${estado === 'publicada' ? 'publicada' : 'despublicada'}` });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'No se pudo actualizar el estado de la tarea' });
   }
 });
 
