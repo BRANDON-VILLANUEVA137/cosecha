@@ -453,4 +453,33 @@ module.exports = {
   comprarItem,
   equiparItem,
   completarTarea
+
+/**
+ * Abre un cofre y entrega una carta aleatoria.
+ * @param {string} uid
+ */
+async function abrirCofre(uid) {
+  const logro = await getLogro(uid);
+  if (logro.naranjas < 50) { // Precio del cofre
+    return { ok: false, mensaje: 'Naranjas insuficientes' };
+  }
+
+  // Lógica simple de probabilidad
+  const cartasSnapshot = await db.collection('cartas').where('activa', '==', true).get();
+  const cartas = cartasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const carta = cartas[Math.floor(Math.random() * cartas.length)];
+
+  logro.naranjas -= 50;
+,
+  abrirCofre
+  logro.cartas_desbloqueadas.push({
+    carta_id: carta.id,
+    obtenida_en: new Date().toISOString(),
+    origen: 'cofre'
+  });
+
+  await db.collection('logros').doc(uid).set(logro);
+  return { ok: true, carta };
+}
+
 };

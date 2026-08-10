@@ -20,6 +20,8 @@ app.use('/api/tareas', authMiddleware, require('./routes/tareas'));
 app.use('/api/analytics', authMiddleware, require('./routes/analytics')); // Router separado para analytics
 app.use('/api/logros', authMiddleware, require('./routes/logros'));
 app.use('/api/prendas', authMiddleware, require('./routes/prendas'));
+app.use('/api/cartas', authMiddleware, require('./routes/cartas'));
+
 app.use('/api/estudiantes', require('./routes/estudiantes'));
 
 // Health check
