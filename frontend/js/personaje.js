@@ -194,29 +194,14 @@ const Personaje = {
   PARAM_DEFAULT: { clothing: 'shirt', hat: 'beanie', accessories: 'glasses', facialExpression: 'smile' },
   EMOJI_CATEGORIA: { cabeza: '🧢', torso: '👕', accesorio: '🕶️', avatar: '🙂', perfil: '🧑' },
 
-  // ---------- Vista previa de la prenda en el grid ----------
+  // ---------- Open Peeps (Armario y Tienda) ----------
   preview(prendas, prenda) {
-    const cat = prenda.categoria;
-    // Marcos → caja de color
-    if (prenda.tipo === 'frame') {
-      return `<div class="swatch-frame" style="--fc:${prenda.color}"><span>▣</span></div>`;
-    }
-    // Fondos → caja con gradiente
-    if (prenda.tipo === 'fondo') {
-      return `<div class="swatch-fondo" style="background:${prenda.gradiente}"></div>`;
-    }
-    // OpenPeeps / fotos de perfil → SVG inline
-    if (prenda.tipo === 'openpeeps' || cat === 'perfil') {
-      return `<div class="swatch-inline">${this.renderOpenPeeps(prenda.variante || 'p1', 60)}</div>`;
-    }
-    // Cualquier categoría de personaje → micro-render DiceBear siempre válido.
-    // Si el ítem no trae dicebearOptions (catálogo viejo), se usa un parámetro
-    // por defecto según la categoría para garantizar una URL SVG válida.
-    const url = this.generarUrlDiceBear({ [cat]: prenda.id }, prendas);
-    const emoji = this.EMOJI_CATEGORIA[cat] || '🎁';
-    return `<img class="swatch-img" src="${url}" alt="${prenda.nombre}" loading="lazy"
-      onerror="this.outerHTML='<div class=&quot;swatch-inline&quot;>${emoji}</div>'">`;
+    // Para el Armario y Tienda: Renderizado exclusivo con Open Peeps
+    // Si la prenda tiene una variante de Open Peeps, la usamos.
+    // De lo contrario, simulamos la vista previa con Open Peeps.
+    return `<div class="swatch-inline">${this.renderOpenPeeps(prenda.variante || 'p1', 60)}</div>`;
   },
+
   emojiDe(cat, prenda) {
     const o = prenda.dicebearOptions || {};
     if (o.hat) return '🧢';

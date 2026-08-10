@@ -1058,18 +1058,15 @@ const App = {
         <div class="armario-layout">
           <div>
             <div class="perfil-card" style="${fondoStyle}">
-              <div class="perfil-card__head">
-                <div class="perfil-card__photo">${Personaje.renderOpenPeeps(perfilId, 40)}</div>
-                <div class="perfil-card__id">
-                  <h3>${logro.nombre || 'Aventurero'}</h3>
-                  <span class="perfil-card__role">${this.authUser?.email || 'estudiante'}</span>
-                </div>
-              </div>
               <div class="perfil-card__avatar">
                 <div class="avatar-frame avatar-frame--${marcoRango}">
                   <img src="${urlAvatar}" alt="Tu personaje" class="avatar-dicebear" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=cosecha&clothing=shirt'">
                   <div class="avatar-frame__badge">${rango.icono} ${this.cap(rango.nombre)}</div>
                 </div>
+              </div>
+              <div class="perfil-card__id">
+                <h3>${logro.nombre || 'Aventurero'}</h3>
+                <span class="perfil-card__role">${this.authUser?.email || 'estudiante'}</span>
               </div>
               <div class="xp-block perfil-card__xp">
                 <div class="xp-bar"><div class="xp-bar__fill" style="width:${prog.progreso}%"></div></div>
