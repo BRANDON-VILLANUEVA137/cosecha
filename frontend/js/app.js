@@ -1089,6 +1089,71 @@ const App = {
       </div>
     `;
   },
+  async renderAlbum() {
+    const [logro, cartas] = await Promise.all([API.getLogros(), API.getCartas()]);
+    const desbloqueadasIds = logro.cartas_desbloqueadas.map(c => c.carta_id);
+
+    const grid = cartas.map(c => {
+      const esDesbloqueada = desbloqueadasIds.includes(c.id);
+      
+      return `
+        <div class="carta-item ${esDesbloqueada ? 'desbloqueada' : 'bloqueada'}">
+          <div class="carta-preview">
+            ${esDesbloqueada ? 
+              `<img src="${c.imagen_url}" alt="${c.nombre}" style="width:100%; border-radius:8px;">` : 
+              `<div class="silueta" style="width:100%; height:150px; background:#eee; display:flex; align-items:center; justify-content:center; border-radius:8px;">❓</div>`}
+          </div>
+          <div class="carta-info">
+            <strong>${esDesbloqueada ? c.nombre : '???'}</strong>
+            ${esDesbloqueada ? `
+              <div class="stats" style="font-size:0.8rem;">
+                <span>⚔️ ${c.stats.poder}</span> 
+                <span>🧠 ${c.stats.inteligencia}</span>
+                <span>💪 ${c.stats.fuerza}</span>
+              </div>` : '<small>Bloqueado</small>'}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="card">
+        <div class="module-header">
+          <div class="badge" style="background:var(--acento);">🃏</div>
+          <div><h2>Mi Álbum de Colección</h2><p>¡Colecciona cartas, sube de nivel y desbloquea cofres con tus naranjas! 🍊</p></div>
+        </div>
+        <div class="album-container" style="padding: 1rem;">
+          <div class="album-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem;">${grid}</div>
+          <button class="btn-cofre" onclick="App.abrirCofreModal()" style="margin-top: 2rem; padding: 0.5rem 1rem; cursor: pointer;">Abrir Cofre (50 🍊)</button>
+        </div>
+      </div>
+    `;
+  },
+
+  async abrirCofreModal() {
+    const result = await API.abrirCofre();
+
+    if (!result.ok) return alert(result.error);
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-revelacion active';
+    modal.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:1000;";
+    modal.innerHTML = `
+      <div class="modal-content" style="background:#fff; padding:2rem; border-radius:12px; text-align:center;">
+        <div class="revelacion-animacion">
+          <h3>¡Nueva Carta!</h3>
+          <img src="${result.carta.imagen_url}" class="carta-revelada pop" style="width:150px; margin:1rem 0;">
+          <p><strong>${result.carta.nombre}</strong> (${result.carta.rareza.toUpperCase()})</p>
+          <button onclick="
+            this.closest('.modal-revelacion').remove(); 
+            App.render();
+          " style="margin-top:1rem; padding:0.5rem 1rem; cursor:pointer;">¡Genial!</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  },
+
 
   /* ---------- DOCENTE: módulo por materia ---------- */
   async renderDocenteMateria(materia) {
