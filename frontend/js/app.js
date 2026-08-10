@@ -5,7 +5,7 @@
 const App = {
   currentRole: null,
   currentModule: 'inicio',
-  currentArmarioTab: 'perfil',
+  currentArmarioTab: 'avatar',
   currentTheme: 'citrico',
   intentosPorEjercicio: {},
   cachePrendas: [],
@@ -155,32 +155,9 @@ const App = {
       logoutBtn.onclick = () => this.handleLogout();
     }
 
-    const config = window.COSECHA_FIREBASE_CONFIG || window.firebaseConfig || null;
-    const hasValidConfig = config && config.apiKey && config.projectId && config.appId
-      && !String(config.apiKey).includes('...')
-      && !String(config.projectId).includes('...')
-      && !String(config.appId).includes('...')
-      && !String(config.apiKey).includes('TU_')
-      && !String(config.projectId).includes('TU_')
-      && !String(config.appId).includes('TU_');
-
-    if (!hasValidConfig) {
+    const initialized = Auth.init((user) => this.onAuthStateChanged(user));
+    if (!initialized) {
       this.showLoginScreen('Configura tus claves reales de Firebase en window.COSECHA_FIREBASE_CONFIG para usar Auth.');
-      return;
-    }
-
-    try {
-      if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length === 0) {
-        firebase.initializeApp(config);
-      }
-
-      if (typeof firebase !== 'undefined' && firebase.auth) {
-        firebase.auth().onAuthStateChanged((user) => this.onAuthStateChanged(user));
-      } else {
-        this.showLoginScreen('Firebase Auth no está disponible');
-      }
-    } catch (error) {
-      this.showLoginScreen(error.message || 'No se pudo inicializar Firebase');
     }
   },
 
@@ -218,9 +195,7 @@ const App = {
     const passwordInput = document.getElementById('loginPassword');
     const errorBox = document.getElementById('loginError');
 
-    if (!emailInput || !passwordInput || !errorBox) {
-      return;
-    }
+    if (!emailInput || !passwordInput || !errorBox) return;
 
     const email = emailInput.value.trim();
     const password = passwordInput.value;
@@ -230,23 +205,25 @@ const App = {
       return;
     }
 
-    if (typeof firebase === 'undefined' || !firebase.auth || !firebase.apps.length) {
-      errorBox.textContent = 'Firebase no está inicializado con tus claves reales.';
-      return;
-    }
-
     try {
       errorBox.textContent = '';
-      const credential = await firebase.auth().signInWithEmailAndPassword(email, password);
-      await credential.user.getIdToken();
+      await Auth.login(email, password);
     } catch (error) {
-      errorBox.textContent = error.message || 'No se pudo iniciar sesión';
+      console.error('Login error:', error);
+      let message = 'No se pudo iniciar sesión.';
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        message = 'Correo o contraseña incorrectos.';
+      } else if (error.code === 'auth/too-many-requests') {
+        message = 'Demasiados intentos. Intenta más tarde.';
+      }
+      errorBox.textContent = message;
+      alert(message);
     }
   },
 
   async handleLogout() {
     try {
-      await firebase.auth().signOut();
+      await Auth.logout();
       API.clearAuthToken();
       this.currentRole = null;
       this.showLoginScreen();
@@ -254,6 +231,7 @@ const App = {
       this.toast('⚠️ ' + error.message);
     }
   },
+
 
   updateUserPill() {
     const userPill = document.getElementById('userPill');
@@ -825,7 +803,6 @@ const App = {
     const rango = Personaje.rangoDeNivel(logro.nivel || 1);
     const prog = this.calcularProgreso(logro);
     const urlAvatar = Personaje.generarUrlDiceBear(logro.equipo, this.cachePrendas, { seed: this.authUser?.uid || 'cosecha', racha: logro.racha });
-    const perfilOpt = (logro.equipo && logro.equipo.perfil) || 'perfil-1';
 
     return `
       <div class="card hero">
@@ -835,7 +812,6 @@ const App = {
               <img src="${urlAvatar}" alt="Tu personaje" class="avatar-dicebear" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=cosecha&clothing=shirt'">
               <div class="avatar-frame__badge">${rango.icono} ${this.cap(rango.nombre)}</div>
             </div>
-            <div class="profile-photo">${Personaje.renderOpenPeeps(perfilOpt, 64)}</div>
           </div>
           <div class="hero-text">
             <h2>¡Hola, ${logro.nombre || 'Aventurero'}! 👋</h2>
@@ -1003,6 +979,24 @@ const App = {
   },
 
   /* ---------- ARMARIO Y PERFIL (estudiante) ---------- */
+  /* Helper: calcula progreso porcentual para la barra */
+  calcularProgreso(logro) {
+    const nivelActual = logro.nivel || 1;
+    const xpBase = Personaje.XP_PARA_NIVEL(nivelActual);
+    const xpSiguiente = Personaje.XP_PARA_NIVEL(nivelActual + 1);
+    const progresoEnNivel = (logro.xp || 0) - xpBase;
+    const totalNecesario = xpSiguiente - xpBase;
+    
+    return {
+      nivel: nivelActual,
+      xpEnNivel: progresoEnNivel,
+      xpParaSiguiente: totalNecesario,
+      progreso: totalNecesario > 0 ? (progresoEnNivel / totalNecesario) * 100 : 100,
+      xpTotal: logro.xp || 0
+    };
+  },
+
+
   async renderArmario() {
     const logro = await API.getLogros();
     const prendas = this.cachePrendas || [];
@@ -1064,22 +1058,27 @@ const App = {
         <div class="armario-layout">
           <div>
             <div class="perfil-card" style="${fondoStyle}">
-              <div class="avatar-frame avatar-frame--${marcoRango}">
-                <img src="${urlAvatar}" alt="Tu personaje" class="avatar-dicebear" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=cosecha&clothing=shirt'">
-                <div class="avatar-frame__badge">${rango.icono} ${this.cap(rango.nombre)}</div>
+              <div class="perfil-card__head">
+                <div class="perfil-card__photo">${Personaje.renderOpenPeeps(perfilId, 40)}</div>
+                <div class="perfil-card__id">
+                  <h3>${logro.nombre || 'Aventurero'}</h3>
+                  <span class="perfil-card__role">${this.authUser?.email || 'estudiante'}</span>
+                </div>
               </div>
-              <div class="perfil-card__info">
-                <div class="perfil-card__photo">${Personaje.renderOpenPeeps(perfilId, 56)}</div>
-                <h3>${logro.nombre || 'Aventurero'}</h3>
-                <div class="xp-block">
-                  <div class="xp-bar"><div class="xp-bar__fill" style="width:${prog.progreso}%"></div></div>
-                  <div class="xp-bar__labels"><span>Nivel ${prog.nivel}</span><span>${prog.xpEnNivel} / ${prog.xpParaSiguiente} XP</span></div>
+              <div class="perfil-card__avatar">
+                <div class="avatar-frame avatar-frame--${marcoRango}">
+                  <img src="${urlAvatar}" alt="Tu personaje" class="avatar-dicebear" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=cosecha&clothing=shirt'">
+                  <div class="avatar-frame__badge">${rango.icono} ${this.cap(rango.nombre)}</div>
                 </div>
-                <div class="perfil-card__stats">
-                  <span class="pill">🍊 ${logro.naranjas || 0}</span>
-                  <span class="pill">🔥 ${logro.racha?.dias || 0} días</span>
-                  <span class="pill">⭐ ${prog.xpTotal} XP</span>
-                </div>
+              </div>
+              <div class="xp-block perfil-card__xp">
+                <div class="xp-bar"><div class="xp-bar__fill" style="width:${prog.progreso}%"></div></div>
+                <div class="xp-bar__labels"><span>Nivel ${prog.nivel}</span><span>${prog.xpEnNivel} / ${prog.xpParaSiguiente} XP</span></div>
+              </div>
+              <div class="perfil-card__stats">
+                <span class="pill">🍊 ${logro.naranjas || 0}</span>
+                <span class="pill">🔥 ${logro.racha?.dias || 0} días</span>
+                <span class="pill">⭐ ${prog.xpTotal} XP</span>
               </div>
             </div>
           </div>

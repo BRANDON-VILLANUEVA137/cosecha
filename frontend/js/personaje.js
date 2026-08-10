@@ -121,7 +121,7 @@ const Personaje = {
     const dias = (extra.racha && extra.racha.dias) || 0;
     if (dias >= 7) params.set('facialExpression', 'smile');
     else if (dias >= 3) params.set('facialExpression', 'serious');
-    const orden = ['torso', 'cabeza', 'accesorio'];
+    const orden = ['torso', 'cabeza', 'accesorio', 'avatar'];
     orden.forEach(cat => {
       const id = equipo && equipo[cat];
       if (!id) return;
@@ -130,6 +130,12 @@ const Personaje = {
         Object.entries(prenda.dicebearOptions).forEach(([k, v]) => {
           if (v !== undefined && v !== null && v !== '') params.set(k, v);
         });
+      } else {
+        // Ítem sin dicebearOptions (catálogo viejo / preview): aplicar un
+        // parámetro por defecto según la categoría para una URL siempre válida.
+        const param = this.PARAM_MAP && this.PARAM_MAP[cat];
+        const val = param && this.PARAM_DEFAULT && this.PARAM_DEFAULT[param];
+        if (param && val) params.set(param, val);
       }
     });
     return `https://api.dicebear.com/7.x/adventurer/svg?${params.toString()}`;
@@ -169,33 +175,59 @@ const Personaje = {
 
   // ---------- Tabs del armario (combina categorías) ----------
   TABS_ARMARIO: [
-    { id: 'perfil', ico: '👤', label: 'Avatar Base' },
+    { id: 'avatar', ico: '👤', label: 'Avatar Base' },
     { id: 'marco', ico: '🖼️', label: 'Marcos de Perfil' },
     { id: 'cabeza', ico: '🧢', label: 'Cabeza / Acceso' },
     { id: 'torso', ico: '👕', label: 'Torso / Ropa' },
     { id: 'fondo', ico: '🌅', label: 'Fondos de Tarjeta' }
   ],
   CATEGORIAS_POR_TAB: {
-    perfil: ['perfil'],
+    avatar: ['perfil', 'avatar'],
     marco: ['marco'],
     cabeza: ['cabeza', 'accesorio'],
     torso: ['torso'],
     fondo: ['fondo']
   },
 
+  // Mapea cada categoría de personaje a un parámetro DiceBear (fallback)
+  PARAM_MAP: { torso: 'clothing', cabeza: 'hat', accesorio: 'accessories', avatar: 'facialExpression' },
+  PARAM_DEFAULT: { clothing: 'shirt', hat: 'beanie', accessories: 'glasses', facialExpression: 'smile' },
+  EMOJI_CATEGORIA: { cabeza: '🧢', torso: '👕', accesorio: '🕶️', avatar: '🙂', perfil: '🧑' },
+
   // ---------- Vista previa de la prenda en el grid ----------
   preview(prendas, prenda) {
-    switch (prenda.tipo) {
-      case 'dicebear':
-        return `<img class="swatch-img" src="${this.generarUrlDiceBear({ [prenda.categoria]: prenda.id }, prendas)}" alt="${prenda.nombre}" loading="lazy" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=cosecha&clothing=shirt'">`;
-      case 'openpeeps':
-        return `<div class="swatch-inline">${this.renderOpenPeeps(prenda.variante, 60)}</div>`;
-      case 'frame':
-        return `<div class="swatch-frame" style="--fc:${prenda.color}"><span>▣</span></div>`;
-      case 'fondo':
-        return `<div class="swatch-fondo" style="background:${prenda.gradiente}"></div>`;
-      default:
-        return `<div class="swatch-inline" style="background:${prenda.color}"><span>?</span></div>`;
+    const cat = prenda.categoria;
+    // Marcos → caja de color
+    if (prenda.tipo === 'frame') {
+      return `<div class="swatch-frame" style="--fc:${prenda.color}"><span>▣</span></div>`;
     }
+    // Fondos → caja con gradiente
+    if (prenda.tipo === 'fondo') {
+      return `<div class="swatch-fondo" style="background:${prenda.gradiente}"></div>`;
+    }
+    // OpenPeeps / fotos de perfil → SVG inline
+    if (prenda.tipo === 'openpeeps' || cat === 'perfil') {
+      return `<div class="swatch-inline">${this.renderOpenPeeps(prenda.variante || 'p1', 60)}</div>`;
+    }
+    // Cualquier categoría de personaje → micro-render DiceBear siempre válido.
+    // Si el ítem no trae dicebearOptions (catálogo viejo), se usa un parámetro
+    // por defecto según la categoría para garantizar una URL SVG válida.
+    const url = this.generarUrlDiceBear({ [cat]: prenda.id }, prendas);
+    const emoji = this.EMOJI_CATEGORIA[cat] || '🎁';
+    return `<img class="swatch-img" src="${url}" alt="${prenda.nombre}" loading="lazy"
+      onerror="this.outerHTML='<div class=&quot;swatch-inline&quot;>${emoji}</div>'">`;
+  },
+  emojiDe(cat, prenda) {
+    const o = prenda.dicebearOptions || {};
+    if (o.hat) return '🧢';
+    if (o.clothing) return '👕';
+    if (o.accessories) return '🕶️';
+    if (o.facialHair) return '🧔';
+    if (o.facialExpression) return '🙂';
+    return this.EMOJI_CATEGORIA[cat] || '🎁';
   }
+};
+Personaje.XP_PARA_NIVEL = function(n) {
+  if (n <= 1) return 0;
+  return Math.round(100 * n * (n - 1) / 2);
 };

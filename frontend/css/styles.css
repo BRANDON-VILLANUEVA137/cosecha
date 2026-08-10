@@ -274,6 +274,17 @@ footer.note{text-align:center; color:var(--texto-suave); font-size:12px; margin-
 .prenda__btn.equipped:hover{background:var(--secundario-oscuro);}
 .prenda__btn.locked, .prenda__btn:disabled{opacity:.55; cursor:not-allowed;}
 
+/* --- Animaciones y Mejoras UI --- */
+.prenda__preview { transition: transform 0.2s ease; }
+.prenda:hover .prenda__preview { transform: scale(1.05); }
+
+.prenda-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+  padding: 10px 0;
+}
+
 /* ---------- Mobile: pila de columnas ---------- */
 @media(max-width:760px){
   .armario-layout{grid-template-columns:1fr;}

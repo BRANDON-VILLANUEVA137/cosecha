@@ -161,7 +161,8 @@ function defaultsLogro(uid, nombre = '') {
     racha: { dias: 0, ultimaFecha: null },
     inventario: [...ITEMS_BASE],
     equipo: {
-      perfil: null,              // OpenPeeps (foto de perfil)
+      perfil: null,              // OpenPeeps (foto de perfil — header)
+      avatar: null,              // DietBear → presets de base (expresión/tono)
       marco: null,               // Marco de perfil (shop) — null = rango automático
       cabeza: null,              // → DiceBear `hat`
       torso: 'camiseta-basica',  // → DiceBear `clothing`
@@ -402,6 +403,7 @@ async function equiparItem(uid, categoria, itemId) {
 
   // Normalizar slots nuevos en documentos legados
   if (equipo.perfil === undefined) equipo.perfil = null;
+  if (equipo.avatar === undefined) equipo.avatar = null;
   if (equipo.marco === undefined) equipo.marco = null;
   if (equipo.fondo === undefined) equipo.fondo = null;
 

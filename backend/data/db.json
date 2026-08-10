@@ -420,6 +420,34 @@
       "nivelRequerido": 1,
       "variante": "p6"
     },
+    "avatar-feliz": {
+      "categoria": "avatar",
+      "nombre": "Cara Feliz (por defecto)",
+      "color": "#FFD9A8",
+      "tipo": "dicebear",
+      "precio": 0,
+      "nivelRequerido": 1,
+      "dicebearOptions": { "facialExpression": "smile" }
+    },
+    "avatar-concentrado": {
+      "categoria": "avatar",
+      "nombre": "Cara Concentrada",
+      "color": "#FFD9A8",
+      "tipo": "dicebear",
+      "precio": 20,
+      "nivelRequerido": 3,
+      "dicebearOptions": { "facialExpression": "serious" }
+    },
+    "avatar-sorprendido": {
+      "categoria": "avatar",
+      "nombre": "Cara Asombrada",
+      "color": "#FFD9A8",
+      "tipo": "dicebear",
+      "precio": 40,
+      "nivelRequerido": 7,
+      "dicebearOptions": { "facialExpression": "surprised" }
+    },
+
     "fondo-campo": {
       "categoria": "fondo",
       "nombre": "Campo Cítrico",
@@ -491,6 +519,7 @@
       "tareasCompletadas": [],
       "equipo": {
         "perfil": "perfil-1",
+        "avatar": "avatar-feliz",
         "marco": "marco-madera",
         "cabeza": "gorro-citrico",
         "torso": "buso-naranja",
