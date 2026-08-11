@@ -452,7 +452,9 @@ module.exports = {
   otorgarXP,
   comprarItem,
   equiparItem,
-  completarTarea
+  completarTarea,
+  abrirCofre
+};
 
 /**
  * Abre un cofre y entrega una carta aleatoria.
@@ -470,8 +472,7 @@ async function abrirCofre(uid) {
   const carta = cartas[Math.floor(Math.random() * cartas.length)];
 
   logro.naranjas -= 50;
-,
-  abrirCofre
+  if (!logro.cartas_desbloqueadas) logro.cartas_desbloqueadas = [];
   logro.cartas_desbloqueadas.push({
     carta_id: carta.id,
     obtenida_en: new Date().toISOString(),
@@ -482,4 +483,3 @@ async function abrirCofre(uid) {
   return { ok: true, carta };
 }
 
-};

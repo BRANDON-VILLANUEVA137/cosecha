@@ -724,7 +724,7 @@ const App = {
       { id: 'inicio', ico: '🏠', label: 'Inicio' },
       { id: 'matematicas', ico: '🍊', label: 'Matemáticas' },
       { id: 'ingles', ico: '🌴', label: 'Inglés' },
-      { id: 'armario', ico: '👕', label: 'Armario' },
+      { id: 'album', ico: '🃏', label: 'Álbum' },
     ];
     const tabsDocente = [
       { id: 'matematicas', ico: '🍊', label: 'Matemáticas' },
@@ -764,7 +764,7 @@ const App = {
       } else {
         if (this.currentModule === 'inicio') html = await this.renderInicio();
         else if (this.currentModule === 'matematicas' || this.currentModule === 'ingles') html = await this.renderModuloEstudiante(this.currentModule);
-        else if (this.currentModule === 'armario') html = await this.renderArmario();
+        else if (this.currentModule === 'album') html = await this.renderAlbum();
       }
       screen.innerHTML = html;
       this.wireEvents();

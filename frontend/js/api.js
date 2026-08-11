@@ -124,6 +124,14 @@ const API = {
     return this.request('/prendas' + q);
   },
 
+  // ---- Cartas (Álbum) ----
+  getCartas() {
+    return this.request('/cartas');
+  },
+  abrirCofre() {
+    return this.request('/cartas/abrir-cofre', { method: 'POST' });
+  },
+
   // ---- Tareas ----
   getTareas() {
     return this.request('/tareas');
