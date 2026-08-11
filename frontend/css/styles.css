@@ -291,3 +291,93 @@ footer.note{text-align:center; color:var(--texto-suave); font-size:12px; margin-
   .hero-gamifica{justify-content:center;}
   .perfil-card{min-height:auto;}
 }
+
+/* ===============================================================
+   ÁLBUM DE CARTAS — estilos de coleccionismo, rarezas y celebración
+   =============================================================== */
+.album-grid .carta-item{
+  position:relative;
+  background:#fff;
+  border:2px solid var(--borde);
+  border-radius:12px;
+  padding:8px;
+  text-align:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.album-grid .carta-item:hover{transform:translateY(-3px) scale(1.02); box-shadow:0 6px 16px rgba(0,0,0,.12);}
+.album-grid .carta-item.bloqueada{opacity:.85; background:#f5f5f5;}
+.album-grid .carta-preview{aspect-ratio:3/4; width:100%; overflow:hidden;}
+.album-grid .carta-preview img{object-fit:cover; width:100%; height:100%;}
+.album-grid .carta-info{display:flex; flex-direction:column; gap:2px; margin-top:6px;}
+.album-grid .carta-info strong{font-size:12px; line-height:1.25;}
+.album-grid .stats{display:flex; justify-content:center; gap:6px; font-size:11px; flex-wrap:wrap;}
+
+/* ---- Estados de rareza en el NOMBRE de la carta ---- */
+.rareza-comun{color:#6b7280;}
+.rareza-rara{color:#2563eb; font-weight:800;}
+.rareza-epica{
+  font-weight:900;
+  background:linear-gradient(135deg, #b8c4ff 0%, #dbe4ff 45%, #8ea6ff 70%, #c7d2ff 100%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:#2e3f8f;
+  filter:drop-shadow(0 0 6px rgba(99,132,253,.65));
+  animation:glowEpica 1.6s ease-in-out infinite;
+}
+@keyframes glowEpica{
+  0%,100%{ filter:drop-shadow(0 0 3px rgba(99,132,253,.45)); }
+  50%    { filter:drop-shadow(0 0 12px rgba(147,197,253,1)); }
+}
+.rareza-legendaria{
+  font-weight:900;
+  background:linear-gradient(90deg,#ff0040,#ff8c00,#ffe600,#33ff57,#33ccff,#7a4fff,#ff33cc,#ff0040);
+  background-size:250% auto;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:#fff;
+  animation:rainbowLegend 2.5s linear infinite;
+}
+@keyframes rainbowLegend{to{background-position:250% center;}}
+
+/* ---- Modal de revelación ---- */
+.modal-revelacion{animation:modalFade .25s ease;}
+@keyframes modalFade{from{opacity:0} to{opacity:1}}
+.revelacion-animacion{position:relative; overflow:hidden;}
+.carta-revelada{
+  border-radius:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.25);
+  animation:popEffect .55s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes popEffect{
+  0%{transform:scale(0) rotate(-12deg); opacity:0;}
+  100%{transform:scale(1) rotate(0); opacity:1;}
+}
+.carta-revelada.rareza-epica{border:3px solid #8ea6ff; box-shadow:0 0 22px rgba(99,132,253,.8);}
+.carta-revelada.rareza-legendaria{border:3px solid #ffd700; box-shadow:0 0 26px rgba(255,215,0,.85);}
+
+/* ---- Título de nueva carta ---- */
+.titulo-nueva{
+  font-size:20px; font-weight:900; letter-spacing:.5px;
+  background:linear-gradient(90deg,#ff8c33,#ffd700,#ff0040,#ffd700,#ff8c33);
+  background-size:250% auto;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  animation:rainbowLegend 2.2s linear infinite;
+}
+.titulo-duplicado{font-size:18px; font-weight:800; color:#6b7280;}
+
+/* ---- Confeti ---- */
+.confeti-wrap{position:absolute; inset:0; overflow:hidden; pointer-events:none; border-radius:12px;}
+.confeti{
+  position:absolute; top:-14px; width:9px; height:13px; border-radius:2px;
+  animation:caer linear infinite;
+}
+@keyframes caer{
+  0%{transform:translateY(0) rotate(0); opacity:1;}
+  100%{transform:translateY(360px) rotate(720deg); opacity:.85;}
+}
+
+/* ---- Botón cofre ---- */
+.btn-cofre{
+  border-radius:999px; font-weight:900; font-size:15px; cursor:pointer;
+  border:2px solid var(--primario-oscuro); background:var(--acento); color:var(--texto);
+  padding:.6rem 1.4rem; transition:transform .15s ease, background .15s ease;
+}
+.btn-cofre:hover:not(:disabled){background:var(--primario); color:#fff; transform:translateY(-2px);}
+.btn-cofre:disabled{opacity:.55; cursor:not-allowed;}

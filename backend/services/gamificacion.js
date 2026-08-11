@@ -456,6 +456,32 @@ module.exports = {
   abrirCofre
 };
 
+  /* Pesos de probabilidad por rareza (en orden de decreciente a creciente rareza) */
+  const PESOS_RAREZA = { comun: 55, rara: 30, epica: 12, legendaria: 3 };
+
+  /**
+   * Selecciona una carta aleatoria respetando las probabilidades por rareza.
+   * @param {Array} cartas  [{ id, rareza, ... }]
+   */
+  function cartaAleatoria(cartas) {
+    const porRareza = {};
+    cartas.forEach(c => {
+      const r = c.rareza || 'comun';
+      (porRareza[r] = porRareza[r] || []).push(c);
+    });
+
+    const totalPeso = Object.keys(porRareza).reduce((acc, r) => acc + (PESOS_RAREZA[r] || 0), 0);
+    let n = Math.random() * totalPeso;
+    for (const r of Object.keys(porRareza)) {
+      n -= (PESOS_RAREZA[r] || 0);
+      if (n < 0) {
+        const grupo = porRareza[r];
+        return grupo[Math.floor(Math.random() * grupo.length)];
+      }
+    }
+    return cartas[Math.floor(Math.random() * cartas.length)];
+  }
+
 /**
  * Abre un cofre y entrega una carta aleatoria.
  * @param {string} uid
@@ -466,10 +492,13 @@ async function abrirCofre(uid) {
     return { ok: false, mensaje: 'Naranjas insuficientes' };
   }
 
-  // Lógica simple de probabilidad
+  // Selección ponderada por rareza
   const cartasSnapshot = await db.collection('cartas').where('activa', '==', true).get();
   const cartas = cartasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  const carta = cartas[Math.floor(Math.random() * cartas.length)];
+  const carta = cartaAleatoria(cartas);
+
+  const tenida = (logro.cartas_desbloqueadas || []).some(c => c.carta_id === carta.id);
+  const nueva = !tenida;
 
   logro.naranjas -= 50;
   if (!logro.cartas_desbloqueadas) logro.cartas_desbloqueadas = [];
@@ -480,6 +509,6 @@ async function abrirCofre(uid) {
   });
 
   await db.collection('logros').doc(uid).set(logro);
-  return { ok: true, carta };
+  return { ok: true, carta, nueva };
 }
 
