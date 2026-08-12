@@ -21,6 +21,7 @@ app.use('/api/analytics', authMiddleware, require('./routes/analytics')); // Rou
 app.use('/api/logros', authMiddleware, require('./routes/logros'));
 app.use('/api/prendas', authMiddleware, require('./routes/prendas'));
 app.use('/api/cartas', authMiddleware, require('./routes/cartas'));
+app.use('/api/personajes', require('./routes/personajes'));
 
 app.use('/api/estudiantes', require('./routes/estudiantes'));
 

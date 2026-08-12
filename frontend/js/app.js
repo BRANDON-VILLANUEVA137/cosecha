@@ -34,6 +34,7 @@ const App = {
   estudiantesGestion: [],
   estudianteEditando: null,
   estudianteFormVisible: false,
+  avatarSeleccionado: '', // id del personaje elegido en el formulario de estudiante
 
   formatMathText(texto) {
     if (typeof texto !== 'string' || !texto) return '';
@@ -802,7 +803,7 @@ const App = {
     const logro = await API.getLogros();
     const rango = Personaje.rangoDeNivel(logro.nivel || 1);
     const prog = this.calcularProgreso(logro);
-    const urlAvatar = Personaje.generarUrlDiceBear(logro.equipo, this.cachePrendas, { seed: this.authUser?.uid || 'cosecha', racha: logro.racha });
+    const urlAvatar = Personaje.generarUrlDiceBear(logro.equipo, this.cachePrendas, { seed: (logro.personaje && logro.personaje.seed) || this.authUser?.uid || 'cosecha', racha: logro.racha });
 
     return `
       <div class="card hero">
@@ -1003,7 +1004,7 @@ const App = {
     const nivel = logro.nivel || 1;
     const rango = Personaje.rangoDeNivel(nivel);
     const prog = this.calcularProgreso(logro);
-    const urlAvatar = Personaje.generarUrlDiceBear(logro.equipo, prendas, { seed: this.authUser?.uid || 'cosecha', racha: logro.racha });
+    const urlAvatar = Personaje.generarUrlDiceBear(logro.equipo, prendas, { seed: (logro.personaje && logro.personaje.seed) || this.authUser?.uid || 'cosecha', racha: logro.racha });
     const perfilId = (logro.equipo && logro.equipo.perfil) || 'perfil-1';
     const marcoId = logro.equipo && logro.equipo.marco;
     const marcoPrenda = marcoId ? prendas.find(p => p.id === marcoId) : null;
@@ -1091,7 +1092,7 @@ const App = {
   },
   async renderAlbum() {
     const [logro, cartas] = await Promise.all([API.getLogros(), API.getCartas()]);
-    const desbloqueadasIds = logro.cartas_desbloqueadas.map(c => c.carta_id);
+    const desbloqueadasIds = (logro.cartas_desbloqueadas || []).map(c => c.carta_id);
 
     const grid = cartas.map(c => {
       const esDesbloqueada = desbloqueadasIds.includes(c.id);
@@ -1803,6 +1804,14 @@ const App = {
       if (!Array.isArray(this.estudiantesGestion)) this.estudiantesGestion = [];
       const tareas = await API.getTareas();
 
+      // Catálogo de personajes para el selector de avatar
+      let catalogo = Personaje.PERSONAJES;
+      try {
+        const c = await API.getPersonajes();
+        if (Array.isArray(c) && c.length) catalogo = c;
+      } catch (e) { /* usa el catálogo local si la API no responde */ }
+      this.personajesCatalogo = catalogo;
+
       const filas = this.estudiantesGestion.length > 0
         ? this.estudiantesGestion.map(e => {
             const estadoActivo = e.estado !== 'inactivo';
@@ -1829,6 +1838,35 @@ const App = {
       // Estado del formulario
       const editando = this.estudianteEditando;
       const formVisible = this.estudianteFormVisible || !!editando;
+
+      // Personaje seleccionado: prioriza la selección actual, si no la del alumno
+      const avatarSel = this.avatarSeleccionado || (editando && editando.personaje ? editando.personaje.id : '');
+      const catalogoAvatars = this.personajesCatalogo || Personaje.PERSONAJES;
+      const avatarSelObj = catalogoAvatars.find(p => p.id === avatarSel) || null;
+      const avatarPickerHtml = `
+        <div style="margin-top:12px;">
+          <label style="font-weight:600; display:block; margin-bottom:6px;">👤 Personaje / Avatar del estudiante</label>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:stretch;">
+            <div onclick="App.seleccionarAvatar('')" style="cursor:pointer; padding:6px; border:2px solid ${avatarSel === '' ? 'var(--acento)' : 'var(--borde)'}; border-radius:10px; text-align:center; width:76px; background:#fff;">
+              <div style="font-size:30px; line-height:56px;">🎲</div>
+              <div style="font-size:10px; margin-top:2px;">Aleatorio</div>
+            </div>
+            ${catalogoAvatars.map(p => {
+              const esSel = avatarSel === p.id;
+              return `<div onclick="App.seleccionarAvatar('${p.id}')" style="cursor:pointer; padding:6px; border:2px solid ${esSel ? 'var(--acento)' : 'var(--borde)'}; border-radius:10px; text-align:center; width:76px; background:#fff;" title="${p.nombre} (${p.genero})">
+                <img src="${Personaje.urlDePersonaje(p)}" width="56" height="56" style="border-radius:8px; display:block;">
+                <div style="font-size:10px; margin-top:2px;">${p.nombre}</div>
+              </div>`;
+            }).join('')}
+          </div>
+          <div style="margin-top:10px;">
+            <div style="font-weight:600; display:block; margin-bottom:4px;">Vista previa del avatar:</div>
+            ${avatarSelObj
+              ? `<img src="${Personaje.urlDePersonaje(avatarSelObj)}" width="92" height="92" style="border-radius:12px; border:2px solid var(--borde);" class="avatar-dicebear">`
+              : '<span style="color:var(--texto-suave); font-size:12px;">Sin elegir → se generará automáticamente con el UID (apariencia al azar).</span>'}
+          </div>
+        </div>`;
+
       const formHtml = formVisible ? `
         <div class="card" style="background:var(--fondo-2); margin-bottom:14px;">
           <h3>${editando ? '✏️ Editar Estudiante' : '➕ Registrar Nuevo Estudiante'}</h3>
@@ -1846,6 +1884,7 @@ const App = {
               <input type="password" id="estPassword" placeholder="${editando ? '••••••••' : 'Mínimo 6 caracteres'}">
             </div>
           </div>
+          ${avatarPickerHtml}
           <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
             <button class="primary" onclick="App.guardarEstudiante()">${editando ? '💾 Guardar Cambios' : '✅ Registrar Estudiante'}</button>
             <button class="ghost" onclick="App.cancelarEdicionEstudiante()">Cancelar</button>
@@ -1889,15 +1928,22 @@ const App = {
     }
   },
 
+  seleccionarAvatar(id) {
+    this.avatarSeleccionado = id || '';
+    this.render();
+  },
+
   mostrarFormEstudiante() {
     this.estudianteEditando = null;
     this.estudianteFormVisible = true;
+    this.avatarSeleccionado = '';
     this.render();
   },
 
   cancelarEdicionEstudiante() {
     this.estudianteEditando = null;
     this.estudianteFormVisible = false;
+    this.avatarSeleccionado = '';
     this.render();
   },
 
@@ -1906,6 +1952,7 @@ const App = {
     if (!estudiante) return;
     this.estudianteEditando = estudiante;
     this.estudianteFormVisible = true;
+    this.avatarSeleccionado = (estudiante.personaje && estudiante.personaje.id) || '';
     this.render();
   },
 
@@ -1914,6 +1961,7 @@ const App = {
     const email = document.getElementById('estEmail').value.trim();
     const password = document.getElementById('estPassword').value;
     const grado = document.getElementById('estGrado')?.value.trim() || '';
+    const avatarId = this.avatarSeleccionado || '';
 
     if (!nombre || !email) {
       this.toast('⚠️ Nombre y correo son obligatorios');
@@ -1927,17 +1975,18 @@ const App = {
     try {
       if (this.estudianteEditando) {
         // Editar
-        const data = { nombre, email, grado };
+        const data = { nombre, email, grado, avatarId };
         if (password) data.password = password;
         await API.editarEstudiante(this.estudianteEditando.id, data);
         this.toast('✅ Estudiante actualizado');
       } else {
         // Crear
-        await API.crearEstudiante({ nombre, email, password, grado });
+        await API.crearEstudiante({ nombre, email, password, grado, avatarId });
         this.toast('✅ Estudiante registrado');
       }
       this.estudianteEditando = null;
       this.estudianteFormVisible = false;
+      this.avatarSeleccionado = '';
       this.render();
     } catch (e) {
       this.toast('⚠️ ' + e.message);

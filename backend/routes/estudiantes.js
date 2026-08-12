@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { auth, db } = require('../config/firebase-admin');
 const gamificacion = require('../services/gamificacion');
+const { getPersonaje } = require('../services/personajes');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 
 // Todas las rutas requieren autenticación y rol docente
@@ -14,6 +15,10 @@ router.get('/', async (req, res) => {
       .where('rol', '==', 'estudiante')
       .get();
 
+    // Cargar los personajes (avatares) de los logros para previsualizarlos
+    const logrosSnap = await db.collection('logros').get();
+    const logrosMap = new Map(logrosSnap.docs.map(d => [d.id, d.data().personaje || null]));
+
     const estudiantes = snapshot.docs.map(doc => {
       const data = doc.data();
       return {
@@ -22,6 +27,7 @@ router.get('/', async (req, res) => {
         email: data.email || '',
         estado: data.estado || 'activo',
         grado: data.grado || '',
+        personaje: logrosMap.get(doc.id) || null,
         createdAt: data.createdAt || null
       };
     });
@@ -36,7 +42,7 @@ router.get('/', async (req, res) => {
 // POST /api/estudiantes - Crear estudiante
 router.post('/', async (req, res) => {
   try {
-    const { nombre, email, password, grado } = req.body;
+    const { nombre, email, password, grado, avatarId } = req.body;
 
     // Validaciones
     if (!nombre || !email || !password) {
@@ -44,6 +50,12 @@ router.post('/', async (req, res) => {
     }
     if (password.length < 6) {
       return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+    }
+
+    // Validar personaje si viene
+    const personaje = getPersonaje(avatarId);
+    if (avatarId && !personaje) {
+      return res.status(400).json({ error: 'El personaje elegido no existe' });
     }
 
     // Seguridad: forzar rol a "estudiante" — nunca usar el rol recibido del cliente
@@ -70,6 +82,7 @@ router.post('/', async (req, res) => {
                   // Crear logro predeterminado con la nueva estructura de gamificación
       const nuevoLogro = gamificacion.defaultsLogro(userRecord.uid, nombre);
       nuevoLogro.email = email;
+      if (personaje) nuevoLogro.personaje = personaje;
       await db.collection('logros').doc(userRecord.uid).set(nuevoLogro);
 
       return res.status(201).json({
@@ -77,7 +90,8 @@ router.post('/', async (req, res) => {
         nombre,
         email,
         estado: 'activo',
-        grado: grado || ''
+        grado: grado || '',
+        personaje: personaje || null
       });
     } catch (firestoreError) {
       // Si falla Firestore, eliminar el usuario de Auth para no dejar inconsistencias
@@ -98,7 +112,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, email, password, estado, grado } = req.body;
+    const { nombre, email, password, estado, grado, avatarId } = req.body;
 
     // Verificar que el estudiante existe y tiene rol estudiante
     const usuarioRef = db.collection('usuarios').doc(id);
@@ -108,6 +122,12 @@ router.put('/:id', async (req, res) => {
     }
     if (usuarioSnap.data().rol !== 'estudiante') {
       return res.status(403).json({ error: 'Solo puedes editar cuentas de estudiantes' });
+    }
+
+    // Validar personaje si viene
+    const personaje = getPersonaje(avatarId);
+    if (avatarId && !personaje) {
+      return res.status(400).json({ error: 'El personaje elegido no existe' });
     }
 
     // Actualizar Auth si se provee contraseña o correo
@@ -132,17 +152,18 @@ router.put('/:id', async (req, res) => {
 
     await usuarioRef.update(firestoreUpdates);
 
-    // Actualizar nombre/email en el logro del estudiante
+    // Actualizar nombre/email/personaje en el logro del estudiante
     const logroRef = db.collection('logros').doc(id);
     const logroSnap = await logroRef.get();
     if (logroSnap.exists) {
       const logroUpdates = {};
       if (nombre !== undefined) logroUpdates.nombre = nombre;
       if (email !== undefined) logroUpdates.email = email;
+      if (personaje) logroUpdates.personaje = personaje;
       await logroRef.update(logroUpdates);
     }
 
-    return res.json({ ok: true, id });
+    return res.json({ ok: true, id, personaje: personaje || null });
   } catch (error) {
     if (error.code === 'auth/email-already-exists') {
       return res.status(409).json({ error: 'El correo ya está registrado' });

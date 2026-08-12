@@ -141,6 +141,27 @@ const Personaje = {
     return `https://api.dicebear.com/7.x/adventurer/svg?${params.toString()}`;
   },
 
+  // ---------- Personajes (avatares elegibles por el docente) ----------
+  // Cada personaje tiene un seed curado que le da su apariencia. El docente
+  // lo elige visualmente (con vista previa) y ese seed queda guardado en el
+  // logro del estudiante (`personaje`). En el estilo adventurer de DiceBear
+  // solo el seed define la apariencia (gender es ignorado).
+  PERSONAJES: [
+    { id: 'personaje-mateo',     nombre: 'Mateo',     genero: 'masculino', seed: 'mateo' },
+    { id: 'personaje-sam',       nombre: 'Sam',       genero: 'masculino', seed: 'sam' },
+    { id: 'personaje-leo',       nombre: 'Leo',       genero: 'masculino', seed: 'leo' },
+    { id: 'personaje-diego',     nombre: 'Diego',     genero: 'masculino', seed: 'diego' },
+    { id: 'personaje-valentina', nombre: 'Valentina', genero: 'femenino',  seed: 'valentina' },
+    { id: 'personaje-sofia',     nombre: 'Sofía',     genero: 'femenino',  seed: 'sofia' },
+    { id: 'personaje-mia',       nombre: 'Mía',       genero: 'femenino',  seed: 'mia' },
+    { id: 'personaje-camila',    nombre: 'Camila',    genero: 'femenino',  seed: 'camila' }
+  ],
+
+  urlDePersonaje(personaje) {
+    if (!personaje || !personaje.seed) return null;
+    return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(personaje.seed)}`;
+  },
+
   // ---------- OpenPeeps (foto de perfil, inline) ----------
   OPENPEEPS_VARIANTES: {
     p1: { skin: '#FFD9A8', hair: '#6B4226', camisa: '#FF8C33', pelo: 'corto', glasses: false },

@@ -132,6 +132,11 @@ const API = {
     return this.request('/cartas/abrir-cofre', { method: 'POST' });
   },
 
+  // ---- Personajes (avatares del docente) ----
+  getPersonajes() {
+    return this.request('/personajes');
+  },
+
   // ---- Tareas ----
   getTareas() {
     return this.request('/tareas');

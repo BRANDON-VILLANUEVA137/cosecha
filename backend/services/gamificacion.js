@@ -169,6 +169,8 @@ function defaultsLogro(uid, nombre = '') {
       accesorio: null,           // → DiceBear `accessories` / `facialHair`
       fondo: null                // Fondo de tarjeta
     },
+    cartas_desbloqueadas: [],    // Cartas del álbum obtenidas al abrir cofres
+    personaje: null,             // Personaje/avatar elegido por el docente (seed DiceBear)
     historial: []
   };
 }
@@ -208,6 +210,8 @@ async function getLogro(uid) {
     racha: data.racha || base.racha,
     inventario,
     equipo,
+    cartas_desbloqueadas: Array.isArray(data.cartas_desbloqueadas) ? data.cartas_desbloqueadas : [],
+    personaje: (data.personaje && typeof data.personaje === 'object') ? data.personaje : null,
     historial: Array.isArray(data.historial) ? data.historial : []
   };
 }
