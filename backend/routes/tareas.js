@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../config/firebase-admin');
 const { authMiddleware, requireRole } = require('../middleware/auth');
+const { instanciarEjercicio } = require('../services/generador');
 
 // GET /api/tareas - Obtener todas las tareas (docente ve todas, estudiante ve las publicadas)
 router.get('/', authMiddleware, async (req, res) => {
@@ -59,11 +60,16 @@ router.get('/:id', authMiddleware, async (req, res) => {
     
     // Filtrar ejercicios nulos y ordenar
     const ejerciciosFiltrados = ejercicios.filter(ej => ej !== null).sort((a, b) => (a.orden || 0) - (b.orden || 0));
-    
+
+    // Instanciar plantillas dinámicas (valores deterministas por usuario + tarea)
+    const ejerciciosInstanciados = ejerciciosFiltrados.map(ej =>
+      instanciarEjercicio(ej, req.user.uid, req.params.id)
+    );
+
     // Si es estudiante, ocultar respuestas correctas
     const ejerciciosPublicos = req.user?.rol === 'docente'
-      ? ejerciciosFiltrados
-      : ejerciciosFiltrados.map(ej => {
+      ? ejerciciosInstanciados
+      : ejerciciosInstanciados.map(ej => {
           const { respuestaCorrecta, ...pub } = ej;
           return pub;
         });

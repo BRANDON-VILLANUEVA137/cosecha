@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../config/firebase-admin');
-const { validarRespuesta } = require('../services/validacion');
+const { validarRespuesta, esTipoSeleccion } = require('../services/validacion');
+const { instanciarEjercicio } = require('../services/generador');
 const { evaluarRecompensas } = require('../services/recompensas');
 const gamificacion = require('../services/gamificacion');
 const { authMiddleware, requireRole } = require('../middleware/auth');
@@ -20,7 +21,10 @@ router.get('/', async (req, res) => {
 
     const snapshot = await query.get();
     const ejercicios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    const publicos = ejercicios.map(ejercicio => {
+    const instanciados = ejercicios.map(ej =>
+      instanciarEjercicio(ej, req.user.uid, null)
+    );
+    const publicos = instanciados.map(ejercicio => {
       if (req.user?.rol === 'docente') {
         return ejercicio;
       }
@@ -44,13 +48,13 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Ejercicio no encontrado' });
     }
 
-    const ejercicio = snapshot.data();
+    const ejercicio = instanciarEjercicio({ id: snapshot.id, ...snapshot.data() }, req.user.uid, null);
     if (req.user?.rol === 'docente') {
-      return res.json({ id: snapshot.id, ...ejercicio });
+      return res.json(ejercicio);
     }
 
     const { respuestaCorrecta, ...pub } = ejercicio;
-    return res.json({ id: snapshot.id, ...pub });
+    return res.json(pub);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'No se pudo cargar el ejercicio' });
@@ -60,21 +64,56 @@ router.get('/:id', async (req, res) => {
 // POST /api/ejercicios  (docente crea ejercicio)
 router.post('/', requireRole('docente'), async (req, res) => {
   try {
-    const { materia, tema, tipo, enunciado, respuestaCorrecta, pistaError, metodologia } = req.body;
-    if (!materia || !enunciado || !respuestaCorrecta) {
-      return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    const { materia, tema, tipo, enunciado, respuestaCorrecta, opciones, plantilla, grafica, pistaError, metodologia } = req.body;
+    if (!materia || !enunciado) {
+      return res.status(400).json({ error: 'Faltan campos obligatorios (materia, enunciado)' });
+    }
+
+    const tipoFinal = tipo || 'texto';
+    const esSeleccion = esTipoSeleccion(tipoFinal);
+
+    // Las plantillas dinámicas calculan la respuesta al instanciar: no la exigen aquí
+    if (!esSeleccion && !plantilla && respuestaCorrecta === undefined) {
+      return res.status(400).json({ error: 'Falta la respuesta correcta' });
+    }
+
+    if (esSeleccion && !Array.isArray(opciones)) {
+      return res.status(400).json({ error: 'Los ejercicios de selección requieren opciones' });
+    }
+
+    if (esSeleccion) {
+      const validas = opciones.filter(o => o && o.clave && o.texto);
+      const claves = new Set(validas.map(o => String(o.clave)));
+      if (claves.size < 2) {
+        return res.status(400).json({ error: 'Agrega al menos 2 opciones con texto (clave única)' });
+      }
+      const tipoMultiple = ['multiple', 'seleccion_multiple', 'checkboxes'].includes(tipoFinal);
+      const correctasArr = Array.isArray(respuestaCorrecta) ? respuestaCorrecta : [respuestaCorrecta];
+      const correctasLimpias = correctasArr
+        .filter(c => c !== undefined && c !== '')
+        .map(c => String(c))
+        .filter(c => claves.has(c));
+      if (correctasLimpias.length === 0) {
+        return res.status(400).json({ error: 'Indica cuál(es) opción(es) es/son la(s) correcta(s)' });
+      }
+      if (!tipoMultiple && correctasLimpias.length > 1) {
+        return res.status(400).json({ error: 'Selección única: solo una opción puede ser la correcta' });
+      }
     }
 
     const ref = db.collection('ejercicios').doc();
     const payload = {
       materia,
       tema: tema || 'General',
-      tipo: tipo || 'texto',
+      tipo: tipoFinal,
       enunciado,
       respuestaCorrecta,
       pistaError: pistaError || 'Vuelve a revisar el procedimiento paso a paso.',
       metodologia: metodologia || 'Estándar / Directo'
     };
+    if (esSeleccion) payload.opciones = opciones.map(o => ({ clave: o.clave, texto: o.texto }));
+    if (plantilla) payload.plantilla = plantilla;
+    if (grafica) payload.grafica = grafica;
 
     await ref.set(payload);
     return res.status(201).json({ id: ref.id, ...payload });
@@ -87,10 +126,14 @@ router.post('/', requireRole('docente'), async (req, res) => {
 // PUT /api/ejercicios/:id  (docente edita)
 router.put('/:id', requireRole('docente'), async (req, res) => {
   try {
-    const { respuestaCorrecta, pistaError } = req.body;
+    const { respuestaCorrecta, pistaError, opciones, tipo, enunciado, plantilla } = req.body;
     const patch = {};
     if (respuestaCorrecta !== undefined) patch.respuestaCorrecta = respuestaCorrecta;
     if (pistaError !== undefined) patch.pistaError = pistaError;
+    if (opciones !== undefined) patch.opciones = opciones;
+    if (tipo !== undefined) patch.tipo = tipo;
+    if (enunciado !== undefined) patch.enunciado = enunciado;
+    if (plantilla !== undefined) patch.plantilla = plantilla;
 
     const ref = db.collection('ejercicios').doc(req.params.id);
     const snapshot = await ref.get();
@@ -133,7 +176,11 @@ router.post('/:id/validar', requireRole('estudiante'), async (req, res) => {
     const ejercicioSnap = await ejercicioRef.get();
     if (!ejercicioSnap.exists) return res.status(404).json({ error: 'Ejercicio no encontrado' });
 
-    const ejercicio = { id: ejercicioSnap.id, ...ejercicioSnap.data() };
+    const ejercicio = instanciarEjercicio(
+      { id: ejercicioSnap.id, ...ejercicioSnap.data() },
+      req.user.uid,
+      tareaId || null
+    );
     const resultado = validarRespuesta(ejercicio, respuesta);
 
     const logroRef = db.collection('logros').doc(req.user.uid);

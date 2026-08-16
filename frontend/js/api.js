@@ -38,7 +38,7 @@ const API = {
     return { Authorization: `Bearer ${token}` };
   },
 
-  async request(path, options = {}) {
+  async request(path, options = {}, _retry = false) {
     const authHeaders = await this.getAuthHeaders();
     const res = await fetch(this.base + path, {
       headers: {
@@ -48,6 +48,22 @@ const API = {
       },
       ...options
     });
+
+    // Si Firebase responde 401 con un token expirado, lo refrescamos y
+    // reintentamos UNA vez. Garantiza que GET /api/progreso (rehidratación
+    // en un dispositivo secundario) siempre viaje con un token válido.
+    if (res.status === 401 && !_retry) {
+      this.authToken = null;
+      const user = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth().currentUser : null;
+      if (user) {
+        try {
+          const token = await user.getIdToken(true);
+          this.authToken = token;
+          return this.request(path, options, true);
+        } catch (_) { /* cae al manejo de error original */ }
+      }
+    }
+
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Error en la petición');
@@ -116,6 +132,14 @@ const API = {
       method: 'POST',
       body: JSON.stringify({ tareaId })
     });
+  },
+
+  // ---- Progreso (sincronización multi-dispositivo) ----
+  getProgreso() {
+    return this.request('/progreso');
+  },
+  setProgreso(payload) {
+    return this.request('/progreso', { method: 'PUT', body: JSON.stringify(payload) });
   },
 
   // ---- Prendas ----

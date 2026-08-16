@@ -35,12 +35,244 @@ const App = {
   estudianteEditando: null,
   estudianteFormVisible: false,
   avatarSeleccionado: '', // id del personaje elegido en el formulario de estudiante
+  opcionesRows: [
+    { clave: 'a', texto: '', correcta: false },
+    { clave: 'b', texto: '', correcta: false }
+  ],
+  graficaSel: {}, // partes coloreadas por ejercicio en el widget de graficación
+  metodologiaHints: {
+    'Estándar / Directo': 'Ejercicio tradicional: el estudiante escribe y la respuesta se corrige al instante.',
+    'Paso a Paso (Carita Sonriente)': 'Muestra el método de la carita sonriente paso a paso para sumar fracciones.',
+    'Graficación Interactiva': 'El estudiante representa la fracción coloreando figuras geométricas (tortas o rectángulos).',
+    'Desafío Contrarreloj': 'Ronda breve con tiempo límite: preguntas rápidas y reto contra el reloj.',
+    'Gramática' : 'Enfoque en completar verbos y pronombres con apoyo visual.',
+    'Opción Múltiple / Gramática': 'Preguntas de selección (única o múltiple) con foco en gramática y vocabulario.'
+  },
 
   formatMathText(texto) {
     if (typeof texto !== 'string' || !texto) return '';
     return texto.replace(/(\d+)\s*\/\s*(\d+)/g, (match, num, den) => {
       return `<span class="fraccion" aria-label="${num}/${den}"><span class="num">${num}</span><span class="den">${den}</span></span>`;
     });
+  },
+
+  escapeHtml(str) {
+    const s = String(str == null ? '' : str);
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  },
+
+  esTipoSeleccion(tipo) {
+    return ['opcion_multiple', 'single', 'seleccion_unica', 'multiple', 'seleccion_multiple', 'checkboxes']
+      .includes(String(tipo || ''));
+  },
+
+  esTipoSeleccionMultiple(tipo) {
+    return ['multiple', 'seleccion_multiple', 'checkboxes'].includes(String(tipo || ''));
+  },
+
+  /** Renderiza el control de respuesta (selección única/múltiple o texto libre). */
+  renderControlesRespuesta(ej, materia) {
+    if (ej.tipo === 'fraccion_grafica' || ej.tipo === 'grafico_interactivo') {
+      return this.renderControlGrafica(ej, materia);
+    }
+    if (Array.isArray(ej.opciones) && ej.opciones.length) {
+      const esMultiple = this.esTipoSeleccionMultiple(ej.tipo);
+      const tipoInput = esMultiple ? 'checkbox' : 'radio';
+      const nombre = 'resp_' + ej.id;
+      const opciones = ej.opciones.map(op => `
+        <label class="opcion-item">
+          <input type="${tipoInput}" name="${nombre}" value="${this.escapeHtml(op.clave)}">
+          <span>${this.formatMathText(this.escapeHtml(op.texto))}</span>
+        </label>
+      `).join('');
+      return `
+        <div class="opciones" data-ej="${ej.id}">${opciones}</div>
+        <div class="answer-row">
+          <button class="primary" data-check="${ej.id}" data-materia="${materia}">Comprobar</button>
+        </div>
+      `;
+    }
+    return `
+      <div class="answer-row">
+        <input type="text" placeholder="Tu respuesta" id="resp_${ej.id}">
+        <button class="primary" data-check="${ej.id}" data-materia="${materia}">Comprobar</button>
+      </div>
+    `;
+  },
+
+  // ---- Editor de opciones del docente (para ejercicios de selección) ----
+  defaultLetraOpcion() {
+    const existentes = (this.opcionesRows || []).map(r => String(r.clave || '').trim().toLowerCase());
+    return 'abcdefghij'.split('').find(L => !existentes.includes(L)) || 'x';
+  },
+
+  toggleOpcionesEditor() {
+    const select = document.getElementById('newTipo');
+    const area = document.getElementById('opcionesArea');
+    const graficaArea = document.getElementById('graficaArea');
+    const respContainer = document.getElementById('newRespContainer');
+    if (!select || !area) return;
+    const tipo = select.value;
+    const esGrafica = ['fraccion_grafica', 'grafico_interactivo'].includes(tipo);
+
+    // UX: en los ejercicios de opciones la respuesta se define en los radios/checkboxes
+    if (respContainer) respContainer.style.display = this.esTipoSeleccion(tipo) ? 'none' : 'block';
+    if (graficaArea) graficaArea.style.display = esGrafica ? 'block' : 'none';
+
+    if (this.esTipoSeleccion(tipo)) {
+      if (!Array.isArray(this.opcionesRows) || this.opcionesRows.length < 2) {
+        this.opcionesRows = [
+          { clave: 'a', texto: '', correcta: false },
+          { clave: 'b', texto: '', correcta: false }
+        ];
+      }
+      area.style.display = 'block';
+      area.innerHTML = this.renderOpcionesEditorHTML(tipo);
+    } else {
+      area.style.display = 'none';
+      area.innerHTML = '';
+    }
+  },
+
+  renderOpcionesEditorHTML(tipo) {
+    const esMultiple = this.esTipoSeleccionMultiple(tipo);
+    const tipoCorrecta = esMultiple ? 'checkbox' : 'radio';
+    const nombreCorrecta = esMultiple ? 'opcCorrecta' : 'opcCorrectaUnica';
+    const rows = (this.opcionesRows || []).map((r, i) => {
+      const onchange = esMultiple
+        ? `App.opcionesRows[${i}].correcta=this.checked`
+        : `App.opcionesRows.forEach(r=>r.correcta=false); App.opcionesRows[${i}].correcta=this.checked`;
+      return `
+      <div class="opcion-fila">
+        <input type="text" class="opc-clave" maxlength="3" value="${this.escapeHtml(r.clave)}" placeholder="A" oninput="App.opcionesRows[${i}].clave=this.value.trim()">
+        <input type="text" class="opc-texto" value="${this.escapeHtml(r.texto)}" placeholder="Texto de la opción" oninput="App.opcionesRows[${i}].texto=this.value">
+        <label class="opc-correcta-label">Correcta
+          <input type="${tipoCorrecta}" name="${nombreCorrecta}" class="opc-correcta" ${r.correcta ? 'checked' : ''} onchange="${onchange}">
+        </label>
+        <button type="button" class="ghost" onclick="App.agregarOpcionFila(${i})" title="Añadir opción">＋</button>
+        <button type="button" class="ghost" onclick="App.quitarOpcionFila(${i})" title="Quitar opción">🗑</button>
+      </div>
+    `;
+    }).join('');
+    return `
+      <label>Opciones de respuesta</label>
+      ${rows}
+      <p class="empty" style="font-size:12px; margin:4px 0 0;">Marca la(s) opción(es) correcta(s). La respuesta correcta nunca la verá el estudiante.</p>
+    `;
+  },
+
+  agregarOpcionFila(index) {
+    (this.opcionesRows || []).splice(index + 1, 0, { clave: this.defaultLetraOpcion(), texto: '', correcta: false });
+    const area = document.getElementById('opcionesArea');
+    const tipo = document.getElementById('newTipo')?.value || '';
+    if (area) area.innerHTML = this.renderOpcionesEditorHTML(tipo);
+  },
+
+  quitarOpcionFila(index) {
+    if ((this.opcionesRows || []).length <= 2) { this.toast('Debe haber al menos 2 opciones'); return; }
+    (this.opcionesRows || []).splice(index, 1);
+    const area = document.getElementById('opcionesArea');
+    const tipo = document.getElementById('newTipo')?.value || '';
+    if (area) area.innerHTML = this.renderOpcionesEditorHTML(tipo);
+  },
+
+  leerOpcionesEditor() {
+    const rows = (this.opcionesRows || []).map(r => ({
+      clave: String(r.clave || '').trim(),
+      texto: String(r.texto || '').trim(),
+      correcta: !!r.correcta
+    }));
+    const opciones = rows.filter(r => r.clave && r.texto).map(r => ({ clave: r.clave, texto: r.texto }));
+    const correctas = rows.filter(r => r.correcta && r.clave).map(r => r.clave);
+    return { opciones, correctas };
+  },
+
+  // ---- Ayuda visual para el campo Metodología ----
+  updateMetodologiaHint() {
+    const sel = document.getElementById('newMetodologia');
+    const hint = document.getElementById('newMetodologiaHint');
+    if (!sel || !hint) return;
+    hint.textContent = this.metodologiaHints[sel.value] || 'Selecciona una metodología para ver la descripción.';
+  },
+
+  // ---- Widget de graficación interactiva de fracciones ----
+  graficaMeta(ej) {
+    if (ej.grafica && ej.grafica.denominador) {
+      return {
+        numerador: Math.max(1, Number(ej.grafica.numerador) || 1),
+        denominador: Math.max(1, Number(ej.grafica.denominador) || 1),
+        forma: ej.grafica.forma === 'circulo' ? 'circulo' : 'rectangulo'
+      };
+    }
+    const m = String(ej.enunciado || '').match(/(\d+)\s*\/\s*(\d+)/);
+    return {
+      numerador: m ? Number(m[1]) : 1,
+      denominador: m ? Number(m[2]) : 1,
+      forma: 'rectangulo'
+    };
+  },
+
+  polarCoords(cx, cy, r, grados) {
+    const a = ((grados - 90) * Math.PI) / 180;
+    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+  },
+
+  /** Trazo SVG de un sector circular (torta). */
+  arcSVG(cx, cy, r, inicioGrad, finGrad) {
+    const s = this.polarCoords(cx, cy, r, finGrad);
+    const e = this.polarCoords(cx, cy, r, inicioGrad);
+    const grande = (finGrad - inicioGrad <= 180) ? '0' : '1';
+    return `M ${cx} ${cy} L ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${r} ${r} 0 ${grande} 0 ${e.x.toFixed(2)} ${e.y.toFixed(2)} Z`;
+  },
+
+  renderControlGrafica(ej, materia) {
+    const key = String(ej.id);
+    const meta = this.graficaMeta(ej);
+    const total = Math.min(Math.max(meta.denominador, 1), 24);
+    const selSet = new Set(this.graficaSel[key] || []);
+    const esCirculo = meta.forma === 'circulo';
+    const idCount = 'fracCount_' + key;
+
+    let canvas = '';
+    if (esCirculo) {
+      const sectores = [];
+      for (let i = 0; i < total; i += 1) {
+        const ini = (360 / total) * i;
+        const fin = (360 / total) * (i + 1);
+        const d = this.arcSVG(100, 100, 92, ini, fin);
+        sectores.push(`<path class="seg-fra ${selSet.has(i) ? 'sel' : ''}" data-widget-part data-frac-key="${key}" data-idx="${i}" d="${d}"></path>`);
+      }
+      canvas = `<svg viewBox="0 0 200 200" class="fig-fra svg-circulo">${sectores.join('')}</svg>`;
+    } else {
+      const ancho = (520 / total).toFixed(1);
+      const rects = [];
+      for (let i = 0; i < total; i += 1) {
+        rects.push(`<rect class="seg-fra ${selSet.has(i) ? 'sel' : ''}" data-widget-part data-frac-key="${key}" data-idx="${i}" x="${(i * Number(ancho)).toFixed(1)}" y="0" width="${ancho}" height="66" rx="4"></rect>`);
+      }
+      canvas = `<svg viewBox="0 0 520 66" class="fig-fra svg-rectangulo">${rects.join('')}</svg>`;
+    }
+
+    return `
+      <div class="grafica-sele" data-frac-key="${key}" data-den="${total}">
+        <div class="grafica-toolbar">
+          <span class="tag mat">Colorea ${meta.numerador} de ${total}</span>
+          <span class="grafica-contador" id="${idCount}">Coloreadas: ${selSet.size}/${total}</span>
+          <div class="graph-pills">
+            <button type="button" class="ghost ${!esCirculo ? 'active' : ''}" data-frac-shape="rectangulo" data-frac-key="${key}">▭ Rectángulo</button>
+            <button type="button" class="ghost ${esCirculo ? 'active' : ''}" data-frac-shape="circulo" data-frac-key="${key}">◯ Círculo</button>
+          </div>
+        </div>
+        ${canvas}
+        <div class="answer-row">
+          <button class="primary" data-check="${ej.id}" data-materia="${materia}">Comprobar</button>
+        </div>
+      </div>
+    `;
   },
 
   renderFractionGraphic(numerador, denominador, tipoFigura = 'rectangulo') {
@@ -182,6 +414,7 @@ const App = {
       this.updateUserPill();
       this.hideLoginScreen();
       await this.cargarPrendas();
+      await this.hydrateProgress();
       this.render();
     } catch (error) {
       console.error(error);
@@ -377,16 +610,57 @@ const App = {
     }
   },
 
-  saveProgressState() {
+  saveProgressState(syncConServidor = true) {
+    const payload = {
+      completedTaskIds: this.completedTaskIds,
+      completedExerciseIds: this.completedExerciseIds,
+      intentosPorEjercicio: this.intentosPorEjercicio
+    };
     try {
-      const payload = {
-        completedTaskIds: this.completedTaskIds,
-        completedExerciseIds: this.completedExerciseIds,
-        intentosPorEjercicio: this.intentosPorEjercicio
-      };
       window.localStorage.setItem(this.getProgressStorageKey(), JSON.stringify(payload));
     } catch (e) {
       console.warn('No se pudo guardar el progreso local', e);
+    }
+    if (syncConServidor && this.authUser && API.authToken) {
+      API.setProgreso(payload).catch(err => console.warn('No se pudo sincronizar el progreso', err));
+    }
+  },
+
+  reconciliarProgreso(local, servidor) {
+    const l = local || {};
+    const s = servidor || {};
+    const lt = Array.isArray(l.completedTaskIds) ? l.completedTaskIds : [];
+    const st = Array.isArray(s.completedTaskIds) ? s.completedTaskIds : [];
+    const le = Array.isArray(l.completedExerciseIds) ? l.completedExerciseIds : [];
+    const se = Array.isArray(s.completedExerciseIds) ? s.completedExerciseIds : [];
+    const completedTaskIds = [...new Set([...lt, ...st])];
+    const completedExerciseIds = [...new Set([...le, ...se])];
+    const li = l.intentosPorEjercicio && typeof l.intentosPorEjercicio === 'object' ? l.intentosPorEjercicio : {};
+    const si = s.intentosPorEjercicio && typeof s.intentosPorEjercicio === 'object' ? s.intentosPorEjercicio : {};
+    const intentosPorEjercicio = {};
+    [...new Set([...Object.keys(li), ...Object.keys(si)])].forEach(k => {
+      intentosPorEjercicio[k] = Math.max(Number(li[k]) || 0, Number(si[k]) || 0);
+    });
+    return { completedTaskIds, completedExerciseIds, intentosPorEjercicio };
+  },
+
+  // Al iniciar sesión rehidrata el estado desde la base central (cualquier dispositivo)
+  async hydrateProgress() {
+    if (!this.authUser) return;
+    const local = {
+      completedTaskIds: this.completedTaskIds || [],
+      completedExerciseIds: this.completedExerciseIds || [],
+      intentosPorEjercicio: this.intentosPorEjercicio || {}
+    };
+    try {
+      const servidor = await API.getProgreso();
+      const fusion = this.reconciliarProgreso(local, servidor);
+      this.completedTaskIds = fusion.completedTaskIds;
+      this.completedExerciseIds = fusion.completedExerciseIds;
+      this.intentosPorEjercicio = fusion.intentosPorEjercicio;
+      this.saveProgressState(); // persiste local + re-sincroniza el merge
+    } catch (e) {
+      console.warn('No se pudo sincronizar el progreso con el servidor', e);
     }
   },
 
@@ -887,10 +1161,7 @@ const App = {
             <div class="feedback ok">✅ Resuelto correctamente</div>
             <div class="attempts">Intentos: ${intentos}</div>
           ` : `
-            <div class="answer-row">
-              <input type="text" placeholder="Tu respuesta" id="resp_${e.id}">
-              <button class="primary" data-check="${e.id}" data-materia="${materia}">Comprobar</button>
-            </div>
+            ${this.renderControlesRespuesta(e, materia)}
             <div class="attempts">Intentos: ${intentos}</div>
           `}
           <div id="fb_${e.id}"></div>
@@ -1318,12 +1589,17 @@ const App = {
       // Formulario de crear ejercicio — CONTEXTUAL según la materia activa
       const tiposMat = `
         <option value="fraccion">Fracción (a/b)</option>
+        <option value="fraccion_simplificada">Fracción simplificada (irreducible)</option>
+        <option value="decimal">Número decimal</option>
+        <option value="fraccion_grafica">Gráfica de fracción (tortas/rectángulos)</option>
         <option value="entero">Número Entero</option>
-        <option value="opcion_multiple">Opción Múltiple</option>
+        <option value="opcion_multiple">Selección única (radio)</option>
+        <option value="multiple">Selección múltiple (varias)</option>
       `;
       const tiposIng = `
         <option value="completar">Completar Espacio (Fill in the blank)</option>
-        <option value="opcion_multiple">Opción Múltiple</option>
+        <option value="opcion_multiple">Selección única (radio)</option>
+        <option value="multiple">Selección múltiple (varias)</option>
         <option value="traduccion">Traducción</option>
       `;
       const tipos = esMat ? tiposMat : tiposIng;
@@ -1338,23 +1614,36 @@ const App = {
             <label>Tema / Categoría</label>
             <input type="text" id="newTema" placeholder="${placeholderTema}" oninput="App.autocompletarPista()">
             <label>Tipo</label>
-            <select id="newTipo">${tipos}</select>
+            <select id="newTipo" onchange="App.toggleOpcionesEditor()">${tipos}</select>
             <label>Metodología</label>
-            <select id="newMetodologia">
+            <select id="newMetodologia" onchange="App.updateMetodologiaHint()">
               <option value="Estándar / Directo">Estándar / Directo</option>
               <option value="Paso a Paso (Carita Sonriente)">Paso a Paso (Carita Sonriente)</option>
               <option value="Graficación Interactiva">Graficación Interactiva</option>
               <option value="Desafío Contrarreloj">Desafío Contrarreloj</option>
+              <option value="Opción Múltiple / Gramática">Opción Múltiple / Gramática</option>
             </select>
+            <div class="hint-preview" id="newMetodologiaHint">${this.metodologiaHints['Estándar / Directo']}</div>
           </div>
           <div>
             <label>Enunciado</label>
             <textarea id="newEnun" placeholder="${placeholderEnun}"></textarea>
-            <label>Respuesta correcta (no la verá la estudiante)</label>
-            <input type="text" id="newResp" placeholder="${placeholderResp}">
+            <div id="newRespContainer">
+              <label>Respuesta correcta (no la verá la estudiante)</label>
+              <input type="text" id="newResp" placeholder="${placeholderResp}">
+            </div>
             <label>Pista en caso de error</label>
             <input type="text" id="newPista" placeholder="Se autocompleta según el tema...">
           </div>
+        </div>
+        <div id="opcionesArea" style="margin-top:14px; display:none;"></div>
+        <div id="graficaArea" style="margin-top:14px; display:none;">
+          <label>Forma de la figura</label>
+          <select id="newGraficaForma">
+            <option value="rectangulo">Rectángulo (barra)</option>
+            <option value="circulo">Círculo (torta)</option>
+          </select>
+          <p class="empty" style="font-size:12px; margin:6px 0 0;">El estudiante coloreará las partes de la figura y el sistema validará que coloree exactamente la fracción del enunciado.</p>
         </div>
         <div style="margin-top:14px;"><button class="primary" id="addExBtn" data-materia="${materia}">Guardar ejercicio</button></div>
       `;
@@ -2018,12 +2307,37 @@ const App = {
         const tipo = document.getElementById('newTipo').value;
         const metodologia = document.getElementById('newMetodologia').value;
         const enunciado = document.getElementById('newEnun').value.trim();
-        const respuestaCorrecta = document.getElementById('newResp').value.trim();
+        let respuestaCorrecta = document.getElementById('newResp').value.trim();
         const pistaError = document.getElementById('newPista').value.trim() || 'Vuelve a revisar el procedimiento paso a paso.';
-        if (!enunciado || !respuestaCorrecta) { this.toast('⚠️ Completa enunciado y respuesta'); return; }
+        if (!enunciado) { this.toast('⚠️ Completa el enunciado'); return; }
+
+        const data = { materia, tema, tipo, enunciado, respuestaCorrecta, pistaError, metodologia };
+        if (['fraccion_grafica', 'grafico_interactivo'].includes(tipo)) {
+          const fracMatch = String(data.respuestaCorrecta).match(/(\d+)\s*\/\s*(\d+)/);
+          if (!fracMatch) { this.toast('⚠️ Escribe la fracción en forma numerador/denominador (ej: 3/5)'); return; }
+          data.grafica = {
+            numerador: Number(fracMatch[1]),
+            denominador: Number(fracMatch[2]),
+            forma: document.getElementById('newGraficaForma')?.value || 'rectangulo'
+          };
+        }
+        if (this.esTipoSeleccion(tipo)) {
+          const { opciones, correctas } = this.leerOpcionesEditor();
+          if (opciones.length < 2) { this.toast('⚠️ Agrega al menos 2 opciones con texto'); return; }
+          if (correctas.length === 0) { this.toast('⚠️ Marca cuál(es) opción(es) es/son la(s) correcta(s)'); return; }
+          if (!this.esTipoSeleccionMultiple(tipo) && correctas.length > 1) { this.toast('⚠️ Selección única: marca solo una respuesta correcta'); return; }
+          data.opciones = opciones;
+          data.respuestaCorrecta = this.esTipoSeleccionMultiple(tipo) ? correctas : correctas[0];
+        }
+        if (!data.respuestaCorrecta) { this.toast('⚠️ Completa la respuesta correcta'); return; }
+
         try {
-          await API.crearEjercicio({ materia, tema, tipo, enunciado, respuestaCorrecta, pistaError, metodologia });
+          await API.crearEjercicio(data);
           this.toast('✅ Ejercicio guardado');
+          this.opcionesRows = [
+            { clave: 'a', texto: '', correcta: false },
+            { clave: 'b', texto: '', correcta: false }
+          ];
           this.render();
         } catch (e) { this.toast('⚠️ ' + e.message); }
       };
@@ -2055,9 +2369,23 @@ const App = {
         btn.onclick = async () => {
           const id = btn.dataset.check;
           const materia = btn.dataset.materia;
+          const cardSel = btn.closest('.task-card');
           const input = document.getElementById('resp_' + id);
-          const respuesta = input.value.trim();
-          if (!respuesta) return;
+          let respuesta = input ? input.value.trim() : '';
+          if (!respuesta) {
+            const gSel = cardSel.querySelector('.grafica-sele[data-frac-key]');
+            if (gSel) {
+              const claveGraph = gSel.dataset.fracKey;
+              const totalPartes = Number(gSel.dataset.den) || 1;
+              const partesSel = (this.graficaSel[claveGraph] || []).filter(i => i < totalPartes);
+              if (partesSel.length === 0) { this.toast('Colorea al menos una parte de la figura'); return; }
+              respuesta = `${partesSel.length}/${totalPartes}`;
+            } else {
+              const marcadas = [].slice.call(cardSel.querySelectorAll('input[name="resp_' + id + '"]:checked'));
+              if (marcadas.length === 0) { this.toast('Recuerda seleccionar tu respuesta'); return; }
+              respuesta = marcadas.length === 1 ? marcadas[0].value : marcadas.map(c => c.value);
+            }
+          }
 
           // Deshabilitar botón mientras valida (evita doble envío)
           btn.disabled = true;
@@ -2107,6 +2435,10 @@ const App = {
               if (card) {
                 const answerRow = card.querySelector('.answer-row');
                 if (answerRow) answerRow.style.display = 'none';
+                const opciones = card.querySelector('.opciones');
+                if (opciones) opciones.style.display = 'none';
+                const graficaSel = card.querySelector('.grafica-sele');
+                if (graficaSel) graficaSel.style.display = 'none';
                 // Asegurar badge verde de éxito
                 fb.innerHTML = `<div class="feedback ok">✅ Resuelto correctamente</div>`;
               }
@@ -2123,6 +2455,31 @@ const App = {
             btn.disabled = false;
             btn.textContent = 'Comprobar';
           }
+        };
+      });
+
+      // Widget de graficación: colorear/deseleccionar partes al hacer clic
+      document.querySelectorAll('[data-widget-part][data-frac-key]').forEach(part => {
+        part.addEventListener('click', () => {
+          const clave = part.dataset.fracKey;
+          const idx = Number(part.dataset.idx);
+          const arr = (this.graficaSel[clave] = this.graficaSel[clave] || []);
+          const pos = arr.indexOf(idx);
+          if (pos >= 0) arr.splice(pos, 1); else arr.push(idx);
+          part.classList.toggle('sel', pos < 0);
+          const total = Number(part.closest('.grafica-sele')?.dataset.den) || 1;
+          const lbl = document.getElementById('fracCount_' + clave);
+          if (lbl) lbl.textContent = `Coloreadas: ${arr.length}/${total}`;
+        });
+      });
+      // Conmutar figura: rectángulo <-> círculo
+      document.querySelectorAll('[data-frac-shape][data-frac-key]').forEach(shapeBtn => {
+        shapeBtn.onclick = () => {
+          const clave = shapeBtn.dataset.fracKey;
+          const ej = (this.currentTaskExercises || []).find(t => String(t.id) === clave);
+          if (!ej) return;
+          ej.grafica = { ...(ej.grafica || {}), forma: shapeBtn.dataset.fracShape };
+          this.render();
         };
       });
 

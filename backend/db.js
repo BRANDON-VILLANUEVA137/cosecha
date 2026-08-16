@@ -55,6 +55,20 @@ class MockFirestore {
     seed.ejercicios['m4'] = { materia: 'matematicas', tema: 'Fracciones · Carita Sonriente', enunciado: '3/8 + 5/4 = ?', tipo: 'fraccion', respuestaCorrecta: '13/8', pistaError: 'Recuerda multiplicar en cruz los numeradores con el denominador contrario, y los denominadores entre sí.' };
     seed.ejercicios['m5'] = { materia: 'matematicas', tema: 'Multiplicación de fracciones', enunciado: '3/5 x 2/7 = ?', tipo: 'fraccion', respuestaCorrecta: '6/35', pistaError: 'En la multiplicación no se busca denominador común: numerador por numerador, denominador por denominador.' };
 
+    // ---- Ejercicios: Nuevas categorías (forma irreducible, decimal y dinámicas) ----
+    seed.ejercicios['m6'] = { materia: 'matematicas', tema: 'Simplificación de fracciones', enunciado: 'Simplifica 8/12 a su forma irreducible', tipo: 'fraccion_simplificada', respuestaCorrecta: '2/3', pistaError: 'Divide el numerador y el denominador entre su mcd (el de 8 y 12 es 4).' };
+    seed.ejercicios['m7'] = { materia: 'matematicas', tema: 'División con cociente decimal', enunciado: 'Convierte 3/2 a número decimal', tipo: 'decimal', respuestaCorrecta: '1.5', pistaError: 'Divide el numerador entre el denominador: 3 ÷ 2 = 1.5.' };
+    // Plantillas dinámicas: la respuesta se calcula al instanciar (por usuario + tarea)
+    seed.ejercicios['m8'] = { materia: 'matematicas', tema: 'Simplificación de fracciones', plantilla: 'simplificacion', tipo: 'fraccion_simplificada', pistaError: 'Divide el numerador y el denominador entre su máximo común divisor (mcd).' };
+    seed.ejercicios['m9'] = { materia: 'matematicas', tema: 'División con cociente decimal', plantilla: 'division_decimal', tipo: 'decimal', pistaError: 'Divide el numerador entre el denominador para obtener el cociente decimal.' };
+
+    // ---- Ejercicios: Selección única y múltiple ----
+    seed.ejercicios['m10'] = { materia: 'matematicas', tema: 'Selección única · Fracciones', enunciado: '¿Cuál es el resultado de la división 3/2?', tipo: 'opcion_multiple', opciones: [{ clave: 'a', texto: '1.5' }, { clave: 'b', texto: '2.5' }, { clave: 'c', texto: '3.5' }, { clave: 'd', texto: '4.5' }], respuestaCorrecta: 'a', pistaError: 'Divide 3 entre 2: 3/2 = 1.5.' };
+    seed.ejercicios['m11'] = { materia: 'matematicas', tema: 'Selección múltiple · Lógica', enunciado: 'Selecciona cuáles son mascotas:', tipo: 'multiple', opciones: [{ clave: 'a', texto: 'Ballena' }, { clave: 'b', texto: 'Gato' }, { clave: 'c', texto: 'Tigre' }, { clave: 'd', texto: 'Perro' }], respuestaCorrecta: ['b', 'd'], pistaError: 'Las mascotas domésticas comunes son el gato y el perro.' };
+
+    // ---- Ejercicio: Graficación interactiva (tortas / rectángulos) ----
+    seed.ejercicios['m12'] = { materia: 'matematicas', tema: 'Graficación de fracciones', enunciado: 'Representa 3/5 coloreando la figura', tipo: 'fraccion_grafica', respuestaCorrecta: '3/5', grafica: { numerador: 3, denominador: 5, forma: 'rectangulo' }, pistaError: 'Colorea exactamente 3 de las 5 partes de la figura.' };
+
     // ---- Ejercicios: Inglés ----
     seed.ejercicios['i1'] = { materia: 'ingles', tema: 'Verbo to be', enunciado: 'My brother ___ happy. (am / is / are)', tipo: 'texto', respuestaCorrecta: 'is', pistaError: '"My brother" es él (singular) → usa la forma para he/she/it.' };
     seed.ejercicios['i2'] = { materia: 'ingles', tema: 'Verbo to be', enunciado: 'Sofía and Pedro ___ friends. (am / is / are)', tipo: 'texto', respuestaCorrecta: 'are', pistaError: 'Cuando son varias personas (plural), el verbo to be usa la forma para we/they/you.' };
