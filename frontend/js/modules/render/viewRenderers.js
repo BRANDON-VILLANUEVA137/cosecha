@@ -6,6 +6,12 @@ const Personaje = window.Personaje;
 
 export const ViewRenderers = {
   renderNav(currentRole, currentModule) {
+    // Si no se pasan argumentos, usamos el estado en vivo:
+    // los llamadores (`hideLoginScreen`, `enterRole`, `goModule`) invocan
+    // `window.App.renderNav()` sin parámetros, así que sin esto las pestañas
+    // siempre se renderizaban como las de estudiante.
+    currentRole = currentRole ?? state.currentRole;
+    currentModule = currentModule ?? state.currentModule;
     const tabsEstudiante = [
       { id: 'inicio', ico: '🏠', label: 'Inicio' },
       { id: 'matematicas', ico: '🍊', label: 'Matemáticas' },
@@ -37,7 +43,7 @@ export const ViewRenderers = {
       const tareas = await API.getTareas();
 
       // Catálogo de personajes para el selector de avatar
-      let catalogo = Personaje.PERSONAJES;
+      let catalogo = (typeof Personaje !== 'undefined' && Personaje.PERSONAJES) || [];
       try {
         const c = await API.getPersonajes();
         if (Array.isArray(c) && c.length) catalogo = c;
@@ -202,7 +208,7 @@ export const ViewRenderers = {
             <div class="feedback ok">✅ Resuelto correctamente</div>
             <div class="attempts">Intentos: ${intentos}</div>
           ` : `
-            ${this.renderControlesRespuesta(e, materia)}
+            ${this.renderControlesRespuesta(e, materia, this)}
             <div class="attempts">Intentos: ${intentos}</div>
           `}
           <div id="fb_${e.id}"></div>

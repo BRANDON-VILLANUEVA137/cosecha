@@ -167,7 +167,7 @@ export async function renderDocenteMateria(materia) {
           <option value="rectangulo">Rectángulo (barra)</option>
           <option value="circulo">Círculo (torta)</option>
         </select>
-        <p class="empty" style="font-size:12px; margin:6px 0 0;">El estudiante coloreará las partes de la figura y el sistema validará que coloree exactamente la fracción del enunciado.</p>
+        <p class="empty" style="font-size:12px; margin:6px 0 0;">El estudiante coloreará las partes de la figura y el sistema validará la representación exacta. Para que el ejercicio funcione usa una fracción <b>propia</b> en "Respuesta correcta": 1&nbsp;≤&nbsp;numerador&nbsp;≤&nbsp;denominador y denominador&nbsp;≤&nbsp;24 (ej:&nbsp;7/9).</p>
       </div>
       <div style="margin-top:14px;"><button class="primary" id="addExBtn" data-materia="${materia}">Guardar ejercicio</button></div>
     `;

@@ -29,7 +29,9 @@ export const ExerciseRenderers = {
 
   renderControlesRespuesta(ej, materia, parentApp) {
     if (ej.tipo === 'fraccion_grafica' || ej.tipo === 'grafico_interactivo') {
-      return parentApp.renderControlGrafica(ej, materia);
+      // `parentApp` puede no llegarse a pasar; si no, usamos `this`
+      // (cuando el método se llama como App.renderControlesRespuesta).
+      return (parentApp || this).renderControlGrafica(ej, materia);
     }
     if (Array.isArray(ej.opciones) && ej.opciones.length) {
       const esMultiple = this.esTipoSeleccionMultiple(ej.tipo);
@@ -50,7 +52,7 @@ export const ExerciseRenderers = {
     }
     return `
       <div class="answer-row">
-        <input type="text" data-ej="${ej.id}" placeholder="Tu respuesta...">
+        <input type="text" id="resp_${ej.id}" data-ej="${ej.id}" placeholder="Tu respuesta...">
         <button class="primary" data-check="${ej.id}" data-materia="${materia}">Comprobar</button>
       </div>
     `;

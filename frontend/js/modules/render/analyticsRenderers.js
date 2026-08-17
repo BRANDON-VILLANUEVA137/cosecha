@@ -276,50 +276,8 @@ export const AnalyticsRenderers = {
     } catch (e) {
       return `<p class="empty">⚠️ Error: ${e.message}</p>`;
     }
-  },
-
- async renderAnalyticsGrupo(data) {
-    if (!data) return '<p class="empty">Error al cargar datos</p>';
-    const estudiantes = Array.isArray(data) ? data : (data.estudiantes || []);
-    const totalEstudiantes = data.totalEstudiantes ?? estudiantes.length;
-    const promedioGrupo = data.promedioGrupo || 0;
-    
-    // --- Vista mejorada del dashboard grupal ---
-    const estudiantesHtml = estudiantes.map(e => `
-      <div class="ex-item">
-        <div class="top">
-          <div>
-            <strong>${escapeHtml(e.nombre || e.email)}</strong>
-            <div style="font-size:12px; color:var(--texto-suave);">
-              ${e.totalIntentos > 0 ? `${e.totalIntentos} intentos · ${e.tasaAcierto}% acierto` : 'Sin actividad aún'}
-            </div>
-          </div>
-          <button class="ghost" onclick="window.App.selectedEstudianteId = '${e.estudianteId}'; window.App.analyticsView = 'estudiante'; window.App.render();">
-            Ver detalle →
-          </button>
-        </div>
-      </div>
-    `).join('') || '<p class="empty">No hay estudiantes registrados</p>';
-
-    return `
-      <div class="card">
-        <h2>📊 Dashboard del Grupo</h2>
-        <div class="stat-row" style="margin-bottom:16px;">
-          <div class="stat"><b>${totalEstudiantes}</b><span>ESTUDIANTES</span></div>
-          <div class="stat"><b>${promedioGrupo}%</b><span>PROMEDIO GENERAL</span></div>
-        </div>
-        <h3>👥 Lista de estudiantes</h3>
-        <div style="margin-top:10px;">${estudiantesHtml}</div>
-      </div>
-    `;
-  },
-
-  cambiarAnalyticsView(appInstance, view) {
-    appInstance.analyticsView = view;
-    appInstance.selectedEstudianteId = null;
-    appInstance.analyticsFilterMateria = '';
-    appInstance.analyticsFilterTarea = '';
-    appInstance.analyticsFilterTema = '';
-    appInstance.render();
   }
 };
+
+// NOTA: `renderAnalyticsGrupo` se importa desde ./renderAnalyticsGrupo.js,
+// por eso ya no vive dentro de AnalyticsRenderers.

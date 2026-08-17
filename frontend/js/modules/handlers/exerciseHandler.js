@@ -27,6 +27,26 @@ export const ExerciseHandler = {
     if (respContainer) respContainer.style.display = esTipoSeleccion(tipo) ? 'none' : 'block';
     if (graficaArea) graficaArea.style.display = esGrafica ? 'block' : 'none';
 
+    // Placeholders contextuales: para gráficas el estudiante colorea (no escribe resultados)
+    const enunInput = document.getElementById('newEnun');
+    const respInput = document.getElementById('newResp');
+    if (enunInput && !enunInput.dataset.placeholderDefault) enunInput.dataset.placeholderDefault = enunInput.placeholder;
+    if (respInput && !respInput.dataset.placeholderDefault) respInput.dataset.placeholderDefault = respInput.placeholder;
+
+    if (esGrafica) {
+      if (enunInput) enunInput.placeholder = 'Ej: Representa 7/9 de la figura (colorea las partes)';
+      if (respInput) respInput.placeholder = 'Ej: 7/9';
+      // Metodología coherente con la actividad gráfica
+      const met = document.getElementById('newMetodologia');
+      if (met && met.value === 'Estándar / Directo') {
+        met.value = 'Graficación Interactiva';
+        this.updateMetodologiaHint();
+      }
+    } else {
+      if (enunInput) enunInput.placeholder = enunInput.dataset.placeholderDefault || 'Escribe el enunciado';
+      if (respInput) respInput.placeholder = respInput.dataset.placeholderDefault || 'Tu respuesta';
+    }
+
     if (esTipoSeleccion(tipo)) {
       if (!Array.isArray(state.opcionesRows) || state.opcionesRows.length < 2) {
         state.opcionesRows = [
@@ -205,11 +225,20 @@ export const ExerciseHandler = {
     const data = { materia, tema, tipo, enunciado, respuestaCorrecta, pistaError, metodologia };
     
     if (['fraccion_grafica', 'grafico_interactivo'].includes(tipo)) {
-      const fracMatch = String(data.respuestaCorrecta).match(/(\d+)\s*\/\s*(\d+)/);
-      if (!fracMatch) { toast('⚠️ Escribe la fracción en forma numerador/denominador (ej: 3/5)'); return; }
+      const fracMatch = String(data.respuestaCorrecta).trim().match(/^(\d+)\s*\/\s*(\d+)$/);
+      if (!fracMatch) { toast('⚠️ Escribe la respuesta correcta como fracción numerador/denominador (ej: 7/9)'); return; }
+      const numerador = Number(fracMatch[1]);
+      const denominador = Number(fracMatch[2]);
+      // El widget de coloreado dibuja `denominador` partes (máx. 24) y compara la
+      // fracción EXACTA coloreada (numerador/denominador) con la respuesta correcta.
+      // Por eso solo admitimos fracciones propias y de tamaño representable.
+      if (numerador < 1 || denominador < 1 || numerador > denominador || denominador > 24) {
+        toast('⚠️ Fracción no válida para gráfica: debe ser propia, 1 ≤ numerador ≤ denominador y denominador ≤ 24 (ej: 7/9)');
+        return;
+      }
       data.grafica = {
-        numerador: Number(fracMatch[1]),
-        denominador: Number(fracMatch[2]),
+        numerador,
+        denominador,
         forma: document.getElementById('newGraficaForma')?.value || 'rectangulo'
       };
     }

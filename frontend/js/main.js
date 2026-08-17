@@ -16,6 +16,9 @@ import { renderArmario } from './modules/render/renderArmario.js';
 import { renderAlbum } from './modules/render/renderAlbum.js';
 import { renderDocenteMateria } from './modules/render/renderDocente.js';
 import { renderDetalleTarea } from './modules/render/renderDetalleTarea.js';
+import { renderAnalyticsGrupo } from './modules/render/renderAnalyticsGrupo.js';
+import { ExerciseRenderers } from './modules/render/exerciseRenderers.js';
+import { renderControlGrafica } from './modules/render/renderFraction.js';
 import { AnalyticsRenderers } from './modules/render/analyticsRenderers.js';
 
 
@@ -49,6 +52,13 @@ const App = {
 
 
   ...AnalyticsRenderers,
+
+  // Vista del grupo: módulo dedicado (reemplaza la versión antigua embebida)
+  renderAnalyticsGrupo,
+
+  // Render de controles de respuesta (estudiante) + gráficas de fracciones
+  ...ExerciseRenderers,
+  renderControlGrafica,
 
   // Handlers
   ...AuthHandler,
@@ -358,6 +368,24 @@ const App = {
     }
   }
 };
+
+// --- Sincronización App ↔ state ---
+// `App` se construye mezclando `...state`, lo que crea una COPIA de los valores
+// al cargar la página. Los handlers (auth, tareas, estudiantes, etc.) mutan el
+// objeto `state` real, así que `App` leía valores obsoletos: por ejemplo
+// `currentRole` quedaba en `null` y un docente terminaba viendo la vista de
+// estudiante (mientras la píldora del usuario sí mostraba "docente").
+// Aquí redefinimos cada clave de `state` dentro de `App` como getter/setter que
+// delega SIEMPRE al objeto compartido: `this.currentRole`, `this.currentModule`,
+// `this.currentTaskView`, etc. quedan sincronizados en vivo con `state`.
+for (const key of Object.keys(state)) {
+  Object.defineProperty(App, key, {
+    get() { return state[key]; },
+    set(val) { state[key] = val; },
+    enumerable: true,
+    configurable: true
+  });
+}
 
 // Exponer App globalmente para llamadas desde HTML
 window.App = App;

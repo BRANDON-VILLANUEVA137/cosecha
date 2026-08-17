@@ -75,6 +75,8 @@ export const AuthHandler = {
       window.API.setAuthToken(token);
       const session = await window.API.getSession();
       state.currentRole = session.rol || 'estudiante';
+      // Módulo inicial según el rol: el docente entra directo a su panel de materia
+      state.currentModule = state.currentRole === 'docente' ? 'matematicas' : 'inicio';
       this.updateUserPill();
       this.hideLoginScreen();
       await this.cargarPrendas();

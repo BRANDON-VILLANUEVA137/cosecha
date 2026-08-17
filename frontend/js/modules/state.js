@@ -38,3 +38,10 @@ export const state = {
     'Opción Múltiple / Gramática': 'Preguntas de selección (única o múltiple) con foco en gramática y vocabulario.'
   }
 };
+
+// ✅ Exponer `state` en window.
+// Los handlers inline del formulario de opciones del docente usan
+// `oninput="state.opcionesRows[i]..."` / `onchange="state.opcionesRows..."`.
+// `state` es un módulo ES (no una variable global), así que sin esto el
+// navegador lanza ReferenceError al escribir las opciones y nunca se guardan.
+window.state = state;

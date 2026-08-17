@@ -237,3 +237,8 @@ Personaje.XP_PARA_NIVEL = function(n) {
   if (n <= 1) return 0;
   return Math.round(100 * n * (n - 1) / 2);
 };
+
+// ✅ Exponer Personaje en window para que los módulos (ESM) puedan acceder a él.
+// Sin esto, `const Personaje = window.Personaje;` en los módulos queda `undefined`
+// (los `const`/`let` globales de un script clásico NO son propiedades de window).
+window.Personaje = Personaje;
