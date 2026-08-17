@@ -1,5 +1,9 @@
 import { state } from '../state.js';
 
+// --- IMPORTAR API y Personaje ---
+const API = window.API;
+const Personaje = window.Personaje;
+
 export const ViewRenderers = {
   renderNav(currentRole, currentModule) {
     const tabsEstudiante = [
@@ -19,14 +23,14 @@ export const ViewRenderers = {
     const navBar = document.getElementById('navBar');
     if (navBar) {
       navBar.innerHTML = tabs.map(t => `
-        <button data-mod="${t.id}" class="${currentModule === t.id ? 'active' : ''}" onclick="App.goModule('${t.id}')">
+        <button data-mod="${t.id}" class="${currentModule === t.id ? 'active' : ''}" onclick="window.App.goModule('${t.id}')">
           <span class="ico">${t.ico}</span> ${t.label}
         </button>`).join('');
     }
   },
 
   async renderGestionEstudiantes(appInstance) {
-        try {
+    try {
       // Cargar estudiantes y tareas para contar asignaciones
       appInstance.estudiantesGestion = await API.getEstudiantes();
       if (!Array.isArray(appInstance.estudiantesGestion)) appInstance.estudiantesGestion = [];
@@ -55,8 +59,8 @@ export const ViewRenderers = {
                 </td>
                 <td style="padding:10px; text-align:center;">${tareasAsignadas}</td>
                 <td style="padding:10px; text-align:center; white-space:nowrap;">
-                  <button class="ghost" onclick="App.editarEstudianteForm('${e.id}')">✏️ Editar</button>
-                  <button class="ghost" onclick="App.eliminarEstudianteGestion('${e.id}')" style="color:var(--error-suave);">🗑️ Eliminar</button>
+                  <button class="ghost" onclick="window.App.editarEstudianteForm('${e.id}')">✏️ Editar</button>
+                  <button class="ghost" onclick="window.App.eliminarEstudianteGestion('${e.id}')" style="color:var(--error-suave);">🗑️ Eliminar</button>
                 </td>
               </tr>
             `;
@@ -67,7 +71,7 @@ export const ViewRenderers = {
       const editando = appInstance.estudianteEditando;
       const formVisible = appInstance.estudianteFormVisible || !!editando;
 
-      // Personaje seleccionado: prioriza la selección actual, si no la del alumno
+      // Personaje seleccionado
       const avatarSel = appInstance.avatarSeleccionado || (editando && editando.personaje ? editando.personaje.id : '');
       const catalogoAvatars = appInstance.personajesCatalogo || Personaje.PERSONAJES;
       const avatarSelObj = catalogoAvatars.find(p => p.id === avatarSel) || null;
@@ -75,13 +79,13 @@ export const ViewRenderers = {
         <div style="margin-top:12px;">
           <label style="font-weight:600; display:block; margin-bottom:6px;">👤 Personaje / Avatar del estudiante</label>
           <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:stretch;">
-            <div onclick="App.seleccionarAvatar('')" style="cursor:pointer; padding:6px; border:2px solid ${avatarSel === '' ? 'var(--acento)' : 'var(--borde)'}; border-radius:10px; text-align:center; width:76px; background:#fff;">
+            <div onclick="window.App.seleccionarAvatar('')" style="cursor:pointer; padding:6px; border:2px solid ${avatarSel === '' ? 'var(--acento)' : 'var(--borde)'}; border-radius:10px; text-align:center; width:76px; background:#fff;">
               <div style="font-size:30px; line-height:56px;">🎲</div>
               <div style="font-size:10px; margin-top:2px;">Aleatorio</div>
             </div>
             ${catalogoAvatars.map(p => {
               const esSel = avatarSel === p.id;
-              return `<div onclick="App.seleccionarAvatar('${p.id}')" style="cursor:pointer; padding:6px; border:2px solid ${esSel ? 'var(--acento)' : 'var(--borde)'}; border-radius:10px; text-align:center; width:76px; background:#fff;" title="${p.nombre} (${p.genero})">
+              return `<div onclick="window.App.seleccionarAvatar('${p.id}')" style="cursor:pointer; padding:6px; border:2px solid ${esSel ? 'var(--acento)' : 'var(--borde)'}; border-radius:10px; text-align:center; width:76px; background:#fff;" title="${p.nombre} (${p.genero})">
                 <img src="${Personaje.urlDePersonaje(p)}" width="56" height="56" style="border-radius:8px; display:block;">
                 <div style="font-size:10px; margin-top:2px;">${p.nombre}</div>
               </div>`;
@@ -114,8 +118,8 @@ export const ViewRenderers = {
           </div>
           ${avatarPickerHtml}
           <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="primary" onclick="App.guardarEstudiante()">${editando ? '💾 Guardar Cambios' : '✅ Registrar Estudiante'}</button>
-            <button class="ghost" onclick="App.cancelarEdicionEstudiante()">Cancelar</button>
+            <button class="primary" onclick="window.App.guardarEstudiante()">${editando ? '💾 Guardar Cambios' : '✅ Registrar Estudiante'}</button>
+            <button class="ghost" onclick="window.App.cancelarEdicionEstudiante()">Cancelar</button>
           </div>
         </div>
       ` : '';
@@ -129,7 +133,7 @@ export const ViewRenderers = {
               <p>Registra, edita y administra las cuentas de tus estudiantes.</p>
             </div>
           </div>
-          <button class="primary" onclick="App.mostrarFormEstudiante()">➕ Registrar Estudiante</button>
+          <button class="primary" onclick="window.App.mostrarFormEstudiante()">➕ Registrar Estudiante</button>
         </div>
         ${formHtml}
         <div class="card">
@@ -156,114 +160,137 @@ export const ViewRenderers = {
     }
   },
 
-  async renderDetalleTarea(appInstance) {
+  async renderModuloEstudiante(materia) {
+    const [tareas, logro] = await Promise.all([
+      API.getTareas(),
+      API.getLogros()
+    ]);
+    const esMat = materia === 'matematicas';
+    const aciertos = esMat ? logro.aciertosMatematicas : logro.aciertosIngles;
 
-     
-    if (!appInstance.currentTaskView) return '';
+    // Filtrar tareas por materia y que estén publicadas
+    const tareasFiltradas = Array.isArray(tareas) ? tareas.filter(t => t.materia === materia && t.estado === 'publicada') : [];
     
-    const tarea = appInstance.currentTaskView;
-    const ejerciciosEnTarea = appInstance.currentTaskExercises || [];
-    const esMat = tarea.materia === 'matematicas';
-    const estaPublicada = tarea.estado === 'publicada';
+    // Obtener ejercicios de la materia para mostrarlos en las tareas
+    const ejercicios = await API.getEjercicios(materia);
+    const ejerciciosMap = new Map((Array.isArray(ejercicios) ? ejercicios : []).map(e => [e.id, e]));
     
-    // Obtener ejercicios disponibles que no están en la tarea
-    const ejerciciosDisponibles = appInstance.allEjercicios.filter(ej => 
-      !ejerciciosEnTarea.some(e => e.id === ej.id)
+    // Para cada tarea, cargar sus ejercicios completos
+    const tareasAsignadas = await Promise.all(
+      tareasFiltradas.map(async (tarea) => {
+        const tareaConEjercicios = await API.getTarea(tarea.id);
+        return {
+          ...tareaConEjercicios,
+          ejercicios: tareaConEjercicios.ejercicios || []
+        };
+      })
     );
 
-    const ejerciciosHtml = ejerciciosEnTarea.map(ej => `
-      <div class="ex-item">
-        <div class="top">
-          <div>
-            <span class="tag ${esMat ? 'mat' : 'ing'}">${ej.tema}</span>
-            <div class="ex-enun">${appInstance.formatMathText(ej.enunciado)}</div>
-          </div>
-          <button class="ghost" onclick="App.eliminarEjercicioDeTarea('${ej.id}')" style="color:var(--error-suave);">❌ Quitar</button>
-        </div>
-      </div>
-    `).join('') || '<p class="empty">No hay ejercicios en esta tarea.</p>';
+    if (this.currentTaskView) {
+      const ejerciciosTask = this.currentTaskExercises || [];
+      const tareaActualId = this.currentTaskView.id || 'libre';
+      const tareas = ejerciciosTask.map(e => {
+        // Clave compuesta: tareaId_ejercicioId — desvincula el progreso entre tareas que comparten ejercicios
+        const claveProgreso = `${tareaActualId}_${e.id}`;
+        const intentos = this.intentosPorEjercicio[claveProgreso] || 0;
+        const yaRespondido = this.completedExerciseIds?.includes(claveProgreso);
+        return `
+        <div class="task-card">
+          <span class="tag ${esMat ? 'mat' : 'ing'}">${e.tema}</span>
+          <div class="enun">${this.formatMathText(e.enunciado)}</div>
+          ${yaRespondido ? `
+            <div class="feedback ok">✅ Resuelto correctamente</div>
+            <div class="attempts">Intentos: ${intentos}</div>
+          ` : `
+            ${this.renderControlesRespuesta(e, materia)}
+            <div class="attempts">Intentos: ${intentos}</div>
+          `}
+          <div id="fb_${e.id}"></div>
+        </div>`;
+      }).join('') || '<p class="empty">No hay ejercicios en esta tarea todavía.</p>';
 
-    const disponiblesHtml = ejerciciosDisponibles.map(ej => `
-      <div class="ex-item" style="border-style:dashed;">
-        <div class="top">
-          <div>
-            <span class="tag ${esMat ? 'mat' : 'ing'}">${ej.tema}</span>
-            <div class="ex-enun">${appInstance.formatMathText(ej.enunciado)}</div>
+      return `
+        <div class="card">
+          <div class="module-header">
+            <div class="badge ${esMat ? 'mat' : 'ing'}">${esMat ? '📘' : '🌈'}</div>
+            <div>
+              <h2>${this.currentTaskView.titulo}</h2>
+              <p>${this.currentTaskView.descripcion}</p>
+            </div>
           </div>
-          <button class="primary" onclick="App.agregarEjercicioATarea('${ej.id}')">➕ Agregar</button>
+          <div class="task-nav-row">
+            <button class="ghost" onclick="App.closeTaskView()">← Volver a tareas</button>
+            <button class="primary" onclick="App.finishTask()">Finalizar tarea</button>
+          </div>
+          <div class="hint-preview">Metodología: ${this.currentTaskView.metodologia || 'Estándar / Directo'}</div>
+          ${tareas}
+        </div>`;
+    }
+
+    const taskCards = tareasAsignadas.map(task => {
+      const completed = this.completedTaskIds.includes(task.id);
+      const status = completed ? 'Completada' : task.estado;
+      const buttonLabel = completed ? 'Revisar tarea' : 'Comenzar tarea';
+      return `
+      <div class="task-card task-module-card">
+        <div class="task-module-head">
+          <div>
+            <span class="tag ${esMat ? 'mat' : 'ing'}">Tutor</span>
+            <h3>${task.titulo}</h3>
+          </div>
+          <span class="task-status">${status}</span>
         </div>
-      </div>
-    `).join('') || '<p class="empty">Todos los ejercicios están en la tarea.</p>';
+        <p>${task.descripcion}</p>
+        <div class="task-meta">${task.ejercicios.length} ejercicios · ${task.metodologia}${task.ejercicios[0]?.tema ? ` · ${task.ejercicios[0].tema}` : ''}</div>
+        <button class="${completed ? 'ghost' : 'primary'}" onclick="App.startTask('${task.id}')">${buttonLabel}</button>
+      </div>`;
+    }).join('');
+
+    const graficacion = esMat ? `
+      <div class="card">
+        <div class="module-header">
+          <div class="badge mat">📐</div>
+          <div>
+            <h2>Graficar fracciones</h2>
+            <p>Explora fracciones propias e impropias con rectángulos y círculos.</p>
+          </div>
+        </div>
+        <div class="graph-controls">
+          <select id="fractionGraphType">
+            <option value="rectangulo">Rectángulos</option>
+            <option value="circulo">Círculos</option>
+          </select>
+          <div class="graph-pills">
+            <button class="ghost" data-frac-demo="2/5">2/5</button>
+            <button class="ghost" data-frac-demo="21/8">21/8</button>
+            <button class="ghost" data-frac-demo="16/9">16/9</button>
+            <button class="ghost" data-frac-demo="10/7">10/7</button>
+          </div>
+        </div>
+        <div id="fractionGraphicArea"></div>
+      </div>` : '';
 
     return `
       <div class="card">
         <div class="module-header">
-          <div class="badge" style="background:var(--acento);">📚</div>
+          <div class="badge ${esMat ? 'mat' : 'ing'}">${esMat ? '🍊' : '🌴'}</div>
           <div>
-            <h2>${tarea.titulo}</h2>
-            <p>${tarea.descripcion || 'Sin descripción'}</p>
+            <h2>${esMat ? 'Matemáticas' : 'Inglés'}</h2>
+            <p>${esMat ? 'Fracciones: suma y multiplicación' : 'Verbo to be y pronombres'}</p>
           </div>
         </div>
-        <div class="task-nav-row">
-          <button class="ghost" onclick="App.closeTaskView()">← Volver a tareas</button>
-          <button class="ghost" onclick="App.eliminarTarea('${tarea.id}')" style="color:var(--error-suave);">🗑️ Eliminar Tarea</button>
-        </div>
-        <div class="task-meta">
-          ${ejerciciosEnTarea.length} ejercicios · 
-          <span class="tag" style="background:${estaPublicada ? 'var(--secundario)' : 'var(--texto-suave)'}; color:white;">
-            ${estaPublicada ? 'Publicada' : 'Borrador'}
-          </span>
-        </div>
-        <div style="margin-top:10px;">
-          <button class="primary" onclick="App.publicarTarea('${tarea.id}', '${estaPublicada ? 'borrador' : 'publicada'}')">
-            ${estaPublicada ? '📝 Despublicar' : '🚀 Publicar Tarea'}
-          </button>
+        <div class="stat-row">
+          <div class="stat"><b>Nv ${logro.nivel || 1}</b><span>NIVEL</span></div>
+          <div class="stat"><b>${logro.xp || 0}</b><span>XP</span></div>
+          <div class="stat"><b>${logro.naranjas || 0}</b><span>NARANJAS 🍊</span></div>
+          <div class="stat"><b>${logro.racha?.dias || 0}</b><span>RACHA 🔥</span></div>
         </div>
       </div>
-
-      <!-- Ejercicios en la tarea -->
-      <div class="card">
-        <h3>📋 Ejercicios de la tarea (${ejerciciosEnTarea.length})</h3>
-        <div style="margin-top:10px;">${ejerciciosHtml}</div>
-      </div>
-
-      <!-- Ejercicios disponibles para agregar -->
-      <div class="card">
-        <h3>➕ Agregar ejercicios desde el banco</h3>
-        
-        <!-- Barra de búsqueda y filtros -->
-        <div style="background:var(--fondo-2); padding:12px; border-radius:8px; margin-bottom:12px;">
-          <input type="text" id="searchEjercicios" placeholder="🔍 Buscar por enunciado o tema..." 
-                 style="width:100%; padding:8px; border:1px solid var(--borde); border-radius:4px; margin-bottom:8px;"
-                 oninput="App.filtrarEjerciciosDisponibles()">
-          
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <select id="filtroTema" onchange="App.filtrarEjerciciosDisponibles()" 
-                    style="padding:6px; border:1px solid var(--borde); border-radius:4px; flex:1; min-width:150px;">
-              <option value="">Todos los temas</option>
-            </select>
-            
-            <select id="filtroMetodologia" onchange="App.filtrarEjerciciosDisponibles()" 
-                    style="padding:6px; border:1px solid var(--borde); border-radius:4px; flex:1; min-width:150px;">
-              <option value="">Todas las metodologías</option>
-              <option value="estándar">Estándar / Directo</option>
-              <option value="paso">Paso a Paso</option>
-              <option value="graficación">Graficación</option>
-              <option value="desafío">Desafío</option>
-            </select>
-          </div>
-        </div>
-
-        <p style="color:var(--texto-suave); font-size:13px; margin-bottom:8px;">
-          Mostrando <b id="countDisponibles">${ejerciciosDisponibles.length}</b> ejercicios disponibles
-        </p>
-        
-        <div id="listaEjerciciosDisponibles" style="margin-top:10px;">
-          ${disponiblesHtml}
-        </div>
-      </div>
+      ${taskCards}
+      ${graficacion}
     `;
-  }
+  },
 
-  
 };
+
+

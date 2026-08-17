@@ -211,3 +211,6 @@ const API = {
     return this.request('/analytics/grupo' + query);
   }
 };
+
+// ✅ Exponer API en window para que los módulos puedan acceder a él
+window.API = API;

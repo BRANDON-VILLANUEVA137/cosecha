@@ -47,3 +47,6 @@ const Auth = {
     }
   }
 };
+
+// ✅ Exponer Auth en window para que los módulos puedan acceder a él
+window.Auth = Auth;
