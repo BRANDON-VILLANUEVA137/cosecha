@@ -133,6 +133,7 @@ function validarListaIA(lista, materia, tema, materiaEsp) {
       if (!r.correcto && e.tipo !== 'fraccion_simplificada') continue;
     }
     validos.push({
+      id: 'ia-' + (materia === 'ingles' ? 'i' : 'm') + '-' + Date.now().toString(36) + '-' + validos.length + '-' + Math.random().toString(36).slice(2, 7),
       materia,
       tema: String(e.tema || tema || 'IA · ' + materiaEsp).slice(0, 120),
       tipo: e.tipo || 'texto',

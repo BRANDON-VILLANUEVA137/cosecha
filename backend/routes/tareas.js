@@ -40,7 +40,7 @@ router.get('/', authMiddleware, async (req, res) => {
 // Usa el generador procedimental (algoritmo) o la IA de Gemini si hay API key configurada.
 router.post('/generar', authMiddleware, requireRole('estudiante'), async (req, res) => {
   try {
-    const { materia, cantidad, solicitud } = req.body;
+    const { materia, cantidad, solicitud } = req.body || {};
     const uid = req.user.uid;
 
     if (!['matematicas', 'ingles'].includes(materia)) {
@@ -49,7 +49,13 @@ router.post('/generar', authMiddleware, requireRole('estudiante'), async (req, r
     const cant = Math.min(Math.max(Number(cantidad) || 10, 5), 15);
     const solicitudLimpia = String(solicitud || '').trim().slice(0, 300);
 
-    const logro = await getLogro(uid);
+    let logro = null;
+    try {
+      logro = await getLogro(uid);
+    } catch (e) {
+      console.error('❌ [Tareas/generar] getLogro falló:', e && e.message);
+      return res.status(500).json({ error: 'No se pudo leer tu progreso (logros). Revisa la conexión con Firestore.' });
+    }
 
     // --- Anti-acumulación: no generar más si hay >= 5 autogeneradas pendientes ---
     const autoSnap = await db.collection('tareas').where('estudianteId', '==', uid).get();
@@ -73,54 +79,83 @@ router.post('/generar', authMiddleware, requireRole('estudiante'), async (req, r
     }
 
     // --- Generación: IA si disponible, si no algoritmo procedimental ---
+    // (la IA ya devuelve ejercicios validados; el algoritmo nunca necesita validación extra)
     let ejercicios = null;
     let origenGenerado = 'auto';
     if (iaDisponible()) {
       try {
         ejercicios = await generarConGemini({ materia, cantidad: cant, solicitud: solicitudLimpia });
         if (ejercicios && ejercicios.length) origenGenerado = 'ia';
-      } catch (_) { ejercicios = null; }
+      } catch (eIA) { console.error('⚠️ [Tareas/generar] IA falló, usando algoritmo:', eIA && eIA.message); ejercicios = null; }
     }
     if (!ejercicios || !ejercicios.length) {
       const seedStr = `${uid}:${Date.now()}`;
-      ejercicios = generarTareaProcedural(materia, solicitudLimpia, cant, seedStr);
+      try {
+        ejercicios = generarTareaProcedural(materia, solicitudLimpia, cant, seedStr);
+      } catch (eGen) {
+        console.error('❌ [Tareas/generar] generarTareaProcedural falló:', eGen && eGen.stack ? eGen.stack : eGen);
+        return res.status(500).json({ error: 'No se pudieron generar ejercicios (algoritmo): ' + (eGen && eGen.message ? eGen.message : 'error interno') });
+      }
     }
 
     if (!ejercicios || !ejercicios.length) {
       return res.status(500).json({ error: 'No se pudieron generar ejercicios. Intenta de nuevo.' });
     }
 
-    // Persistir ejercicios en la colección ejercicios (GET /:id los resuelve por ahí)
-    const batch = db.batch();
-    for (const ej of ejercicios) {
-      batch.set(db.collection('ejercicios').doc(ej.id), ej);
-    }
-    await batch.commit();
+    // Normalizar IDs (la IA a veces no trae id propio)
+    const sello = Date.now().toString(36);
+    ejercicios = ejercicios.map((ej, idx) => ({
+      ...ej,
+      id: ej.id || `gen-${materia === 'ingles' ? 'i' : 'm'}-${sello}-${idx}-${Math.random().toString(36).slice(2, 7)}`
+    }));
 
-    // Crear la tarea
+    // Persistir ejercicios en la colección ejercicios (GET /:id los resuelve por ahí)
+    try {
+      const batch = db.batch();
+      for (const ej of ejercicios) {
+        const { id, ...datos } = ej;
+        batch.set(db.collection('ejercicios').doc(id), datos);
+      }
+      await batch.commit();
+    } catch (eBatch) {
+      console.error('❌ [Tareas/generar] batch ejercicios falló:', eBatch && eBatch.stack ? eBatch.stack : eBatch);
+      return res.status(500).json({ error: 'No se pudieron guardar los ejercicios: ' + (eBatch && eBatch.message ? eBatch.message : 'Firestore') });
+    }
+
+    // Crear la tarea (fechas como ISO para evitar problemas de Timestamp en Firestore)
     const tareaRef = db.collection('tareas').doc();
-    const ahora = new Date();
+    const ahora = new Date().toISOString();
     const titulo = tituloAuto(materia, solicitudLimpia);
-    await tareaRef.set({
-      titulo,
-      descripcion: solicitudLimpia ? `Solicitud: ${solicitudLimpia}` : 'Tarea generada automáticamente por el estudiante.',
-      materia,
-      estado: 'publicada',
-      origen: origenGenerado,
-      estudianteId: uid,
-      docenteId: null,
-      metodologia: materia === 'ingles' ? 'Opción Múltiple / Gramática' : 'Estándar / Directo',
-      fechaCreacion: ahora,
-      fechaActualizacion: ahora
-    });
+    try {
+      await tareaRef.set({
+        titulo,
+        descripcion: solicitudLimpia ? `Solicitud: ${solicitudLimpia}` : 'Tarea generada automáticamente por el estudiante.',
+        materia,
+        estado: 'publicada',
+        origen: origenGenerado,
+        estudianteId: uid,
+        docenteId: null,
+        metodologia: materia === 'ingles' ? 'Opción Múltiple / Gramática' : 'Estándar / Directo',
+        fechaCreacion: ahora,
+        fechaActualizacion: ahora
+      });
+    } catch (eTarea) {
+      console.error('❌ [Tareas/generar] set tarea falló:', eTarea && eTarea.stack ? eTarea.stack : eTarea);
+      return res.status(500).json({ error: 'No se pudo crear la tarea: ' + (eTarea && eTarea.message ? eTarea.message : 'Firestore') });
+    }
 
     const ejerciciosRef = db.collection('tareas').doc(tareaRef.id).collection('ejercicios');
-    for (let i = 0; i < ejercicios.length; i += 1) {
-      await ejerciciosRef.doc().set({
-        ejercicioId: ejercicios[i].id,
-        orden: i + 1,
-        fechaAgregado: ahora
-      });
+    try {
+      for (let i = 0; i < ejercicios.length; i += 1) {
+        await ejerciciosRef.doc().set({
+          ejercicioId: ejercicios[i].id,
+          orden: i + 1,
+          fechaAgregado: ahora
+        });
+      }
+    } catch (eSub) {
+      console.error('❌ [Tareas/generar] subcolección ejercicios falló:', eSub && eSub.stack ? eSub.stack : eSub);
+      return res.status(500).json({ error: 'Tarea creada pero no se pudieron vincular ejercicios: ' + (eSub && eSub.message ? eSub.message : 'Firestore') });
     }
 
     return res.status(201).json({
@@ -132,8 +167,8 @@ router.post('/generar', authMiddleware, requireRole('estudiante'), async (req, r
       mensaje: origenGenerado === 'ia' ? '✅ Tarea generada con IA' : '✅ Tarea generada automáticamente'
     });
   } catch (error) {
-    console.error('❌ [Tareas] Error generando tarea automática:', error);
-    return res.status(500).json({ error: 'No se pudo generar la tarea' });
+    console.error('❌ [Tareas/generar] Error:', error && error.stack ? error.stack : error);
+    return res.status(500).json({ error: 'No se pudo generar la tarea: ' + (error && error.message ? error.message : 'error interno') });
   }
 });
 
