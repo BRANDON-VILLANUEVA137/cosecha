@@ -51,6 +51,58 @@ async function seedCollection(collectionName, source) {
   console.log(`✅ ${collectionName} cargados correctamente.`);
 }
 
+/**
+ * Siembra la colección "tareas" y su subcolección "ejercicios".
+ * Se eliminan primero los vínculos previos de cada tarea para que el
+ * proceso sea idempotente (no duplica ejercicios al re-ejecutar).
+ */
+async function seedTareas(tareasRaw) {
+  const tareas = Object.entries(tareasRaw || {});
+  if (!tareas.length) {
+    console.log('ℹ️ No se encontraron datos para tareas.');
+    return;
+  }
+
+  console.log(`📦 Cargando ${tareas.length} documentos en tareas...`);
+
+  for (const [id, tarea] of tareas) {
+    const { ejercicios = [], id: _idOmitido, ...tareaDoc } = tarea || {};
+
+    // Normalizar fechas a Date (Firestore) para mantener el mismo tipo de dato
+    // que registra el endpoint POST /api/tareas (new Date()).
+    ['fechaCreacion', 'fechaActualizacion'].forEach((campo) => {
+      if (typeof tareaDoc[campo] === 'string' && !isNaN(Date.parse(tareaDoc[campo]))) {
+        tareaDoc[campo] = new Date(tareaDoc[campo]);
+      } else if (!(tareaDoc[campo] instanceof Date)) {
+        tareaDoc[campo] = new Date();
+      }
+    });
+
+    const ejerciciosRef = db.collection('tareas').doc(id).collection('ejercicios');
+    const previos = await ejerciciosRef.get();
+    const batch = db.batch();
+    previos.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+
+    await db.collection('tareas').doc(id).set(tareaDoc, { merge: true });
+
+    for (const ej of ejercicios) {
+      const fechaAgregado = ej.fechaAgregado && !isNaN(Date.parse(ej.fechaAgregado))
+        ? new Date(ej.fechaAgregado)
+        : new Date();
+      await ejerciciosRef.doc().set({
+        ejercicioId: ej.ejercicioId,
+        orden: ej.orden || 1,
+        fechaAgregado
+      });
+    }
+
+    console.log(`✅ tarea ${id} → ${ejercicios.length} ejercicio(s)`);
+  }
+
+  console.log('✅ tareas cargadas correctamente.');
+}
+
 async function seedDatabase() {
   console.log('🌱 Iniciando migración de db.json a Firestore...');
 
@@ -69,6 +121,7 @@ async function seedDatabase() {
     await seedCollection('ejercicios', data.ejercicios);
     await seedCollection('prendas', data.prendas);
     await seedCollection('logros', data.logros);
+    await seedTareas(data.tareas);
 
     console.log('🎉 ¡Sembrado completado con éxito!');
     process.exit(0);

@@ -499,6 +499,1636 @@
       "respuestaCorrecta": "they",
       "pistaError": "Son varios estudiantes (plural) → el pronombre para varios es \"they\".",
       "metodologia": "Estándar / Directo"
+    },
+    "i23": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Afirmativo",
+      "enunciado": "He ___ my best friend. (am / is / are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "is",
+      "pistaError": "\"He\" es singular → usa \"is\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i24": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Afirmativo",
+      "enunciado": "These books ___ very interesting. (am / is / are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "are",
+      "pistaError": "Los libros son plural (they) → usa \"are\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i25": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Afirmativo",
+      "enunciado": "I ___ twelve years old. (am / is / are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "am",
+      "pistaError": "La primera persona (I) siempre usa \"am\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i26": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Afirmativo",
+      "enunciado": "Sara ___ in the kitchen. (am / is / are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "is",
+      "pistaError": "\"Sara\" = she (singular) → usa \"is\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i27": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Afirmativo",
+      "enunciado": "The birds ___ singing in the tree. (am / is / are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "are",
+      "pistaError": "Los pájaros son varios (they) → usa \"are\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i28": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Afirmativo",
+      "enunciado": "We ___ from Colombia. (am / is / are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "are",
+      "pistaError": "\"We\" (nosotros) → usa \"are\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i29": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Afirmativo",
+      "enunciado": "It ___ a beautiful flower. (am / is / are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "is",
+      "pistaError": "\"It\" (singular) → usa \"is\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i30": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Afirmativo",
+      "enunciado": "Pedro and Luis ___ cousins. (am / is / are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "are",
+      "pistaError": "Dos personas = plural (they) → usa \"are\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i31": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Afirmativo",
+      "enunciado": "That ___ my favorite movie. (am / is / are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "is",
+      "pistaError": "\"That\" (singular) → usa \"is\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i32": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Afirmativo",
+      "enunciado": "You ___ a great student. (am / is / are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "are",
+      "pistaError": "\"You\" siempre usa \"are\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i33": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Negativo",
+      "enunciado": "He ___ a doctor; he is a nurse. (am not / isn't / aren't)",
+      "tipo": "texto",
+      "respuestaCorrecta": "isn't",
+      "pistaError": "\"He\" (singular) → usa \"isn't\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i34": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Negativo",
+      "enunciado": "The children ___ in the classroom. (am not / isn't / aren't)",
+      "tipo": "texto",
+      "respuestaCorrecta": "aren't",
+      "pistaError": "Los niños son plural (they) → usa \"aren't\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i35": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Negativo",
+      "enunciado": "I ___ from Spain; I am from Mexico. (am not / isn't / aren't)",
+      "tipo": "texto",
+      "respuestaCorrecta": "am not",
+      "pistaError": "Primera persona (I) → usa \"am not\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i36": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Negativo",
+      "enunciado": "She ___ very happy with the result. (am not / isn't / aren't)",
+      "tipo": "texto",
+      "respuestaCorrecta": "isn't",
+      "pistaError": "\"She\" (singular) → usa \"isn't\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i37": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Negativo",
+      "enunciado": "We ___ ready for the trip. (am not / isn't / aren't)",
+      "tipo": "texto",
+      "respuestaCorrecta": "aren't",
+      "pistaError": "\"We\" (plural) → usa \"aren't\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i38": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Negativo",
+      "enunciado": "This ___ my pen; mine is blue. (am not / isn't / aren't)",
+      "tipo": "texto",
+      "respuestaCorrecta": "isn't",
+      "pistaError": "\"This\" (singular) → usa \"isn't\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i39": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Negativo",
+      "enunciado": "The dogs ___ in the garden. (am not / isn't / aren't)",
+      "tipo": "texto",
+      "respuestaCorrecta": "aren't",
+      "pistaError": "Los perros son varios (they) → usa \"aren't\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i40": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Negativo",
+      "enunciado": "You ___ late; you arrived on time. (am not / isn't / aren't)",
+      "tipo": "texto",
+      "respuestaCorrecta": "aren't",
+      "pistaError": "\"You\" → usa \"aren't\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i41": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Negativo",
+      "enunciado": "My brother ___ at work today. (am not / isn't / aren't)",
+      "tipo": "texto",
+      "respuestaCorrecta": "isn't",
+      "pistaError": "\"My brother\" es singular (he) → usa \"isn't\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i42": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Negativo",
+      "enunciado": "I ___ angry; I am just tired. (am not / isn't / aren't)",
+      "tipo": "texto",
+      "respuestaCorrecta": "am not",
+      "pistaError": "Primera persona (I) → usa \"am not\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i43": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Preguntas",
+      "enunciado": "___ she your cousin? (Am / Is / Are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "is",
+      "pistaError": "Con \"she\" (singular) → \"Is\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i44": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Preguntas",
+      "enunciado": "___ we invited to the party? (Am / Is / Are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "are",
+      "pistaError": "Con \"we\" (plural) → \"Are\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i45": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Preguntas",
+      "enunciado": "___ I in your team? (Am / Is / Are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "am",
+      "pistaError": "Con el sujeto \"I\" la pregunta comienza con \"Am\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i46": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Preguntas",
+      "enunciado": "___ it raining outside? (Am / Is / Are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "is",
+      "pistaError": "Con \"it\" (singular) → \"Is\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i47": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Preguntas",
+      "enunciado": "___ you from Ecuador? (Am / Is / Are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "are",
+      "pistaError": "Con \"you\" la pregunta usa \"Are\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i48": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Preguntas",
+      "enunciado": "___ they playing soccer? (Am / Is / Are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "are",
+      "pistaError": "Con \"they\" (plural) → \"Are\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i49": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Preguntas",
+      "enunciado": "___ your parents at home? (Am / Is / Are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "are",
+      "pistaError": "\"Your parents\" son varios (they) → \"Are\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i50": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Preguntas",
+      "enunciado": "___ he the new teacher? (Am / Is / Are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "is",
+      "pistaError": "Con \"he\" (singular) → \"Is\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i51": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Preguntas",
+      "enunciado": "___ the movie good? (Am / Is / Are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "is",
+      "pistaError": "\"The movie\" es singular (it) → \"Is\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i52": {
+      "materia": "ingles",
+      "tema": "Verbo to be · Preguntas",
+      "enunciado": "___ we best friends? (Am / Is / Are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "are",
+      "pistaError": "Con \"we\" (plural) → \"Are\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "m33": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma mismo denominador",
+      "enunciado": "3/7 + 2/7 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "5/7",
+      "pistaError": "Denominador igual: suma los numeradores (3+2=5).",
+      "metodologia": "Estándar / Directo"
+    },
+    "m34": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma mismo denominador",
+      "enunciado": "5/9 + 3/9 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "8/9",
+      "pistaError": "Denominador igual: suma los numeradores (5+3=8).",
+      "metodologia": "Estándar / Directo"
+    },
+    "m35": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma mismo denominador",
+      "enunciado": "4/11 + 6/11 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "10/11",
+      "pistaError": "Denominador igual: suma solo los numeradores (4+6=10).",
+      "metodologia": "Estándar / Directo"
+    },
+    "m36": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma mismo denominador",
+      "enunciado": "7/13 + 2/13 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "9/13",
+      "pistaError": "Denominador igual: suma solo los numeradores (7+2=9).",
+      "metodologia": "Estándar / Directo"
+    },
+    "m37": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma mismo denominador",
+      "enunciado": "10/21 + 5/21 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "15/21",
+      "pistaError": "Denominador igual: suma solo los numeradores (10+5=15).",
+      "metodologia": "Estándar / Directo"
+    },
+    "m38": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma mismo denominador",
+      "enunciado": "4/5 + 3/5 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "7/5",
+      "pistaError": "Denominador igual: suma los numeradores (4+3=7).",
+      "metodologia": "Estándar / Directo"
+    },
+    "m39": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma mismo denominador",
+      "enunciado": "2/9 + 7/9 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "9/9",
+      "pistaError": "Denominador igual: suma los numeradores (2+7=9).",
+      "metodologia": "Estándar / Directo"
+    },
+    "m40": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma mismo denominador",
+      "enunciado": "8/17 + 5/17 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "13/17",
+      "pistaError": "Denominador igual: suma solo los numeradores (8+5=13).",
+      "metodologia": "Estándar / Directo"
+    },
+    "m41": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma mismo denominador",
+      "enunciado": "3/14 + 6/14 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "9/14",
+      "pistaError": "Denominador igual: suma solo los numeradores (3+6=9).",
+      "metodologia": "Estándar / Directo"
+    },
+    "m42": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma mismo denominador",
+      "enunciado": "12/25 + 8/25 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "20/25",
+      "pistaError": "Denominador igual: suma solo los numeradores (12+8=20).",
+      "metodologia": "Estándar / Directo"
+    },
+    "m43": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma diferente denominador (carita sonriente)",
+      "enunciado": "1/3 + 1/4 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "7/12",
+      "pistaError": "Carita sonriente: (1×4 + 3×1)/(3×4) = 7/12.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
+    },
+    "m44": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma diferente denominador (carita sonriente)",
+      "enunciado": "2/7 + 1/2 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "11/14",
+      "pistaError": "Carita sonriente: (2×2 + 7×1)/(7×2) = 11/14.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
+    },
+    "m45": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma diferente denominador (carita sonriente)",
+      "enunciado": "3/5 + 2/9 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "37/45",
+      "pistaError": "Carita sonriente: (3×9 + 5×2)/(5×9) = 37/45.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
+    },
+    "m46": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma diferente denominador (carita sonriente)",
+      "enunciado": "1/6 + 3/8 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "26/48",
+      "pistaError": "Carita sonriente: (1×8 + 6×3)/(6×8) = 26/48.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
+    },
+    "m47": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma diferente denominador (carita sonriente)",
+      "enunciado": "4/7 + 1/3 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "19/21",
+      "pistaError": "Carita sonriente: (4×3 + 7×1)/(7×3) = 19/21.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
+    },
+    "m48": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma diferente denominador (carita sonriente)",
+      "enunciado": "5/8 + 3/4 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "44/32",
+      "pistaError": "Carita sonriente: (5×4 + 8×3)/(8×4) = 44/32.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
+    },
+    "m49": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma diferente denominador (carita sonriente)",
+      "enunciado": "2/9 + 5/6 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "57/54",
+      "pistaError": "Carita sonriente: (2×6 + 9×5)/(9×6) = 57/54.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
+    },
+    "m50": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma diferente denominador (carita sonriente)",
+      "enunciado": "3/10 + 2/5 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "35/50",
+      "pistaError": "Carita sonriente: (3×5 + 10×2)/(10×5) = 35/50.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
+    },
+    "m51": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma diferente denominador (carita sonriente)",
+      "enunciado": "1/4 + 5/12 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "32/48",
+      "pistaError": "Carita sonriente: (1×12 + 4×5)/(4×12) = 32/48.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
+    },
+    "m52": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Suma diferente denominador (carita sonriente)",
+      "enunciado": "7/9 + 1/2 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "23/18",
+      "pistaError": "Carita sonriente: (7×2 + 9×1)/(9×2) = 23/18.",
+      "metodologia": "Paso a Paso (Carita Sonriente)"
+    },
+    "m53": {
+      "materia": "matematicas",
+      "tema": "Fracciones · División",
+      "enunciado": "9/3 ÷ 3/3 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "27/9",
+      "pistaError": "Multiplica en cruz: (9×3)/(3×3) = 27/9.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m54": {
+      "materia": "matematicas",
+      "tema": "Fracciones · División",
+      "enunciado": "9/3 ÷ 3/1 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "9/9",
+      "pistaError": "Multiplica en cruz: (9×1)/(3×3) = 9/9.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m55": {
+      "materia": "matematicas",
+      "tema": "Fracciones · División",
+      "enunciado": "4/1 ÷ 5/3 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "12/5",
+      "pistaError": "Multiplica en cruz: (4×3)/(1×5) = 12/5.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m56": {
+      "materia": "matematicas",
+      "tema": "Fracciones · División",
+      "enunciado": "6/5 ÷ 2/3 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "18/10",
+      "pistaError": "Multiplica en cruz: (6×3)/(5×2) = 18/10.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m57": {
+      "materia": "matematicas",
+      "tema": "Fracciones · División",
+      "enunciado": "8/3 ÷ 4/3 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "24/12",
+      "pistaError": "Multiplica en cruz: (8×3)/(3×4) = 24/12.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m58": {
+      "materia": "matematicas",
+      "tema": "Fracciones · División",
+      "enunciado": "7/2 ÷ 1/4 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "28/2",
+      "pistaError": "Multiplica en cruz: (7×4)/(2×1) = 28/2.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m59": {
+      "materia": "matematicas",
+      "tema": "Fracciones · División",
+      "enunciado": "10/6 ÷ 5/2 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "20/30",
+      "pistaError": "Multiplica en cruz: (10×2)/(6×5) = 20/30.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m60": {
+      "materia": "matematicas",
+      "tema": "Fracciones · División",
+      "enunciado": "3/4 ÷ 9/8 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "24/36",
+      "pistaError": "Multiplica en cruz: (3×8)/(4×9) = 24/36.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m61": {
+      "materia": "matematicas",
+      "tema": "Fracciones · División",
+      "enunciado": "5/1 ÷ 2/5 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "25/2",
+      "pistaError": "Multiplica en cruz: (5×5)/(1×2) = 25/2.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m62": {
+      "materia": "matematicas",
+      "tema": "Fracciones · División",
+      "enunciado": "12/7 ÷ 3/14 = ?",
+      "tipo": "fraccion",
+      "respuestaCorrecta": "168/21",
+      "pistaError": "Multiplica en cruz: (12×14)/(7×3) = 168/21.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m63": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Propias e impropias",
+      "enunciado": "¿Es propia o impropia? 4/9",
+      "tipo": "opcion_multiple",
+      "respuestaCorrecta": "propia",
+      "pistaError": "Propia: 4 < 9.",
+      "metodologia": "Estándar / Directo",
+      "opciones": [
+        {
+          "clave": "propia",
+          "texto": "Propia"
+        },
+        {
+          "clave": "impropia",
+          "texto": "Impropia"
+        }
+      ]
+    },
+    "m64": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Propias e impropias",
+      "enunciado": "¿Es propia o impropia? 13/5",
+      "tipo": "opcion_multiple",
+      "respuestaCorrecta": "impropia",
+      "pistaError": "Impropia: 13 > 5.",
+      "metodologia": "Estándar / Directo",
+      "opciones": [
+        {
+          "clave": "propia",
+          "texto": "Propia"
+        },
+        {
+          "clave": "impropia",
+          "texto": "Impropia"
+        }
+      ]
+    },
+    "m65": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Propias e impropias",
+      "enunciado": "¿Es propia o impropia? 7/12",
+      "tipo": "opcion_multiple",
+      "respuestaCorrecta": "propia",
+      "pistaError": "Propia: 7 < 12.",
+      "metodologia": "Estándar / Directo",
+      "opciones": [
+        {
+          "clave": "propia",
+          "texto": "Propia"
+        },
+        {
+          "clave": "impropia",
+          "texto": "Impropia"
+        }
+      ]
+    },
+    "m66": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Propias e impropias",
+      "enunciado": "¿Es propia o impropia? 9/4",
+      "tipo": "opcion_multiple",
+      "respuestaCorrecta": "impropia",
+      "pistaError": "Impropia: 9 > 4.",
+      "metodologia": "Estándar / Directo",
+      "opciones": [
+        {
+          "clave": "propia",
+          "texto": "Propia"
+        },
+        {
+          "clave": "impropia",
+          "texto": "Impropia"
+        }
+      ]
+    },
+    "m67": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Propias e impropias",
+      "enunciado": "¿Es propia o impropia? 2/13",
+      "tipo": "opcion_multiple",
+      "respuestaCorrecta": "propia",
+      "pistaError": "Propia: 2 < 13.",
+      "metodologia": "Estándar / Directo",
+      "opciones": [
+        {
+          "clave": "propia",
+          "texto": "Propia"
+        },
+        {
+          "clave": "impropia",
+          "texto": "Impropia"
+        }
+      ]
+    },
+    "m68": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Propias e impropias",
+      "enunciado": "¿Es propia o impropia? 21/8",
+      "tipo": "opcion_multiple",
+      "respuestaCorrecta": "impropia",
+      "pistaError": "Impropia: 21 > 8.",
+      "metodologia": "Estándar / Directo",
+      "opciones": [
+        {
+          "clave": "propia",
+          "texto": "Propia"
+        },
+        {
+          "clave": "impropia",
+          "texto": "Impropia"
+        }
+      ]
+    },
+    "m69": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Propias e impropias",
+      "enunciado": "¿Es propia o impropia? 15/16",
+      "tipo": "opcion_multiple",
+      "respuestaCorrecta": "propia",
+      "pistaError": "Propia: 15 < 16.",
+      "metodologia": "Estándar / Directo",
+      "opciones": [
+        {
+          "clave": "propia",
+          "texto": "Propia"
+        },
+        {
+          "clave": "impropia",
+          "texto": "Impropia"
+        }
+      ]
+    },
+    "m70": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Propias e impropias",
+      "enunciado": "¿Es propia o impropia? 31/30",
+      "tipo": "opcion_multiple",
+      "respuestaCorrecta": "impropia",
+      "pistaError": "Impropia: 31 > 30.",
+      "metodologia": "Estándar / Directo",
+      "opciones": [
+        {
+          "clave": "propia",
+          "texto": "Propia"
+        },
+        {
+          "clave": "impropia",
+          "texto": "Impropia"
+        }
+      ]
+    },
+    "m71": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Propias e impropias",
+      "enunciado": "¿Es propia o impropia? 3/20",
+      "tipo": "opcion_multiple",
+      "respuestaCorrecta": "propia",
+      "pistaError": "Propia: 3 < 20.",
+      "metodologia": "Estándar / Directo",
+      "opciones": [
+        {
+          "clave": "propia",
+          "texto": "Propia"
+        },
+        {
+          "clave": "impropia",
+          "texto": "Impropia"
+        }
+      ]
+    },
+    "m72": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Propias e impropias",
+      "enunciado": "¿Es propia o impropia? 7/7",
+      "tipo": "opcion_multiple",
+      "respuestaCorrecta": "impropia",
+      "pistaError": "Impropia: el numerador (7) es igual al denominador (7).",
+      "metodologia": "Estándar / Directo",
+      "opciones": [
+        {
+          "clave": "propia",
+          "texto": "Propia"
+        },
+        {
+          "clave": "impropia",
+          "texto": "Impropia"
+        }
+      ]
+    },
+    "m73": {
+      "materia": "matematicas",
+      "tema": "Fracciones → decimales",
+      "enunciado": "Convierte la fracción 3/5 a número decimal.",
+      "tipo": "decimal",
+      "respuestaCorrecta": 0.6,
+      "pistaError": "Divide: 3 ÷ 5 = 0.6.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m74": {
+      "materia": "matematicas",
+      "tema": "Fracciones → decimales",
+      "enunciado": "Convierte la fracción 7/10 a número decimal.",
+      "tipo": "decimal",
+      "respuestaCorrecta": 0.7,
+      "pistaError": "Divide: 7 ÷ 10 = 0.7.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m75": {
+      "materia": "matematicas",
+      "tema": "Fracciones → decimales",
+      "enunciado": "Convierte la fracción 3/8 a número decimal.",
+      "tipo": "decimal",
+      "respuestaCorrecta": 0.375,
+      "pistaError": "Divide: 3 ÷ 8 = 0.375.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m76": {
+      "materia": "matematicas",
+      "tema": "Fracciones → decimales",
+      "enunciado": "Convierte la fracción 5/4 a número decimal.",
+      "tipo": "decimal",
+      "respuestaCorrecta": 1.25,
+      "pistaError": "Divide: 5 ÷ 4 = 1.25.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m77": {
+      "materia": "matematicas",
+      "tema": "Fracciones → decimales",
+      "enunciado": "Convierte la fracción 7/2 a número decimal.",
+      "tipo": "decimal",
+      "respuestaCorrecta": 3.5,
+      "pistaError": "Divide: 7 ÷ 2 = 3.5.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m78": {
+      "materia": "matematicas",
+      "tema": "Fracciones → decimales",
+      "enunciado": "Convierte la fracción 9/8 a número decimal.",
+      "tipo": "decimal",
+      "respuestaCorrecta": 1.125,
+      "pistaError": "Divide: 9 ÷ 8 = 1.125.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m79": {
+      "materia": "matematicas",
+      "tema": "Fracciones → decimales",
+      "enunciado": "Convierte la fracción 4/5 a número decimal.",
+      "tipo": "decimal",
+      "respuestaCorrecta": 0.8,
+      "pistaError": "Divide: 4 ÷ 5 = 0.8.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m80": {
+      "materia": "matematicas",
+      "tema": "Fracciones → decimales",
+      "enunciado": "Convierte la fracción 11/4 a número decimal.",
+      "tipo": "decimal",
+      "respuestaCorrecta": 2.75,
+      "pistaError": "Divide: 11 ÷ 4 = 2.75.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m81": {
+      "materia": "matematicas",
+      "tema": "Fracciones → decimales",
+      "enunciado": "Convierte la fracción 19/10 a número decimal.",
+      "tipo": "decimal",
+      "respuestaCorrecta": 1.9,
+      "pistaError": "Divide: 19 ÷ 10 = 1.9.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m82": {
+      "materia": "matematicas",
+      "tema": "Fracciones → decimales",
+      "enunciado": "Convierte la fracción 13/5 a número decimal.",
+      "tipo": "decimal",
+      "respuestaCorrecta": 2.6,
+      "pistaError": "Divide: 13 ÷ 5 = 2.6.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m83": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Simplificación (forma irreducible)",
+      "enunciado": "Simplifica 9/15 a su forma irreducible.",
+      "tipo": "fraccion_simplificada",
+      "respuestaCorrecta": "3/5",
+      "pistaError": "Divide entre su mcd (el de 9 y 15 es 3): 9/15 = 3/5.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m84": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Simplificación (forma irreducible)",
+      "enunciado": "Simplifica 14/35 a su forma irreducible.",
+      "tipo": "fraccion_simplificada",
+      "respuestaCorrecta": "2/5",
+      "pistaError": "Divide entre su mcd (el de 14 y 35 es 7): 14/35 = 2/5.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m85": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Simplificación (forma irreducible)",
+      "enunciado": "Simplifica 6/14 a su forma irreducible.",
+      "tipo": "fraccion_simplificada",
+      "respuestaCorrecta": "3/7",
+      "pistaError": "Divide entre su mcd (el de 6 y 14 es 2): 6/14 = 3/7.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m86": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Simplificación (forma irreducible)",
+      "enunciado": "Simplifica 16/24 a su forma irreducible.",
+      "tipo": "fraccion_simplificada",
+      "respuestaCorrecta": "2/3",
+      "pistaError": "Divide entre su mcd (el de 16 y 24 es 8): 16/24 = 2/3.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m87": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Simplificación (forma irreducible)",
+      "enunciado": "Simplifica 25/35 a su forma irreducible.",
+      "tipo": "fraccion_simplificada",
+      "respuestaCorrecta": "5/7",
+      "pistaError": "Divide entre su mcd (el de 25 y 35 es 5): 25/35 = 5/7.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m88": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Simplificación (forma irreducible)",
+      "enunciado": "Simplifica 8/20 a su forma irreducible.",
+      "tipo": "fraccion_simplificada",
+      "respuestaCorrecta": "2/5",
+      "pistaError": "Divide entre su mcd (el de 8 y 20 es 4): 8/20 = 2/5.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m89": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Simplificación (forma irreducible)",
+      "enunciado": "Simplifica 21/36 a su forma irreducible.",
+      "tipo": "fraccion_simplificada",
+      "respuestaCorrecta": "7/12",
+      "pistaError": "Divide entre su mcd (el de 21 y 36 es 3): 21/36 = 7/12.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m90": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Simplificación (forma irreducible)",
+      "enunciado": "Simplifica 15/40 a su forma irreducible.",
+      "tipo": "fraccion_simplificada",
+      "respuestaCorrecta": "3/8",
+      "pistaError": "Divide entre su mcd (el de 15 y 40 es 5): 15/40 = 3/8.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m91": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Simplificación (forma irreducible)",
+      "enunciado": "Simplifica 24/30 a su forma irreducible.",
+      "tipo": "fraccion_simplificada",
+      "respuestaCorrecta": "4/5",
+      "pistaError": "Divide entre su mcd (el de 24 y 30 es 6): 24/30 = 4/5.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m92": {
+      "materia": "matematicas",
+      "tema": "Fracciones · Simplificación (forma irreducible)",
+      "enunciado": "Simplifica 28/49 a su forma irreducible.",
+      "tipo": "fraccion_simplificada",
+      "respuestaCorrecta": "4/7",
+      "pistaError": "Divide entre su mcd (el de 28 y 49 es 7): 28/49 = 4/7.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m93": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Introducción",
+      "enunciado": "Escribe el símbolo que representa a los números negativos.",
+      "tipo": "texto",
+      "respuestaCorrecta": "-",
+      "pistaError": "El signo de los números negativos es MENOS (-), se escribe antes del número, por ejemplo: -5.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m94": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Introducción",
+      "enunciado": "Determina si el número -15 es mayor o menor que 0. (escribe: mayor o menor)",
+      "tipo": "texto",
+      "respuestaCorrecta": "menor",
+      "pistaError": "En la recta numérica, -15 está a la izquierda del cero, por lo tanto es MENOR que 0.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m95": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Introducción",
+      "enunciado": "Indica qué número de la recta numérica no es ni positivo ni negativo.",
+      "tipo": "texto",
+      "respuestaCorrecta": "0",
+      "pistaError": "El cero (0) es el elemento neutro: no tiene signo y no es positivo ni negativo.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m96": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Introducción",
+      "enunciado": "¿De qué lado de la recta numérica (izquierda o derecha) se ubican los números negativos?",
+      "tipo": "texto",
+      "respuestaCorrecta": "izquierda",
+      "pistaError": "Los números negativos van a la IZQUIERDA del cero; los positivos, a la derecha.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m97": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Introducción",
+      "enunciado": "En la recta numérica, ¿el -2 está a la derecha o a la izquierda del -4?",
+      "tipo": "texto",
+      "respuestaCorrecta": "derecha",
+      "pistaError": "En la recta, -2 está más cerca del cero que -4, por lo tanto -2 queda a la DERECHA de -4.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m98": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Introducción",
+      "enunciado": "¿Cuál número está más cerca del cero: -1 o -5?",
+      "tipo": "texto",
+      "respuestaCorrecta": "-1",
+      "pistaError": "Compara los valores absolutos: |-1| = 1 y |-5| = 5; el más pequeño es -1, así que está más cerca del cero.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m99": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Introducción",
+      "enunciado": "Coloca el signo mayor que (>) o menor que (<) según corresponda: -3 ___ -1",
+      "tipo": "texto",
+      "respuestaCorrecta": "<",
+      "pistaError": "En la recta, -3 está a la izquierda de -1, por lo tanto -3 < -1: el signo es <.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m100": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Introducción",
+      "enunciado": "Ordena de menor a mayor los valores -4, 3, -1, 0 y -6. (escríbelos separados por comas y espacios)",
+      "tipo": "texto",
+      "respuestaCorrecta": "-6, -4, -1, 0, 3",
+      "pistaError": "En la recta numérica, de menor a mayor quedan: -6, -4, -1, 0, 3.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m101": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Introducción",
+      "enunciado": "Expresa con un número negativo una deuda de 50 dólares.",
+      "tipo": "texto",
+      "respuestaCorrecta": "-50",
+      "pistaError": "Una deuda es dinero que se debe, por eso se representa con signo negativo: -50.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m102": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Introducción",
+      "enunciado": "El termómetro marcó 3 grados bajo cero. ¿Qué número negativo lo representa?",
+      "tipo": "texto",
+      "respuestaCorrecta": "-3",
+      "pistaError": "Bajo cero significa menor que 0; \"3 grados bajo cero\" se escribe como -3.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m103": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Práctica Extra",
+      "enunciado": "Escribe el símbolo que se coloca antes de un número negativo.",
+      "tipo": "texto",
+      "respuestaCorrecta": "-",
+      "pistaError": "El signo negativo es MENOS (-), por ejemplo: -8.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m104": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Práctica Extra",
+      "enunciado": "Determina si el número -29 es mayor o menor que 0. (escribe: mayor o menor)",
+      "tipo": "texto",
+      "respuestaCorrecta": "menor",
+      "pistaError": "En la recta numérica, -29 está a la izquierda del cero, por lo tanto es MENOR que 0.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m105": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Práctica Extra",
+      "enunciado": "El número que separa a los positivos de los negativos en la recta numérica es...",
+      "tipo": "texto",
+      "respuestaCorrecta": "0",
+      "pistaError": "El cero (0) es el elemento neutro: no es positivo ni negativo.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m106": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Práctica Extra",
+      "enunciado": "¿De qué lado de la recta numérica (izquierda o derecha) del cero están los números como -7 y -12?",
+      "tipo": "texto",
+      "respuestaCorrecta": "izquierda",
+      "pistaError": "Los números negativos se ubican a la IZQUIERDA del cero.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m107": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Práctica Extra",
+      "enunciado": "En la recta numérica, ¿el -6 está a la derecha o a la izquierda del -9?",
+      "tipo": "texto",
+      "respuestaCorrecta": "derecha",
+      "pistaError": "-6 está más cerca del cero que -9, por lo tanto queda a la DERECHA de -9.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m108": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Práctica Extra",
+      "enunciado": "¿Cuál número está más cerca del cero: -3 o -8?",
+      "tipo": "texto",
+      "respuestaCorrecta": "-3",
+      "pistaError": "Compara los valores absolutos: |-3| = 3 y |-8| = 8; -3 está más cerca del cero.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m109": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Práctica Extra",
+      "enunciado": "Coloca el signo mayor que (>) o menor que (<) según corresponda: -7 ___ -2",
+      "tipo": "texto",
+      "respuestaCorrecta": "<",
+      "pistaError": "En la recta, -7 está a la izquierda de -2, por lo tanto -7 < -2: el signo es <.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m110": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Práctica Extra",
+      "enunciado": "Ordena de menor a mayor los valores -8, 2, -5, 0 y -10. (escríbelos separados por comas y espacios)",
+      "tipo": "texto",
+      "respuestaCorrecta": "-10, -8, -5, 0, 2",
+      "pistaError": "En la recta numérica, de menor a mayor quedan: -10, -8, -5, 0, 2.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m111": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Práctica Extra",
+      "enunciado": "Un cliente retiró 120 dólares y su cuenta quedó en deuda. ¿Qué número negativo representa esa deuda?",
+      "tipo": "texto",
+      "respuestaCorrecta": "-120",
+      "pistaError": "Una deuda es dinero que se debe, por eso se representa con signo negativo: -120.",
+      "metodologia": "Estándar / Directo"
+    },
+    "m112": {
+      "materia": "matematicas",
+      "tema": "Números Negativos · Práctica Extra",
+      "enunciado": "En el Polo Sur el termómetro marcó 18 grados bajo cero. ¿Qué número negativo lo representa?",
+      "tipo": "texto",
+      "respuestaCorrecta": "-18",
+      "pistaError": "18 grados bajo cero se escribe con signo negativo: -18.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i53": {
+      "materia": "ingles",
+      "tema": "Artículos · A y An",
+      "enunciado": "I have ___ apple. (a / an)",
+      "tipo": "texto",
+      "respuestaCorrecta": "an",
+      "pistaError": "Antes de una palabra que empieza con vocal (a, e, i, o, u) se usa \"an\": an apple.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i54": {
+      "materia": "ingles",
+      "tema": "Artículos · A y An",
+      "enunciado": "She is eating ___ banana. (a / an)",
+      "tipo": "texto",
+      "respuestaCorrecta": "a",
+      "pistaError": "Banana empieza con consonante (b) → se usa \"a\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i55": {
+      "materia": "ingles",
+      "tema": "Artículos · A y An",
+      "enunciado": "This is ___ orange. (a / an)",
+      "tipo": "texto",
+      "respuestaCorrecta": "an",
+      "pistaError": "Orange empieza con vocal (o) → se usa \"an\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i56": {
+      "materia": "ingles",
+      "tema": "Artículos · A y An",
+      "enunciado": "He has ___ dog. (a / an)",
+      "tipo": "texto",
+      "respuestaCorrecta": "a",
+      "pistaError": "Dog empieza con consonante (d) → se usa \"a\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i57": {
+      "materia": "ingles",
+      "tema": "Artículos · A y An",
+      "enunciado": "It is ___ umbrella. (a / an)",
+      "tipo": "texto",
+      "respuestaCorrecta": "an",
+      "pistaError": "Umbrella empieza con vocal (u) → se usa \"an\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i58": {
+      "materia": "ingles",
+      "tema": "Artículos · A y An",
+      "enunciado": "We need ___ pencil. (a / an)",
+      "tipo": "texto",
+      "respuestaCorrecta": "a",
+      "pistaError": "Pencil empieza con consonante (p) → se usa \"a\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i59": {
+      "materia": "ingles",
+      "tema": "Artículos · A y An",
+      "enunciado": "I see ___ elephant. (a / an)",
+      "tipo": "texto",
+      "respuestaCorrecta": "an",
+      "pistaError": "Elephant empieza con vocal (e) → se usa \"an\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i60": {
+      "materia": "ingles",
+      "tema": "Artículos · A y An",
+      "enunciado": "My mom is ___ teacher. (a / an)",
+      "tipo": "texto",
+      "respuestaCorrecta": "a",
+      "pistaError": "Teacher empieza con consonante (t) → se usa \"a\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i61": {
+      "materia": "ingles",
+      "tema": "Artículos · A y An",
+      "enunciado": "That is ___ egg. (a / an)",
+      "tipo": "texto",
+      "respuestaCorrecta": "an",
+      "pistaError": "Egg empieza con vocal (e) → se usa \"an\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i62": {
+      "materia": "ingles",
+      "tema": "Artículos · A y An",
+      "enunciado": "She wears ___ red dress. (a / an)",
+      "tipo": "texto",
+      "respuestaCorrecta": "a",
+      "pistaError": "El artículo mira la primera letra de la siguiente palabra; \"red\" empieza con consonante (r) → se usa \"a\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i63": {
+      "materia": "ingles",
+      "tema": "Sustantivos plurales",
+      "enunciado": "Escribe el plural de: book",
+      "tipo": "texto",
+      "respuestaCorrecta": "books",
+      "pistaError": "A la mayoría de los sustantivos solo se les agrega una -s: book → books.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i64": {
+      "materia": "ingles",
+      "tema": "Sustantivos plurales",
+      "enunciado": "Escribe el plural de: box",
+      "tipo": "texto",
+      "respuestaCorrecta": "boxes",
+      "pistaError": "Los sustantivos que terminan en s, x, ch o sh agregan -es: box → boxes.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i65": {
+      "materia": "ingles",
+      "tema": "Sustantivos plurales",
+      "enunciado": "Escribe el plural de: child",
+      "tipo": "texto",
+      "respuestaCorrecta": "children",
+      "pistaError": "\"Child\" es irregular: su plural es children (niños).",
+      "metodologia": "Estándar / Directo"
+    },
+    "i66": {
+      "materia": "ingles",
+      "tema": "Sustantivos plurales",
+      "enunciado": "Escribe el plural de: city",
+      "tipo": "texto",
+      "respuestaCorrecta": "cities",
+      "pistaError": "Cuando termina en consonante + y, se cambia la y por i y se agrega -es: city → cities.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i67": {
+      "materia": "ingles",
+      "tema": "Sustantivos plurales",
+      "enunciado": "Escribe el plural de: dog",
+      "tipo": "texto",
+      "respuestaCorrecta": "dogs",
+      "pistaError": "A la mayoría de los sustantivos solo se les agrega una -s: dog → dogs.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i68": {
+      "materia": "ingles",
+      "tema": "Sustantivos plurales",
+      "enunciado": "Escribe el plural de: person",
+      "tipo": "texto",
+      "respuestaCorrecta": "people",
+      "pistaError": "\"Person\" es irregular: su plural es people (personas).",
+      "metodologia": "Estándar / Directo"
+    },
+    "i69": {
+      "materia": "ingles",
+      "tema": "Sustantivos plurales",
+      "enunciado": "Escribe el plural de: brush",
+      "tipo": "texto",
+      "respuestaCorrecta": "brushes",
+      "pistaError": "Las palabras que terminan en sh agregan -es: brush → brushes.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i70": {
+      "materia": "ingles",
+      "tema": "Sustantivos plurales",
+      "enunciado": "Escribe el plural de: man",
+      "tipo": "texto",
+      "respuestaCorrecta": "men",
+      "pistaError": "\"Man\" es irregular: su plural es men (hombres).",
+      "metodologia": "Estándar / Directo"
+    },
+    "i71": {
+      "materia": "ingles",
+      "tema": "Sustantivos plurales",
+      "enunciado": "Escribe el plural de: tomato",
+      "tipo": "texto",
+      "respuestaCorrecta": "tomatoes",
+      "pistaError": "Los sustantivos que terminan en -o como tomato agregan -es: tomato → tomatoes.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i72": {
+      "materia": "ingles",
+      "tema": "Sustantivos plurales",
+      "enunciado": "Escribe el plural de: foot",
+      "tipo": "texto",
+      "respuestaCorrecta": "feet",
+      "pistaError": "\"Foot\" es irregular: su plural es feet (pies).",
+      "metodologia": "Estándar / Directo"
+    },
+    "i73": {
+      "materia": "ingles",
+      "tema": "Adjetivos posesivos",
+      "enunciado": "This is ___ book. It belongs to me. (my / mine)",
+      "tipo": "texto",
+      "respuestaCorrecta": "my",
+      "pistaError": "\"My\" se usa antes de un sustantivo para indicar que es mío: my book.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i74": {
+      "materia": "ingles",
+      "tema": "Adjetivos posesivos",
+      "enunciado": "___ name is Ana. (Her / His)",
+      "tipo": "texto",
+      "respuestaCorrecta": "her",
+      "pistaError": "Ana es ella (she) → su nombre es \"her name\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i75": {
+      "materia": "ingles",
+      "tema": "Adjetivos posesivos",
+      "enunciado": "Pedro has a bike. ___ bike is red. (His / Her)",
+      "tipo": "texto",
+      "respuestaCorrecta": "his",
+      "pistaError": "Pedro es él (he) → su bicicleta es \"his bike\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i76": {
+      "materia": "ingles",
+      "tema": "Adjetivos posesivos",
+      "enunciado": "We live in this house. ___ house is big. (Our / Their)",
+      "tipo": "texto",
+      "respuestaCorrecta": "our",
+      "pistaError": "Con \"we\" (nosotros) → nuestra casa es \"our house\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i77": {
+      "materia": "ingles",
+      "tema": "Adjetivos posesivos",
+      "enunciado": "The cat is washing ___ face. (its / it's)",
+      "tipo": "texto",
+      "respuestaCorrecta": "its",
+      "pistaError": "Para animales y cosas se usa \"its\" (su): its face.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i78": {
+      "materia": "ingles",
+      "tema": "Adjetivos posesivos",
+      "enunciado": "___ parents are doctors. They work at the hospital. (Their / There)",
+      "tipo": "texto",
+      "respuestaCorrecta": "their",
+      "pistaError": "Con \"they\" (ellos) → sus padres son \"their parents\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i79": {
+      "materia": "ingles",
+      "tema": "Adjetivos posesivos",
+      "enunciado": "You forgot ___ backpack. (your / you're)",
+      "tipo": "texto",
+      "respuestaCorrecta": "your",
+      "pistaError": "Con \"you\" (tú) → tu mochila es \"your backpack\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i80": {
+      "materia": "ingles",
+      "tema": "Adjetivos posesivos",
+      "enunciado": "María loves ___ dog. (her / his)",
+      "tipo": "texto",
+      "respuestaCorrecta": "her",
+      "pistaError": "María es ella (she) → su perro es \"her dog\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i81": {
+      "materia": "ingles",
+      "tema": "Adjetivos posesivos",
+      "enunciado": "The students do ___ homework every night. (their / our)",
+      "tipo": "texto",
+      "respuestaCorrecta": "their",
+      "pistaError": "The students = they → su tarea es \"their homework\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i82": {
+      "materia": "ingles",
+      "tema": "Adjetivos posesivos",
+      "enunciado": "___ uncle is very funny. (My / Mine)",
+      "tipo": "texto",
+      "respuestaCorrecta": "my",
+      "pistaError": "\"My\" siempre va antes de un sustantivo: my uncle.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i83": {
+      "materia": "ingles",
+      "tema": "There is / There are",
+      "enunciado": "___ a cat on the roof. (there is / there are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "there is",
+      "pistaError": "Un solo gato (singular) → \"There is a cat\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i84": {
+      "materia": "ingles",
+      "tema": "There is / There are",
+      "enunciado": "___ three apples on the table. (there is / there are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "there are",
+      "pistaError": "Tres manzanas (plural) → \"There are three apples\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i85": {
+      "materia": "ingles",
+      "tema": "There is / There are",
+      "enunciado": "___ a park near my house. (there is / there are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "there is",
+      "pistaError": "Un parque (singular) → \"There is a park\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i86": {
+      "materia": "ingles",
+      "tema": "There is / There are",
+      "enunciado": "___ many stars in the sky. (there is / there are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "there are",
+      "pistaError": "Muchas estrellas (plural) → \"There are many stars\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i87": {
+      "materia": "ingles",
+      "tema": "There is / There are",
+      "enunciado": "___ milk in the fridge. (there is / there are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "there is",
+      "pistaError": "La leche es incontable y singular → \"There is milk\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i88": {
+      "materia": "ingles",
+      "tema": "There is / There are",
+      "enunciado": "___ two dogs in the yard. (there is / there are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "there are",
+      "pistaError": "Dos perros (plural) → \"There are two dogs\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i89": {
+      "materia": "ingles",
+      "tema": "There is / There are",
+      "enunciado": "___ a book on the desk. (there is / there are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "there is",
+      "pistaError": "Un libro (singular) → \"There is a book\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i90": {
+      "materia": "ingles",
+      "tema": "There is / There are",
+      "enunciado": "___ some eggs in the basket. (there is / there are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "there are",
+      "pistaError": "Varios huevos (plural) → \"There are some eggs\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i91": {
+      "materia": "ingles",
+      "tema": "There is / There are",
+      "enunciado": "___ a beautiful garden downtown. (there is / there are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "there is",
+      "pistaError": "Un jardín (singular) → \"There is a garden\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i92": {
+      "materia": "ingles",
+      "tema": "There is / There are",
+      "enunciado": "___ four windows in the classroom. (there is / there are)",
+      "tipo": "texto",
+      "respuestaCorrecta": "there are",
+      "pistaError": "Cuatro ventanas (plural) → \"There are four windows\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i93": {
+      "materia": "ingles",
+      "tema": "Presente simple · -s en tercera persona",
+      "enunciado": "She ___ soccer on weekends. (play / plays)",
+      "tipo": "texto",
+      "respuestaCorrecta": "plays",
+      "pistaError": "Con he/she/it el verbo agrega -s: she plays.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i94": {
+      "materia": "ingles",
+      "tema": "Presente simple · -s en tercera persona",
+      "enunciado": "My father ___ at a bank. (work / works)",
+      "tipo": "texto",
+      "respuestaCorrecta": "works",
+      "pistaError": "My father = he → el verbo lleva -s: works.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i95": {
+      "materia": "ingles",
+      "tema": "Presente simple · -s en tercera persona",
+      "enunciado": "He ___ TV every night. (watch / watches)",
+      "tipo": "texto",
+      "respuestaCorrecta": "watches",
+      "pistaError": "Los verbos que terminan en ch agregan -es: he watches.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i96": {
+      "materia": "ingles",
+      "tema": "Presente simple · -s en tercera persona",
+      "enunciado": "The bird ___ very high. (fly / flies)",
+      "tipo": "texto",
+      "respuestaCorrecta": "flies",
+      "pistaError": "Los verbos que terminan en consonante + y cambian la y por -ies: it flies.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i97": {
+      "materia": "ingles",
+      "tema": "Presente simple · -s en tercera persona",
+      "enunciado": "Maria ___ ice cream. (like / likes)",
+      "tipo": "texto",
+      "respuestaCorrecta": "likes",
+      "pistaError": "Maria = she → el verbo agrega -s: likes.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i98": {
+      "materia": "ingles",
+      "tema": "Presente simple · -s en tercera persona",
+      "enunciado": "My brother ___ to school by bus. (go / goes)",
+      "tipo": "texto",
+      "respuestaCorrecta": "goes",
+      "pistaError": "El verbo \"go\" en tercera persona es \"goes\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i99": {
+      "materia": "ingles",
+      "tema": "Presente simple · -s en tercera persona",
+      "enunciado": "The dog ___ in the park. (run / runs)",
+      "tipo": "texto",
+      "respuestaCorrecta": "runs",
+      "pistaError": "The dog = it → el verbo agrega -s: runs.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i100": {
+      "materia": "ingles",
+      "tema": "Presente simple · -s en tercera persona",
+      "enunciado": "She ___ English every day. (study / studies)",
+      "tipo": "texto",
+      "respuestaCorrecta": "studies",
+      "pistaError": "Termina en consonante + y → cambia a -ies: studies.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i101": {
+      "materia": "ingles",
+      "tema": "Presente simple · -s en tercera persona",
+      "enunciado": "Tom ___ a book at night. (read / reads)",
+      "tipo": "texto",
+      "respuestaCorrecta": "reads",
+      "pistaError": "Tom = he → el verbo agrega -s: reads.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i102": {
+      "materia": "ingles",
+      "tema": "Presente simple · -s en tercera persona",
+      "enunciado": "My mom ___ delicious food. (cook / cooks)",
+      "tipo": "texto",
+      "respuestaCorrecta": "cooks",
+      "pistaError": "My mom = she → el verbo agrega -s: cooks.",
+      "metodologia": "Estándar / Directo"
+    },
+    "i103": {
+      "materia": "ingles",
+      "tema": "Vocabulario · Objetos de clase",
+      "enunciado": "¿Cómo se dice \"lápiz\" en inglés?",
+      "tipo": "texto",
+      "respuestaCorrecta": "pencil",
+      "pistaError": "Lápiz en inglés es \"pencil\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i104": {
+      "materia": "ingles",
+      "tema": "Vocabulario · Objetos de clase",
+      "enunciado": "¿Cómo se dice \"libro\" en inglés?",
+      "tipo": "texto",
+      "respuestaCorrecta": "book",
+      "pistaError": "Libro en inglés es \"book\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i105": {
+      "materia": "ingles",
+      "tema": "Vocabulario · Objetos de clase",
+      "enunciado": "¿Cómo se dice \"silla\" en inglés?",
+      "tipo": "texto",
+      "respuestaCorrecta": "chair",
+      "pistaError": "Silla en inglés es \"chair\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i106": {
+      "materia": "ingles",
+      "tema": "Vocabulario · Objetos de clase",
+      "enunciado": "¿Cómo se dice \"mochila\" en inglés?",
+      "tipo": "texto",
+      "respuestaCorrecta": "backpack",
+      "pistaError": "Mochila en inglés es \"backpack\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i107": {
+      "materia": "ingles",
+      "tema": "Vocabulario · Objetos de clase",
+      "enunciado": "¿Cómo se dice \"borrador\" en inglés?",
+      "tipo": "texto",
+      "respuestaCorrecta": "eraser",
+      "pistaError": "Borrador en inglés es \"eraser\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i108": {
+      "materia": "ingles",
+      "tema": "Vocabulario · Objetos de clase",
+      "enunciado": "¿Cómo se dice \"tablero\" en inglés?",
+      "tipo": "texto",
+      "respuestaCorrecta": "board",
+      "pistaError": "Tablero en inglés es \"board\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i109": {
+      "materia": "ingles",
+      "tema": "Vocabulario · Objetos de clase",
+      "enunciado": "¿Cómo se dice \"regla\" en inglés?",
+      "tipo": "texto",
+      "respuestaCorrecta": "ruler",
+      "pistaError": "Regla en inglés es \"ruler\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i110": {
+      "materia": "ingles",
+      "tema": "Vocabulario · Objetos de clase",
+      "enunciado": "¿Cómo se dice \"cuaderno\" en inglés?",
+      "tipo": "texto",
+      "respuestaCorrecta": "notebook",
+      "pistaError": "Cuaderno en inglés es \"notebook\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i111": {
+      "materia": "ingles",
+      "tema": "Vocabulario · Objetos de clase",
+      "enunciado": "¿Cómo se dice \"mesa\" en inglés?",
+      "tipo": "texto",
+      "respuestaCorrecta": "table",
+      "pistaError": "Mesa en inglés es \"table\".",
+      "metodologia": "Estándar / Directo"
+    },
+    "i112": {
+      "materia": "ingles",
+      "tema": "Vocabulario · Objetos de clase",
+      "enunciado": "¿Cómo se dice \"crayones\" en inglés?",
+      "tipo": "texto",
+      "respuestaCorrecta": "crayons",
+      "pistaError": "Crayones en inglés es \"crayons\".",
+      "metodologia": "Estándar / Directo"
     }
   },
   "prendas": {
@@ -936,6 +2566,1079 @@
           "respuesta": "14/7",
           "respuestaCorrecta": "50/12",
           "fecha": "2026-08-09T14:37:00.000Z"
+        }
+      ]
+    }
+  },
+  "tareas": {
+    "t-ing-verbo-to-be-afirmativo": {
+      "id": "t-ing-verbo-to-be-afirmativo",
+      "titulo": "Verbo To Be — Afirmativo",
+      "descripcion": "Completa cada oración con la forma correcta del verbo to be: am, is o are.",
+      "materia": "ingles",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-08-21T00:00:00.000Z",
+      "fechaActualizacion": "2026-08-21T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "i23",
+          "orden": 1,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i24",
+          "orden": 2,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i25",
+          "orden": 3,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i26",
+          "orden": 4,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i27",
+          "orden": 5,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i28",
+          "orden": 6,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i29",
+          "orden": 7,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i30",
+          "orden": 8,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i31",
+          "orden": 9,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i32",
+          "orden": 10,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-ing-verbo-to-be-negativo": {
+      "id": "t-ing-verbo-to-be-negativo",
+      "titulo": "Verbo To Be — Negativo",
+      "descripcion": "Completa cada oración con la forma negativa del verbo to be: am not, isn't o aren't.",
+      "materia": "ingles",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-08-21T00:00:00.000Z",
+      "fechaActualizacion": "2026-08-21T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "i33",
+          "orden": 1,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i34",
+          "orden": 2,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i35",
+          "orden": 3,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i36",
+          "orden": 4,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i37",
+          "orden": 5,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i38",
+          "orden": 6,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i39",
+          "orden": 7,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i40",
+          "orden": 8,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i41",
+          "orden": 9,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i42",
+          "orden": 10,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-ing-verbo-to-be-preguntas": {
+      "id": "t-ing-verbo-to-be-preguntas",
+      "titulo": "Verbo To Be — Preguntas",
+      "descripcion": "Completa cada pregunta con Am, Is o Are.",
+      "materia": "ingles",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-08-21T00:00:00.000Z",
+      "fechaActualizacion": "2026-08-21T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "i43",
+          "orden": 1,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i44",
+          "orden": 2,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i45",
+          "orden": 3,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i46",
+          "orden": 4,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i47",
+          "orden": 5,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i48",
+          "orden": 6,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i49",
+          "orden": 7,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i50",
+          "orden": 8,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i51",
+          "orden": 9,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i52",
+          "orden": 10,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-mat-suma-mismo-denominador": {
+      "id": "t-mat-suma-mismo-denominador",
+      "titulo": "Suma de Fracciones — Mismo Denominador",
+      "descripcion": "Suma las fracciones. Cuando el denominador es igual, solo se suman los numeradores.",
+      "materia": "matematicas",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-08-21T00:00:00.000Z",
+      "fechaActualizacion": "2026-08-21T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "m33",
+          "orden": 1,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m34",
+          "orden": 2,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m35",
+          "orden": 3,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m36",
+          "orden": 4,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m37",
+          "orden": 5,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m38",
+          "orden": 6,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m39",
+          "orden": 7,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m40",
+          "orden": 8,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m41",
+          "orden": 9,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m42",
+          "orden": 10,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-mat-suma-diferente-denominador": {
+      "id": "t-mat-suma-diferente-denominador",
+      "titulo": "Suma de Fracciones — Diferente Denominador",
+      "descripcion": "Suma las fracciones aplicando la regla de la carita sonriente (multiplicación en cruz).",
+      "materia": "matematicas",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Paso a Paso (Carita Sonriente)",
+      "fechaCreacion": "2026-08-21T00:00:00.000Z",
+      "fechaActualizacion": "2026-08-21T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "m43",
+          "orden": 1,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m44",
+          "orden": 2,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m45",
+          "orden": 3,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m46",
+          "orden": 4,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m47",
+          "orden": 5,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m48",
+          "orden": 6,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m49",
+          "orden": 7,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m50",
+          "orden": 8,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m51",
+          "orden": 9,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m52",
+          "orden": 10,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-mat-division-fracciones": {
+      "id": "t-mat-division-fracciones",
+      "titulo": "División de Fracciones",
+      "descripcion": "Divide las fracciones: multiplica la primera por el inverso de la segunda (multiplicación en cruz).",
+      "materia": "matematicas",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-08-21T00:00:00.000Z",
+      "fechaActualizacion": "2026-08-21T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "m53",
+          "orden": 1,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m54",
+          "orden": 2,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m55",
+          "orden": 3,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m56",
+          "orden": 4,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m57",
+          "orden": 5,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m58",
+          "orden": 6,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m59",
+          "orden": 7,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m60",
+          "orden": 8,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m61",
+          "orden": 9,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m62",
+          "orden": 10,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-mat-propia-e-impropia": {
+      "id": "t-mat-propia-e-impropia",
+      "titulo": "Fracciones Propias e Impropias",
+      "descripcion": "Indica si cada fracción es propia (numerador menor que el denominador) o impropia (numerador mayor o igual).",
+      "materia": "matematicas",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-08-21T00:00:00.000Z",
+      "fechaActualizacion": "2026-08-21T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "m63",
+          "orden": 1,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m64",
+          "orden": 2,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m65",
+          "orden": 3,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m66",
+          "orden": 4,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m67",
+          "orden": 5,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m68",
+          "orden": 6,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m69",
+          "orden": 7,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m70",
+          "orden": 8,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m71",
+          "orden": 9,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m72",
+          "orden": 10,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-mat-fraccion-a-decimal": {
+      "id": "t-mat-fraccion-a-decimal",
+      "titulo": "Conversión de Fracciones a Decimales",
+      "descripcion": "Divide el numerador entre el denominador para obtener el número decimal de cada fracción.",
+      "materia": "matematicas",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-08-21T00:00:00.000Z",
+      "fechaActualizacion": "2026-08-21T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "m73",
+          "orden": 1,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m74",
+          "orden": 2,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m75",
+          "orden": 3,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m76",
+          "orden": 4,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m77",
+          "orden": 5,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m78",
+          "orden": 6,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m79",
+          "orden": 7,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m80",
+          "orden": 8,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m81",
+          "orden": 9,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m82",
+          "orden": 10,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-mat-simplificacion-fracciones": {
+      "id": "t-mat-simplificacion-fracciones",
+      "titulo": "Simplificación de Fracciones",
+      "descripcion": "Simplifica cada fracción hasta su forma irreducible, dividiendo numerador y denominador entre su máximo común divisor (mcd).",
+      "materia": "matematicas",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-08-21T00:00:00.000Z",
+      "fechaActualizacion": "2026-08-21T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "m83",
+          "orden": 1,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m84",
+          "orden": 2,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m85",
+          "orden": 3,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m86",
+          "orden": 4,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m87",
+          "orden": 5,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m88",
+          "orden": 6,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m89",
+          "orden": 7,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m90",
+          "orden": 8,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m91",
+          "orden": 9,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m92",
+          "orden": 10,
+          "fechaAgregado": "2026-08-21T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-mat-introduccion-numeros-negativos": {
+      "id": "t-mat-introduccion-numeros-negativos",
+      "titulo": "Introducción a los Números Negativos",
+      "descripcion": "Aprende a usar el signo menos, ubicar números negativos en la recta numérica, compararlos con el cero y ordenarlos de menor a mayor.",
+      "materia": "matematicas",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-08-30T00:00:00.000Z",
+      "fechaActualizacion": "2026-08-30T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "m93",
+          "orden": 1,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m94",
+          "orden": 2,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m95",
+          "orden": 3,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m96",
+          "orden": 4,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m97",
+          "orden": 5,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m98",
+          "orden": 6,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m99",
+          "orden": 7,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m100",
+          "orden": 8,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m101",
+          "orden": 9,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m102",
+          "orden": 10,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-mat-numeros-negativos-practica": {
+      "id": "t-mat-numeros-negativos-practica",
+      "titulo": "Números Negativos — Práctica Extra",
+      "descripcion": "Repasa la recta numérica, la comparación con el cero y el orden de los números negativos con una práctica adicional.",
+      "materia": "matematicas",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-08-30T00:00:00.000Z",
+      "fechaActualizacion": "2026-08-30T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "m103",
+          "orden": 1,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m104",
+          "orden": 2,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m105",
+          "orden": 3,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m106",
+          "orden": 4,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m107",
+          "orden": 5,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m108",
+          "orden": 6,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m109",
+          "orden": 7,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m110",
+          "orden": 8,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m111",
+          "orden": 9,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "m112",
+          "orden": 10,
+          "fechaAgregado": "2026-08-30T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-ing-articulos-a-an": {
+      "id": "t-ing-articulos-a-an",
+      "titulo": "Artículos — A y An",
+      "descripcion": "Completa cada oración con el artículo correcto: a (consonante) o an (vocal).",
+      "materia": "ingles",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-09-01T00:00:00.000Z",
+      "fechaActualizacion": "2026-09-01T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "i53",
+          "orden": 1,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i54",
+          "orden": 2,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i55",
+          "orden": 3,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i56",
+          "orden": 4,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i57",
+          "orden": 5,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i58",
+          "orden": 6,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i59",
+          "orden": 7,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i60",
+          "orden": 8,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i61",
+          "orden": 9,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i62",
+          "orden": 10,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-ing-sustantivos-plurales": {
+      "id": "t-ing-sustantivos-plurales",
+      "titulo": "Sustantivos Plurales",
+      "descripcion": "Escribe el plural de cada sustantivo aplicando las reglas (-s, -es, -ies) y los plurales irregulares.",
+      "materia": "ingles",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-09-01T00:00:00.000Z",
+      "fechaActualizacion": "2026-09-01T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "i63",
+          "orden": 1,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i64",
+          "orden": 2,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i65",
+          "orden": 3,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i66",
+          "orden": 4,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i67",
+          "orden": 5,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i68",
+          "orden": 6,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i69",
+          "orden": 7,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i70",
+          "orden": 8,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i71",
+          "orden": 9,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i72",
+          "orden": 10,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-ing-adjetivos-posesivos": {
+      "id": "t-ing-adjetivos-posesivos",
+      "titulo": "Adjetivos Posesivos",
+      "descripcion": "Elige el adjetivo posesivo correcto: my, your, his, her, its, our o their.",
+      "materia": "ingles",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-09-01T00:00:00.000Z",
+      "fechaActualizacion": "2026-09-01T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "i73",
+          "orden": 1,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i74",
+          "orden": 2,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i75",
+          "orden": 3,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i76",
+          "orden": 4,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i77",
+          "orden": 5,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i78",
+          "orden": 6,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i79",
+          "orden": 7,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i80",
+          "orden": 8,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i81",
+          "orden": 9,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i82",
+          "orden": 10,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-ing-there-is-there-are": {
+      "id": "t-ing-there-is-there-are",
+      "titulo": "There Is / There Are",
+      "descripcion": "Completa cada oración con there is (singular) o there are (plural) para hablar de lo que existe.",
+      "materia": "ingles",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-09-01T00:00:00.000Z",
+      "fechaActualizacion": "2026-09-01T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "i83",
+          "orden": 1,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i84",
+          "orden": 2,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i85",
+          "orden": 3,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i86",
+          "orden": 4,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i87",
+          "orden": 5,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i88",
+          "orden": 6,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i89",
+          "orden": 7,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i90",
+          "orden": 8,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i91",
+          "orden": 9,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i92",
+          "orden": 10,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-ing-presente-simple": {
+      "id": "t-ing-presente-simple",
+      "titulo": "Presente Simple — Tercera Persona",
+      "descripcion": "Completa las oraciones conjugando el verbo en presente simple con he, she o it (agrega -s, -es o -ies).",
+      "materia": "ingles",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-09-01T00:00:00.000Z",
+      "fechaActualizacion": "2026-09-01T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "i93",
+          "orden": 1,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i94",
+          "orden": 2,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i95",
+          "orden": 3,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i96",
+          "orden": 4,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i97",
+          "orden": 5,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i98",
+          "orden": 6,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i99",
+          "orden": 7,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i100",
+          "orden": 8,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i101",
+          "orden": 9,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i102",
+          "orden": 10,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        }
+      ]
+    },
+    "t-ing-vocabulario-objetos-de-clase": {
+      "id": "t-ing-vocabulario-objetos-de-clase",
+      "titulo": "Vocabulario — Objetos de Clase",
+      "descripcion": "Traduce al inglés el nombre de los objetos que encuentras todos los días en el salón de clase.",
+      "materia": "ingles",
+      "docenteId": "docente-001",
+      "estado": "publicada",
+      "metodologia": "Estándar / Directo",
+      "fechaCreacion": "2026-09-01T00:00:00.000Z",
+      "fechaActualizacion": "2026-09-01T00:00:00.000Z",
+      "ejercicios": [
+        {
+          "ejercicioId": "i103",
+          "orden": 1,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i104",
+          "orden": 2,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i105",
+          "orden": 3,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i106",
+          "orden": 4,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i107",
+          "orden": 5,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i108",
+          "orden": 6,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i109",
+          "orden": 7,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i110",
+          "orden": 8,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i111",
+          "orden": 9,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
+        },
+        {
+          "ejercicioId": "i112",
+          "orden": 10,
+          "fechaAgregado": "2026-09-01T00:00:00.000Z"
         }
       ]
     }

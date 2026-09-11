@@ -171,7 +171,12 @@ function defaultsLogro(uid, nombre = '') {
     },
     cartas_desbloqueadas: [],    // Cartas del álbum obtenidas al abrir cofres
     personaje: null,             // Personaje/avatar elegido por el docente (seed DiceBear)
-    historial: []
+    historial: [],
+    misionesReclamadas: [],      // IDs de misiones ya cobradas (anti doble recompensa)
+    autotareas: {                // Control anti-acumulación de tareas auto-generadas
+      contadorDia: 0,
+      fechaDia: null
+    }
   };
 }
 
@@ -212,7 +217,11 @@ async function getLogro(uid) {
     equipo,
     cartas_desbloqueadas: Array.isArray(data.cartas_desbloqueadas) ? data.cartas_desbloqueadas : [],
     personaje: (data.personaje && typeof data.personaje === 'object') ? data.personaje : null,
-    historial: Array.isArray(data.historial) ? data.historial : []
+    historial: Array.isArray(data.historial) ? data.historial : [],
+    misionesReclamadas: Array.isArray(data.misionesReclamadas) ? data.misionesReclamadas : base.misionesReclamadas,
+    autotareas: (data.autotareas && typeof data.autotareas === 'object')
+      ? { ...base.autotareas, ...data.autotareas }
+      : base.autotareas
   };
 }
 
@@ -439,6 +448,48 @@ async function completarTarea(uid, tareaId) {
   return { ok: true, mensaje: '¡Lección completada!', yaCompletada: false, ...res };
 }
 
+/* ------------------------------------------------------------------ *
+ * RECOMPENSA DE MISIÓN (XP + Naranjas directo, sin tocar racha)
+ * ------------------------------------------------------------------ */
+/**
+ * Otorga una recompensa fija de XP + Naranjas por una misión completada.
+ * No cuenta como "evento de ejercicio" (no toca racha). Idempotente a
+ * nivel de servicio: la protección de doble cobro la hace el llamador.
+ *
+ * @param {string} uid
+ * @param {number} xp      XP a sumar
+ * @param {number} naranjas Naranjas a sumar
+ */
+async function otorgarRecompensaMision(uid, xp = 0, naranjas = 0) {
+  const logro = await getLogro(uid);
+  const xpAntes = Number(logro.xp) || 0;
+  const nivelAnterior = Number(logro.nivel) || 1;
+
+  logro.xp = xpAntes + (Number(xp) || 0);
+  logro.naranjas = (Number(logro.naranjas) || 0) + (Number(naranjas) || 0);
+
+  const nuevoNivel = calcularNivel(logro.xp);
+  logro.nivel = nuevoNivel;
+
+  await db.collection('logros').doc(uid).set(logro);
+
+  const progreso = calcularProgresoNivel(logro.xp);
+  const rango = rangoPorNivel(nuevoNivel);
+
+  return {
+    ok: true,
+    xpGanada: Number(xp) || 0,
+    naranjasGanadas: Number(naranjas) || 0,
+    nivelAnterior,
+    nuevoNivel: nuevoNivel,
+    subioNivel: nuevoNivel > nivelAnterior,
+    rango,
+    xpTotal: logro.xp,
+    naranjasTotales: logro.naranjas,
+    ...progreso
+  };
+}
+
 module.exports = {
   XP_GANAR,
   RATIO_XP_NARANJAS,
@@ -454,6 +505,7 @@ module.exports = {
   getLogro,
   fechaHoyISO,
   otorgarXP,
+  otorgarRecompensaMision,
   comprarItem,
   equiparItem,
   completarTarea,

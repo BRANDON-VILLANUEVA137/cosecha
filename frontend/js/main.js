@@ -20,6 +20,7 @@ import { renderAnalyticsGrupo } from './modules/render/renderAnalyticsGrupo.js';
 import { ExerciseRenderers } from './modules/render/exerciseRenderers.js';
 import { renderControlGrafica } from './modules/render/renderFraction.js';
 import { AnalyticsRenderers } from './modules/render/analyticsRenderers.js';
+import { renderMissiones } from './modules/render/renderMissiones.js';
 
 
 // --- Handlers ---
@@ -28,6 +29,7 @@ import { TaskHandler } from './modules/handlers/taskHandler.js';
 import { StudentHandler } from './modules/handlers/studentHandler.js';
 import { ShopHandler } from './modules/handlers/shopHandler.js';
 import { ExerciseHandler } from './modules/handlers/exerciseHandler.js';
+import { MissionHandler } from './modules/handlers/missionHandler.js';
 
 // --- Utils ---
 import { toast } from './modules/utils/domUtils.js';
@@ -56,6 +58,9 @@ const App = {
   // Vista del grupo: módulo dedicado (reemplaza la versión antigua embebida)
   renderAnalyticsGrupo,
 
+  // Vista de misiones del estudiante
+  renderMissiones,
+
   // Render de controles de respuesta (estudiante) + gráficas de fracciones
   ...ExerciseRenderers,
   renderControlGrafica,
@@ -66,6 +71,7 @@ const App = {
   ...StudentHandler,
   ...ShopHandler,
   ...ExerciseHandler,
+  ...MissionHandler,
 
   // Utils expuestos para uso en HTML
   formatMathText,
@@ -106,7 +112,8 @@ const App = {
         if (this.currentModule === 'inicio') html = await this.renderInicio();
         else if (this.currentModule === 'matematicas' || this.currentModule === 'ingles') {
           html = await this.renderModuloEstudiante(this.currentModule);
-        } else if (this.currentModule === 'album') html = await this.renderAlbum();
+        } else if (this.currentModule === 'misiones') html = await this.renderMissiones();
+        else if (this.currentModule === 'album') html = await this.renderAlbum();
       }
       screen.innerHTML = html;
       this.wireEvents();

@@ -134,6 +134,16 @@ const API = {
     });
   },
 
+  // ---- Misiones (estudiante) ----
+  getMisiones() {
+    return this.request('/misiones');
+  },
+  reclamarMision(misionId) {
+    return this.request('/misiones/' + misionId + '/reclamar', {
+      method: 'POST'
+    });
+  },
+
   // ---- Progreso (sincronización multi-dispositivo) ----
   getProgreso() {
     return this.request('/progreso');
@@ -192,6 +202,12 @@ const API = {
     return this.request('/tareas/' + id + '/publicar', {
       method: 'PATCH',
       body: JSON.stringify({ estado })
+    });
+  },
+  generarTarea(data) {
+    return this.request('/tareas/generar', {
+      method: 'POST',
+      body: JSON.stringify(data)
     });
   },
   

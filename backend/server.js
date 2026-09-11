@@ -1,7 +1,21 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const { authMiddleware } = require('./middleware/auth');
+
+// Cargar variables de entorno desde backend/.env si existe (sin dependencias).
+// En producción (Render, Netlify) se usan variables de entorno configuradas por la plataforma.
+const dotenvPath = path.join(__dirname, '.env');
+if (fs.existsSync(dotenvPath)) {
+  const dotenvContent = fs.readFileSync(dotenvPath, 'utf-8');
+  dotenvContent.split(/\r?\n/).forEach((line) => {
+    const m = line.match(/^\s*([\w.-]+)\s*=\s*(.*)\s*$/);
+    if (m && !process.env[m[1]]) {
+      process.env[m[1]] = m[2].replace(/^["']|["']$/g, '').trim();
+    }
+  });
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,6 +33,7 @@ app.use('/api/ejercicios', authMiddleware, require('./routes/ejercicios'));
 app.use('/api/tareas', authMiddleware, require('./routes/tareas'));
 app.use('/api/analytics', authMiddleware, require('./routes/analytics')); // Router separado para analytics
 app.use('/api/logros', authMiddleware, require('./routes/logros'));
+app.use('/api/misiones', authMiddleware, require('./routes/misiones'));
 app.use('/api/prendas', authMiddleware, require('./routes/prendas'));
 app.use('/api/cartas', authMiddleware, require('./routes/cartas'));
 app.use('/api/personajes', require('./routes/personajes'));

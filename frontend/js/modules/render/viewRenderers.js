@@ -16,6 +16,7 @@ export const ViewRenderers = {
       { id: 'inicio', ico: '🏠', label: 'Inicio' },
       { id: 'matematicas', ico: '🍊', label: 'Matemáticas' },
       { id: 'ingles', ico: '🌴', label: 'Inglés' },
+      { id: 'misiones', ico: '🎯', label: 'Misiones' },
       { id: 'album', ico: '🃏', label: 'Álbum' },
     ];
     const tabsDocente = [
@@ -237,11 +238,13 @@ export const ViewRenderers = {
       const completed = this.completedTaskIds.includes(task.id);
       const status = completed ? 'Completada' : task.estado;
       const buttonLabel = completed ? 'Revisar tarea' : 'Comenzar tarea';
+      const esAuto = task.origen === 'auto' || task.origen === 'ia';
+      const tagTipo = esAuto ? `🤖 ${task.origen === 'ia' ? 'IA' : 'Auto'}` : 'Tutor';
       return `
       <div class="task-card task-module-card">
         <div class="task-module-head">
           <div>
-            <span class="tag ${esMat ? 'mat' : 'ing'}">Tutor</span>
+            <span class="tag ${esMat ? 'mat' : 'ing'}">${tagTipo}</span>
             <h3>${task.titulo}</h3>
           </div>
           <span class="task-status">${status}</span>
@@ -276,6 +279,29 @@ export const ViewRenderers = {
         <div id="fractionGraphicArea"></div>
       </div>` : '';
 
+    // Bloque "Generar mi tarea" (tareas automáticas + IA)
+    const bloqueGenerar = `
+      <div class="card">
+        <div class="module-header">
+          <div class="badge ${esMat ? 'mat' : 'ing'}">🎲</div>
+          <div>
+            <h2>Generar mi tarea personalizada</h2>
+            <p>Cosecha crea ejercicios desde cero para ti: escribe qué quieres practicar y cuántos.</p>
+          </div>
+        </div>
+        <div class="answer-row" style="flex-wrap:wrap; gap:10px;">
+          <input type="text" id="autoSolicitud_${materia}" placeholder="${esMat ? 'Ej: sumas de fracciones, números negativos, problemas con naranjas...' : 'Ej: verb to be, a/an, plurales, vocabulario...'}" style="flex:2; min-width:220px; padding:10px; border:1px solid var(--borde); border-radius:8px;">
+          <select id="autoCantidad_${materia}" style="padding:10px; border:1px solid var(--borde); border-radius:8px;">
+            <option value="5">5 ejercicios</option>
+            <option value="10" selected>10 ejercicios</option>
+            <option value="15">15 ejercicios</option>
+          </select>
+          <button class="primary" id="btnGenerarARem_${materia}" onclick="window.App.generarTareaAuto('${materia}')">🎲 Generar mi tarea</button>
+        </div>
+        <p class="task-meta" style="margin-top:8px;">Se usará IA (Gemini) si está configurada; si no, el algoritmo de Cosecha. Máximo 3 temas en la solicitud.</p>
+      </div>
+    `;
+
     return `
       <div class="card">
         <div class="module-header">
@@ -292,6 +318,7 @@ export const ViewRenderers = {
           <div class="stat"><b>${logro.racha?.dias || 0}</b><span>RACHA 🔥</span></div>
         </div>
       </div>
+      ${bloqueGenerar}
       ${taskCards}
       ${graficacion}
     `;

@@ -2,7 +2,18 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../config/firebase-admin');
 const { authMiddleware, requireRole } = require('../middleware/auth');
-const { instanciarEjercicio } = require('../services/generador');
+const { instanciarEjercicio, generarTareaProcedural, tituloAuto } = require('../services/generador');
+const { generarConGemini, iaDisponible } = require('../services/aiGenerador');
+const { getLogro } = require('../services/gamificacion');
+
+/* Permisos: el docente gestiona sus tareas propias y las autogeneradas (origen auto/ia),
+   que no tienen docenteId porque las crea el sistema a petición del estudiante. */
+function puedeGestionar(tarea, uidDocente) {
+  if (!tarea) return false;
+  if (tarea.origen === 'auto' || tarea.origen === 'ia') return true;
+  if (!tarea.docenteId) return true;
+  return tarea.docenteId === uidDocente;
+}
 
 // GET /api/tareas - Obtener todas las tareas (docente ve todas, estudiante ve las publicadas)
 router.get('/', authMiddleware, async (req, res) => {
@@ -13,12 +24,116 @@ router.get('/', authMiddleware, async (req, res) => {
     // Si es estudiante, filtrar solo tareas publicadas
     const tareasFiltradas = req.user?.rol === 'docente' 
       ? tareas 
-      : tareas.filter(t => t.estado === 'publicada');
+      : tareas.filter(t =>
+          (t.estado === 'publicada' && !t.estudianteId) ||
+          (t.estudianteId === req.user.uid && (t.origen === 'auto' || t.origen === 'ia'))
+        );
     
     return res.json(tareasFiltradas);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'No se pudieron obtener las tareas' });
+  }
+});
+
+// POST /api/tareas/generar - Generar tarea automática y personalizada (solo estudiante)
+// Usa el generador procedimental (algoritmo) o la IA de Gemini si hay API key configurada.
+router.post('/generar', authMiddleware, requireRole('estudiante'), async (req, res) => {
+  try {
+    const { materia, cantidad, solicitud } = req.body;
+    const uid = req.user.uid;
+
+    if (!['matematicas', 'ingles'].includes(materia)) {
+      return res.status(400).json({ error: 'Materia no válida. Usa "matematicas" o "ingles".' });
+    }
+    const cant = Math.min(Math.max(Number(cantidad) || 10, 5), 15);
+    const solicitudLimpia = String(solicitud || '').trim().slice(0, 300);
+
+    const logro = await getLogro(uid);
+
+    // --- Anti-acumulación: no generar más si hay >= 5 autogeneradas pendientes ---
+    const autoSnap = await db.collection('tareas').where('estudianteId', '==', uid).get();
+    const autoTareas = autoSnap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(t => t.origen === 'auto' || t.origen === 'ia');
+    const completadasSet = new Set(Array.isArray(logro.tareasCompletadas) ? logro.tareasCompletadas : []);
+    const pendientes = autoTareas.filter(t => !completadasSet.has(t.id) && t.estado === 'publicada');
+
+    const BLOQUEO_PENDIENTES = 5;
+    const MAX_PENDIENTES = 6;
+    if (pendientes.length >= MAX_PENDIENTES) {
+      return res.status(429).json({
+        error: `Llegaste al máximo de ${MAX_PENDIENTES} tareas pendientes (` + pendientes.length + `). Completa algunas primero.`
+      });
+    }
+    if (pendientes.length >= BLOQUEO_PENDIENTES) {
+      return res.status(429).json({
+        error: `Tienes ${pendientes.length} tareas pendientes. Completa al menos ${BLOQUEO_PENDIENTES} de ellas antes de pedir otra. ¡Ánimo! 🍊`
+      });
+    }
+
+    // --- Generación: IA si disponible, si no algoritmo procedimental ---
+    let ejercicios = null;
+    let origenGenerado = 'auto';
+    if (iaDisponible()) {
+      try {
+        ejercicios = await generarConGemini({ materia, cantidad: cant, solicitud: solicitudLimpia });
+        if (ejercicios && ejercicios.length) origenGenerado = 'ia';
+      } catch (_) { ejercicios = null; }
+    }
+    if (!ejercicios || !ejercicios.length) {
+      const seedStr = `${uid}:${Date.now()}`;
+      ejercicios = generarTareaProcedural(materia, solicitudLimpia, cant, seedStr);
+    }
+
+    if (!ejercicios || !ejercicios.length) {
+      return res.status(500).json({ error: 'No se pudieron generar ejercicios. Intenta de nuevo.' });
+    }
+
+    // Persistir ejercicios en la colección ejercicios (GET /:id los resuelve por ahí)
+    const batch = db.batch();
+    for (const ej of ejercicios) {
+      batch.set(db.collection('ejercicios').doc(ej.id), ej);
+    }
+    await batch.commit();
+
+    // Crear la tarea
+    const tareaRef = db.collection('tareas').doc();
+    const ahora = new Date();
+    const titulo = tituloAuto(materia, solicitudLimpia);
+    await tareaRef.set({
+      titulo,
+      descripcion: solicitudLimpia ? `Solicitud: ${solicitudLimpia}` : 'Tarea generada automáticamente por el estudiante.',
+      materia,
+      estado: 'publicada',
+      origen: origenGenerado,
+      estudianteId: uid,
+      docenteId: null,
+      metodologia: materia === 'ingles' ? 'Opción Múltiple / Gramática' : 'Estándar / Directo',
+      fechaCreacion: ahora,
+      fechaActualizacion: ahora
+    });
+
+    const ejerciciosRef = db.collection('tareas').doc(tareaRef.id).collection('ejercicios');
+    for (let i = 0; i < ejercicios.length; i += 1) {
+      await ejerciciosRef.doc().set({
+        ejercicioId: ejercicios[i].id,
+        orden: i + 1,
+        fechaAgregado: ahora
+      });
+    }
+
+    return res.status(201).json({
+      id: tareaRef.id,
+      titulo,
+      materia,
+      origen: origenGenerado,
+      cantidadEjercicios: ejercicios.length,
+      mensaje: origenGenerado === 'ia' ? '✅ Tarea generada con IA' : '✅ Tarea generada automáticamente'
+    });
+  } catch (error) {
+    console.error('❌ [Tareas] Error generando tarea automática:', error);
+    return res.status(500).json({ error: 'No se pudo generar la tarea' });
   }
 });
 
@@ -121,7 +236,7 @@ router.put('/:id', authMiddleware, requireRole('docente'), async (req, res) => {
     }
     
     // Verificar que la tarea pertenece al docente
-    if (tareaDoc.data().docenteId !== req.user.uid) {
+    if (!puedeGestionar(tareaDoc.data(), req.user.uid)) {
       return res.status(403).json({ error: 'No tienes permiso para editar esta tarea' });
     }
     
@@ -156,7 +271,7 @@ router.patch('/:id/publicar', authMiddleware, requireRole('docente'), async (req
     }
     
     // Verificar que la tarea pertenece al docente
-    if (tareaDoc.data().docenteId !== req.user.uid) {
+    if (!puedeGestionar(tareaDoc.data(), req.user.uid)) {
       return res.status(403).json({ error: 'No tienes permiso para modificar esta tarea' });
     }
     
@@ -182,7 +297,7 @@ router.delete('/:id', authMiddleware, requireRole('docente'), async (req, res) =
     }
     
     // Verificar que la tarea pertenece al docente
-    if (tareaDoc.data().docenteId !== req.user.uid) {
+    if (!puedeGestionar(tareaDoc.data(), req.user.uid)) {
       return res.status(403).json({ error: 'No tienes permiso para eliminar esta tarea' });
     }
     
@@ -224,7 +339,7 @@ router.post('/:id/ejercicios', authMiddleware, requireRole('docente'), async (re
       return res.status(404).json({ error: 'Tarea no encontrada' });
     }
     
-    if (tareaDoc.data().docenteId !== req.user.uid) {
+    if (!puedeGestionar(tareaDoc.data(), req.user.uid)) {
       return res.status(403).json({ error: 'No tienes permiso para modificar esta tarea' });
     }
     
@@ -276,7 +391,7 @@ router.delete('/:tareaId/ejercicios/:ejercicioId', authMiddleware, requireRole('
       return res.status(404).json({ error: 'Tarea no encontrada' });
     }
     
-    if (tareaDoc.data().docenteId !== req.user.uid) {
+    if (!puedeGestionar(tareaDoc.data(), req.user.uid)) {
       return res.status(403).json({ error: 'No tienes permiso para modificar esta tarea' });
     }
     

@@ -9,12 +9,18 @@ const API = window.API;
 
 export async function renderDocenteMateria(materia) {
   const esMat = materia === 'matematicas';
-  const [ejercicios, tareas] = await Promise.all([
+  const [ejercicios, tareas, estudiantes] = await Promise.all([
     API.getEjercicios(materia),
-    API.getTareas()
+    API.getTareas(),
+    API.getEstudiantes().catch(() => [])
   ]);
 
   state.allEjercicios = ejercicios;
+
+  // Mapa estudianteId → nombre para tareas auto-generadas
+  const nombreEstudiante = new Map(
+    (Array.isArray(estudiantes) ? estudiantes : []).map(e => [e.id, e.nombre])
+  );
 
   const tareasFiltradas = tareas.filter(t => t.materia === materia);
 
@@ -55,23 +61,32 @@ export async function renderDocenteMateria(materia) {
   
   let contenidoTab = '';
   if (tabActiva === 'tareas') {
-    const tareasHtml = tareasConEjercicios.map(t => `
+    const tareasHtml = tareasConEjercicios.map(t => {
+      const esAuto = t.origen === 'auto' || t.origen === 'ia';
+      const badgeAuto = esAuto
+        ? `<span class="tag" style="background:#7C4DFF;">🤖 ${t.origen === 'ia' ? 'IA' : 'Auto'}</span> `
+        : '';
+      const propietario = esAuto
+        ? ` · Estudiante: ${nombreEstudiante.get(t.estudianteId) || t.estudianteId}`
+        : '';
+      return `
       <div class="task-card task-module-card">
         <div class="task-module-head">
           <div>
-            <span class="tag ${esMat ? 'mat' : 'ing'}">Tarea</span>
+            ${badgeAuto}<span class="tag ${esMat ? 'mat' : 'ing'}">Tarea</span>
             <h3>${t.titulo}</h3>
           </div>
           <span class="task-status" style="background:${t.estado === 'publicada' ? 'var(--secundario)' : 'var(--texto-suave)'}; color:white;">${t.estado === 'publicada' ? 'Publicada' : 'Borrador'}</span>
         </div>
         <p>${t.descripcion || 'Sin descripción'}</p>
-        <div class="task-meta">${t.ejercicios?.length || 0} ejercicios</div>
+        <div class="task-meta">${t.ejercicios?.length || 0} ejercicios${propietario}</div>
         <div class="task-actions">
           <button class="ghost" onclick="window.App.verTareaDocente('${t.id}')">📋 Ver/Editar</button>
           <button class="ghost" onclick="window.App.eliminarTarea('${t.id}')" style="color:var(--error-suave);">🗑️ Eliminar</button>
         </div>
       </div>
-    `).join('') || '<p class="empty">No hay tareas creadas.</p>';
+    `;
+    }).join('') || '<p class="empty">No hay tareas creadas.</p>';
 
     contenidoTab = `
       <div style="margin-bottom:14px;">
