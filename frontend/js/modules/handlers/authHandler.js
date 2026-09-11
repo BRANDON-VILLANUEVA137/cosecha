@@ -77,6 +77,7 @@ export const AuthHandler = {
       state.currentRole = session.rol || 'estudiante';
       // Módulo inicial según el rol: el docente entra directo a su panel de materia
       state.currentModule = state.currentRole === 'docente' ? 'matematicas' : 'inicio';
+      this.applyRoleSkin(state.currentRole);
       this.updateUserPill();
       this.hideLoginScreen();
       await this.cargarPrendas();
@@ -186,6 +187,7 @@ export const AuthHandler = {
   },
 
   showLoginScreen(message = '') {
+    this.applyRoleSkin(null);
     const errorBox = document.getElementById('loginError');
     if (errorBox) {
       errorBox.textContent = message;
@@ -231,6 +233,7 @@ export const AuthHandler = {
     const allowedRole = state.currentRole || role;
     state.currentRole = allowedRole;
     state.currentModule = allowedRole === 'docente' ? 'matematicas' : 'inicio';
+    this.applyRoleSkin(allowedRole);
 
     const roleSelect = document.getElementById('roleSelectScreen');
     const topControls = document.getElementById('topControls');
@@ -254,6 +257,21 @@ export const AuthHandler = {
     if (window.App && typeof window.App.render === 'function') {
       window.App.render();
     }
+  },
+
+  /**
+   * Aplica la skin visual del rol activo (remodelación "Nuevos diseños").
+   * Estudiante = default (crema cálida); docente = body[data-role="docente"]
+   * (shell teal con sidebar). Se limpia al cerrar sesión / volver al login.
+   */
+  applyRoleSkin(role) {
+    try {
+      if (role === 'docente') {
+        document.body.setAttribute('data-role', 'docente');
+      } else {
+        document.body.removeAttribute('data-role');
+      }
+    } catch (e) { /* sin bloquear el flujo de auth */ }
   },
 
   async cargarPrendas() {

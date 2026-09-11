@@ -17,6 +17,11 @@ export const MissionHandler = {
       } else {
         toast(`⚠️ ${res.mensaje || res.error}`);
       }
+      // Refrescar el panel flotante si está abierto (el mockup del estudiante
+      // mantiene el panel abierto tras reclamar, mostrando "Reclamada")
+      if (typeof this.refrescarMisionesPanel === 'function') {
+        this.refrescarMisionesPanel();
+      }
       if (window.App && typeof window.App.render === 'function') {
         window.App.render();
       }
@@ -46,6 +51,129 @@ export const MissionHandler = {
     } catch (e) {
       toast('⚠️ ' + e.message);
       if (btn) { btn.disabled = false; btn.textContent = '🎲 Generar mi tarea'; }
+    }
+  },
+
+  /* --------------------------------------------------------------
+   * FAB 🎯 + PANEL FLOTANTE DE MISIONES (mockup: Nuevos diseños)
+   * ------------------------------------------------------------ */
+  // Inyecta el FAB + overlay + panel en #fabLayer (vive FUERA de
+  // #appScreen para sobrevivir a los re-render de módulos).
+  async renderMissionesFab() {
+    const layer = document.getElementById('fabLayer');
+    if (!layer) return;
+    layer.innerHTML = `
+      <button class="fab" id="fabBtn" onclick="window.App.toggleMisionesPanel(true)">
+        <span class="fab-icon">🎯<span class="count" id="fabMisionesCount" style="display:none;"></span></span>
+        Misiones
+      </button>
+      <div class="overlay" id="misionesOverlay" onclick="window.App.toggleMisionesPanel(false)"></div>
+      <div class="missions-panel" id="misionesPanel">
+        <div class="mp-header">
+          <div class="icon">🎯</div>
+          <div>
+            <h3>Misiones</h3>
+            <p>Completa objetivos y gana XP + Naranjas 🍊. El progreso cuenta todo lo que ya has resuelto.</p>
+          </div>
+          <button class="mp-close" onclick="window.App.toggleMisionesPanel(false)">✕</button>
+        </div>
+        <div class="mp-body" id="mpBody"><p class="empty">Cargando misiones…</p></div>
+      </div>
+    `;
+    // Contador del badge: misiones completadas pendientes de reclamar
+    try {
+      const misiones = await API.getMisiones();
+      const pendientes = (Array.isArray(misiones) ? misiones : []).filter(m => m.completada && !m.reclamada).length;
+      const count = document.getElementById('fabMisionesCount');
+      if (count) {
+        count.textContent = String(pendientes);
+        count.style.display = pendientes > 0 ? 'flex' : 'none';
+      }
+    } catch (_) { /* badge silencioso */ }
+  },
+
+  // Abre/cierra el panel; al abrir carga (o recarga) las mission-cards
+  async toggleMisionesPanel(force) {
+    const panel = document.getElementById('misionesPanel');
+    const overlay = document.getElementById('misionesOverlay');
+    if (!panel || !overlay) return;
+    const abrir = force !== undefined ? force : !panel.classList.contains('open');
+    overlay.classList.toggle('open', abrir);
+    panel.classList.toggle('open', abrir);
+    if (abrir) await this.cargarMisionesPanel();
+  },
+
+  // Carga las misiones dentro del panel con las clases del mockup
+  async cargarMisionesPanel() {
+    const body = document.getElementById('mpBody');
+    if (!body) return;
+    body.innerHTML = '<p class="empty">Cargando misiones…</p>';
+    let misiones = [];
+    try {
+      misiones = await API.getMisiones();
+    } catch (e) {
+      body.innerHTML = `<p class="empty">⚠️ Error al cargar misiones: ${e.message}</p>`;
+      return;
+    }
+    if (!Array.isArray(misiones) || !misiones.length) {
+      body.innerHTML = '<p class="empty">Aún no hay misiones disponibles.</p>';
+      return;
+    }
+
+    body.innerHTML = misiones.map(m => {
+      const pct = Math.min(100, Math.max(0, Math.round((m.progreso / m.objetivo) * 100)));
+      const fillCls = m.reclamada ? 'done' : m.completada ? '' : pct > 0 ? '' : 'locked';
+      const estadoCls = m.reclamada ? 'done' : m.completada ? 'done' : pct > 0 ? 'progress' : 'locked';
+      const estadoTxt = m.reclamada ? 'Reclamada' : m.completada ? 'Completada' : pct > 0 ? 'En progreso' : 'Bloqueada';
+      let accion;
+      if (m.reclamada) {
+        accion = '<button class="lock" disabled style="opacity:.7;">✅ Reclamada</button>';
+      } else if (m.completada) {
+        accion = `<button class="claim" onclick="window.App.reclamarMision('${m.id}')">🎁 Reclamar</button>`;
+      } else {
+        accion = `<button class="lock" disabled>🔒 ${m.progreso}/${m.objetivo}</button>`;
+      }
+      return `
+        <div class="mission-card ${m.completada && !m.reclamada ? '' : 'locked'}">
+          <div class="mc-top">
+            <span class="tag mission">${m.icono || '🍊'} Misión</span>
+            <span class="status ${estadoCls}">${estadoTxt}</span>
+          </div>
+          <h4>${m.titulo}</h4>
+          <p class="desc">${m.descripcion}</p>
+          <div class="m-track"><div class="m-fill ${fillCls}" data-progress="${pct}"></div></div>
+          <div class="m-meta"><span>${m.progreso}/${m.objetivo}</span><span>${pct}%</span></div>
+          <div class="m-reward">
+            <span class="prize">Recompensa: +${m.recompensa.xp} XP · +${m.recompensa.naranjas} 🍊</span>
+            ${accion}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Animación de barras (igual que el mockup: 0% → target con delay)
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        document.querySelectorAll('#mpBody .m-fill').forEach(el => {
+          el.style.width = el.dataset.progress + '%';
+        });
+      }, 200);
+    });
+
+    // Actualizar badge
+    const pendientes = misiones.filter(m => m.completada && !m.reclamada).length;
+    const count = document.getElementById('fabMisionesCount');
+    if (count) {
+      count.textContent = String(pendientes);
+      count.style.display = pendientes > 0 ? 'flex' : 'none';
+    }
+  },
+
+  // Recarga solo el cuerpo del panel (tras reclamar) sin cerrarlo
+  async refrescarMisionesPanel() {
+    const panel = document.getElementById('misionesPanel');
+    if (panel && panel.classList.contains('open')) {
+      await this.cargarMisionesPanel();
     }
   }
 };

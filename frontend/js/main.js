@@ -117,6 +117,15 @@ const App = {
       }
       screen.innerHTML = html;
       this.wireEvents();
+
+      // FAB flotante de Misiones (solo estudiante — mockup: Nuevos diseños).
+      // Vive en #fabLayer, fuera de #appScreen, para sobrevivir al re-render.
+      if (this.currentRole === 'estudiante') {
+        await this.renderMissionesFab();
+      } else {
+        const layer = document.getElementById('fabLayer');
+        if (layer) layer.innerHTML = '';
+      }
     } catch (e) {
       screen.innerHTML = `<p class="empty">⚠️ Error: ${e.message}</p>`;
       console.error('Render error:', e);

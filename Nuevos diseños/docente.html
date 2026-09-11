@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Cosecha — Panel docente (versión profesional)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F7F5;
+    --surface:#FFFFFF;
+    --ink:#1B2420;
+    --ink-soft:#5C6960;
+    --ink-faint:#8B958D;
+    --line:#E3E6E0;
+    --teal:#1F5C4F;
+    --teal-deep:#163F37;
+    --teal-tint:#E7EFEC;
+    --amber:#B9822C;
+    --amber-tint:#F6EDDC;
+    --violet:#5B4FBE;
+    --violet-tint:#ECEAFA;
+    --danger:#A8462F;
+    --radius-md:10px;
+    --radius-sm:7px;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .shell{
+    display:flex;
+    max-width:1240px;
+    margin:24px auto 60px;
+    min-height:720px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+  }
+
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    width:230px;
+    flex:0 0 auto;
+    background:var(--teal-deep);
+    color:#EFF3F1;
+    padding:26px 18px;
+    display:flex;
+    flex-direction:column;
+  }
+  .sb-logo{ display:flex; align-items:center; gap:10px; margin-bottom:34px; padding:0 6px; }
+  .sb-logo .mark{
+    width:30px;height:30px; border-radius:7px; background:var(--amber);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Source Serif 4',serif; font-weight:700; color:var(--teal-deep); font-size:15px;
+  }
+  .sb-logo h1{ font-family:'Source Serif 4',serif; font-size:18px; font-weight:600; margin:0; color:#fff; letter-spacing:.2px; }
+  .sb-logo p{ margin:0; font-size:10.5px; color:#AEC2BB; }
+  .sb-nav{ display:flex; flex-direction:column; gap:2px; flex:1; }
+  .sb-nav button{
+    display:flex; align-items:center; gap:11px; text-align:left;
+    background:transparent; border:none; color:#CBDAD3;
+    font-family:'Inter',sans-serif; font-size:13.5px; font-weight:500;
+    padding:10px 12px; border-radius:8px; cursor:pointer;
+  }
+  .sb-nav button .ic{ width:17px; height:17px; flex:0 0 auto; opacity:.85; }
+  .sb-nav button.active{ background:rgba(255,255,255,.1); color:#fff; font-weight:600; }
+  .sb-nav button.active .ic{ opacity:1; }
+  .sb-foot{
+    border-top:1px solid rgba(255,255,255,.12); padding-top:16px; margin-top:16px;
+    font-size:11px; color:#8FA79E; line-height:1.5;
+  }
+
+  /* ---------- main ---------- */
+  .main{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 30px; border-bottom:1px solid var(--line);
+  }
+  .topbar .crumb{ font-size:13px; color:var(--ink-faint); }
+  .topbar .crumb strong{ color:var(--ink); font-weight:600; }
+  .profile-menu{ position:relative; }
+  .profile-btn{
+    display:flex; align-items:center; gap:10px;
+    background:transparent; border:1px solid var(--line);
+    padding:5px 12px 5px 5px; border-radius:999px; cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  .avatar-chip{
+    width:28px;height:28px;border-radius:50%; background:var(--amber); color:#fff;
+    display:flex;align-items:center;justify-content:center; font-size:12px;font-weight:700;
+  }
+  .profile-btn .name{ font-size:12.5px; font-weight:600; color:var(--ink); display:block; }
+  .profile-btn .role{ font-size:10px; color:var(--ink-faint); display:block; }
+  .caret{ color:var(--ink-faint); font-size:10px; margin-left:2px; }
+  .dropdown{
+    position:absolute; right:0; top:calc(100% + 8px);
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius-md); box-shadow:0 14px 30px rgba(20,30,25,.10);
+    width:210px; padding:6px; display:none; z-index:20;
+  }
+  .profile-menu.open .dropdown{ display:block; }
+  .dropdown button{
+    width:100%; text-align:left; background:none; border:none;
+    padding:9px 11px; border-radius:var(--radius-sm);
+    font-family:'Inter',sans-serif; font-size:13px; color:var(--ink);
+    cursor:pointer; display:flex; align-items:center; gap:8px;
+  }
+  .dropdown button:hover{ background:var(--bg); }
+  .dropdown .divider{ height:1px; background:var(--line); margin:5px 3px; }
+
+  .content{ padding:26px 30px 34px; }
+  .page-title{ font-family:'Source Serif 4',serif; font-size:23px; font-weight:600; margin:0 0 4px; }
+  .page-sub{ margin:0 0 22px; color:var(--ink-soft); font-size:13.5px; }
+
+  .toolbar{ display:flex; gap:10px; margin-bottom:22px; }
+  .toolbar button{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
+    padding:9px 16px; border-radius:var(--radius-sm);
+    border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer;
+  }
+  .toolbar button.active{ background:var(--teal-tint); border-color:var(--teal); color:var(--teal-deep); }
+  .toolbar button.primary{ background:var(--teal-deep); border-color:var(--teal-deep); color:#fff; margin-left:auto; }
+
+  .task-list{ display:flex; flex-direction:column; gap:0; border:1px solid var(--line); border-radius:var(--radius-md); overflow:hidden; }
+  .task-row{
+    display:flex; gap:20px; padding:18px 20px;
+    border-bottom:1px solid var(--line);
+    align-items:flex-start;
+  }
+  .task-row:last-child{ border-bottom:none; }
+  .task-row:nth-child(odd){ background:var(--surface); }
+  .task-main{ flex:1; min-width:0; }
+  .task-tags{ display:flex; gap:8px; margin-bottom:8px; align-items:center; }
+  .tag{
+    font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .tag.ia{ background:var(--violet-tint); color:var(--violet); }
+  .tag.tarea{ background:var(--amber-tint); color:#7A5A1B; }
+  .status-pill{ font-size:11px; font-weight:600; padding:4px 10px; border-radius:999px; margin-left:auto; }
+  .status-pill.published{ background:var(--teal-tint); color:var(--teal-deep); }
+  .status-pill.draft{ background:var(--bg); color:var(--ink-faint); border:1px solid var(--line); }
+  .task-main h4{ font-size:16px; font-weight:600; margin:0 0 6px; }
+  .task-main p.desc{ font-size:13px; color:var(--ink-soft); margin:0 0 10px; max-width:520px; line-height:1.45; }
+  .task-meta{ display:flex; align-items:center; gap:16px; font-size:12px; color:var(--ink-faint); font-weight:600; }
+  .task-meta .assignee{ display:flex; align-items:center; gap:6px; color:var(--ink-soft); }
+  .assignee .chip{
+    width:20px;height:20px;border-radius:50%; background:var(--amber);
+    color:#fff; font-size:9.5px; font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .mini-track{ width:110px; height:6px; background:var(--bg); border:1px solid var(--line); border-radius:999px; overflow:hidden; }
+  .mini-fill{ height:100%; background:var(--teal); }
+
+  .task-side{ flex:0 0 auto; display:flex; flex-direction:column; gap:8px; align-items:flex-end; padding-top:2px; }
+  .task-actions{ display:flex; gap:6px; }
+  .task-actions button{
+    font-size:12px; font-weight:600; padding:6px 11px; border-radius:var(--radius-sm);
+    border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer;
+  }
+  .task-actions button.danger{ color:var(--danger); border-color:#E7C9BE; }
+
+  @media (max-width:860px){
+    .shell{ flex-direction:column; }
+    .sidebar{ width:100%; flex-direction:row; flex-wrap:wrap; align-items:center; }
+    .sb-nav{ flex-direction:row; flex-wrap:wrap; }
+    .sb-foot{ display:none; }
+    .task-row{ flex-direction:column; }
+    .task-side{ align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="mark">C</div>
+      <div>
+        <h1>Cosecha</h1>
+        <p>Panel docente</p>
+      </div>
+    </div>
+    <div class="sb-nav">
+      <button class="active"><span class="ic">∑</span> Matemáticas</button>
+      <button><span class="ic">A</span> Inglés</button>
+      <button><span class="ic">▤</span> Progreso</button>
+      <button><span class="ic">◍</span> Estudiantes</button>
+    </div>
+    <div class="sb-foot">20 estudiantes activos<br>4 tareas publicadas</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb">Matemáticas &nbsp;/&nbsp; <strong>Mis tareas</strong></div>
+      <div class="profile-menu" id="profileMenuT">
+        <button class="profile-btn" id="profileBtnT">
+          <span class="avatar-chip">BV</span>
+          <span>
+            <span class="name">Brandon Villanueva</span>
+            <span class="role">Docente</span>
+          </span>
+          <span class="caret">▾</span>
+        </button>
+        <div class="dropdown">
+          <button>Tema: Cítrico</button>
+          <button>Cambiar de rol</button>
+          <div class="divider"></div>
+          <button>Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <h2 class="page-title">Mis tareas</h2>
+      <p class="page-sub">Gestiona y da seguimiento a las tareas asignadas a tus estudiantes.</p>
+
+      <div class="toolbar">
+        <button class="active">Mis tareas</button>
+        <button>Banco de ejercicios</button>
+        <button class="primary">＋ Crear ejercicio</button>
+      </div>
+
+      <div class="task-list">
+
+        <div class="task-row">
+          <div class="task-main">
+            <div class="task-tags">
+              <span class="tag ia">✨ IA</span>
+              <span class="tag tarea">Tarea</span>
+              <span class="status-pill published">Publicada</span>
+            </div>
+            <h4>Desafío Cosecha: fracciones 🍊</h4>
+            <p class="desc">Solicitud: fracciones. Generada automáticamente a partir del tema que necesita reforzar la estudiante.</p>
+            <div class="task-meta">
+              <span>10 ejercicios</span>
+              <span class="assignee"><span class="chip">L</span> Asignada a Laura</span>
+            </div>
+          </div>
+          <div class="task-side">
+            <div class="task-actions">
+              <button>Ver / editar</button>
+              <button class="danger">Eliminar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="task-row">
+          <div class="task-main">
+            <div class="task-tags">
+              <span class="tag tarea">Tarea</span>
+              <span class="status-pill published">Publicada</span>
+            </div>
+            <h4>Números negativos — Práctica extra</h4>
+            <p class="desc">Repasa la recta numérica, la comparación con el cero y el orden de los números negativos con una práctica adicional.</p>
+            <div class="task-meta">
+              <span>10 ejercicios</span>
+              <span>Grupo completo</span>
+              <div class="mini-track"><div class="mini-fill" style="width:70%"></div></div>
+              <span>14/20</span>
+            </div>
+          </div>
+          <div class="task-side">
+            <div class="task-actions">
+              <button>Ver / editar</button>
+              <button class="danger">Eliminar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="task-row">
+          <div class="task-main">
+            <div class="task-tags">
+              <span class="tag tarea">Tarea</span>
+              <span class="status-pill published">Publicada</span>
+            </div>
+            <h4>Introducción a los números negativos</h4>
+            <p class="desc">Aprende a usar el signo menos, ubicar números negativos en la recta numérica, compararlos con el cero y ordenarlos de menor a mayor.</p>
+            <div class="task-meta">
+              <span>8 ejercicios</span>
+              <span>Grupo completo</span>
+              <div class="mini-track"><div class="mini-fill" style="width:45%"></div></div>
+              <span>9/20</span>
+            </div>
+          </div>
+          <div class="task-side">
+            <div class="task-actions">
+              <button>Ver / editar</button>
+              <button class="danger">Eliminar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="task-row">
+          <div class="task-main">
+            <div class="task-tags">
+              <span class="tag tarea">Tarea</span>
+              <span class="status-pill draft">Borrador</span>
+            </div>
+            <h4>Fracciones equivalentes — Reto final</h4>
+            <p class="desc">Ejercicio de cierre para consolidar la unidad de fracciones antes de pasar a decimales.</p>
+            <div class="task-meta">
+              <span>Sin publicar</span>
+            </div>
+          </div>
+          <div class="task-side">
+            <div class="task-actions">
+              <button>Ver / editar</button>
+              <button class="danger">Eliminar</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const menu = document.getElementById('profileMenuT');
+  const btn = document.getElementById('profileBtnT');
+  btn.addEventListener('click',(e)=>{ e.stopPropagation(); menu.classList.toggle('open'); });
+  document.addEventListener('click',()=> menu.classList.remove('open'));
+</script>
+</body>
+</html>
