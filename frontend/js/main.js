@@ -21,7 +21,7 @@ import { ExerciseRenderers } from './modules/render/exerciseRenderers.js';
 import { renderControlGrafica } from './modules/render/renderFraction.js';
 import { AnalyticsRenderers } from './modules/render/analyticsRenderers.js';
 import { renderMissiones } from './modules/render/renderMissiones.js';
-
+import { renderAdmin } from './modules/render/renderAdmin.js';
 
 // --- Handlers ---
 import { AuthHandler } from './modules/handlers/authHandler.js';
@@ -30,6 +30,7 @@ import { StudentHandler } from './modules/handlers/studentHandler.js';
 import { ShopHandler } from './modules/handlers/shopHandler.js';
 import { ExerciseHandler } from './modules/handlers/exerciseHandler.js';
 import { MissionHandler } from './modules/handlers/missionHandler.js';
+import { AdminHandler } from './modules/handlers/adminHandler.js';
 
 // --- Utils ---
 import { toast } from './modules/utils/domUtils.js';
@@ -61,6 +62,9 @@ const App = {
   // Vista de misiones del estudiante
   renderMissiones,
 
+  // Panel de administración (rol admin)
+  renderAdmin,
+
   // Render de controles de respuesta (estudiante) + gráficas de fracciones
   ...ExerciseRenderers,
   renderControlGrafica,
@@ -72,6 +76,7 @@ const App = {
   ...ShopHandler,
   ...ExerciseHandler,
   ...MissionHandler,
+  ...AdminHandler,
 
   // Utils expuestos para uso en HTML
   formatMathText,
@@ -98,7 +103,10 @@ const App = {
 
     try {
       let html = '';
-      if (this.currentRole === 'docente') {
+      if (this.currentRole === 'admin') {
+        // Panel de administración: docentes → cursos → estudiantes
+        html = await this.renderAdmin(this);
+      } else if (this.currentRole === 'docente') {
         if (this.currentTaskView && (this.currentModule === 'matematicas' || this.currentModule === 'ingles')) {
           html = await this.renderDetalleTarea();
         } else if (this.currentModule === 'matematicas' || this.currentModule === 'ingles') {
@@ -126,6 +134,7 @@ const App = {
         const layer = document.getElementById('fabLayer');
         if (layer) layer.innerHTML = '';
       }
+      // Ocultar el FAB también para admin (solo aplica al rol estudiante)
     } catch (e) {
       screen.innerHTML = `<p class="empty">⚠️ Error: ${e.message}</p>`;
       console.error('Render error:', e);

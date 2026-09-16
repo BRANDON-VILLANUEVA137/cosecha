@@ -27,6 +27,17 @@ export const state = {
   estudianteEditando: null,
   estudianteFormVisible: false,
   avatarSeleccionado: '',
+  // --- Módulo de administración (rol admin) ---
+  adminTab: 'docentes',
+  adminDocentes: [],
+  adminCursos: [],
+  adminEstudiantes: [],
+  adminFormDocente: false,
+  adminEditandoDocente: null,
+  adminFormCurso: false,
+  adminEditandoCurso: null,
+  adminFormEstudiante: false,
+  adminEditandoEstudiante: null,
   opcionesRows: [{ clave: 'a', texto: '', correcta: false }, { clave: 'b', texto: '', correcta: false }],
   graficaSel: {},
   metodologiaHints: {

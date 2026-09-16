@@ -5,6 +5,7 @@ const { authMiddleware, requireRole } = require('../middleware/auth');
 const { instanciarEjercicio, generarTareaProcedural, tituloAuto } = require('../services/generador');
 const { generarConGemini, iaDisponible } = require('../services/aiGenerador');
 const { getLogro } = require('../services/gamificacion');
+const { obtenerDocenteDeEstudiante } = require('../services/cursoEstudiantes');
 
 /* Permisos: el docente gestiona sus tareas propias y las autogeneradas (origen auto/ia),
    que no tienen docenteId porque las crea el sistema a petición del estudiante. */
@@ -15,20 +16,50 @@ function puedeGestionar(tarea, uidDocente) {
   return tarea.docenteId === uidDocente;
 }
 
-// GET /api/tareas - Obtener todas las tareas (docente ve todas, estudiante ve las publicadas)
+// GET /api/tareas - Obtener tareas
+// Docente: ve todas sus tareas (+ autogeneradas de sus estudiantes).
+// Estudiante: ve las tareas publicadas del docente de SU CURSO y sus autogeneradas.
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const snapshot = await db.collection('tareas').orderBy('fechaCreacion', 'desc').get();
     const tareas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    
-    // Si es estudiante, filtrar solo tareas publicadas
-    const tareasFiltradas = req.user?.rol === 'docente' 
-      ? tareas 
-      : tareas.filter(t =>
-          (t.estado === 'publicada' && !t.estudianteId) ||
-          (t.estudianteId === req.user.uid && (t.origen === 'auto' || t.origen === 'ia'))
-        );
-    
+
+    if (req.user?.rol === 'docente') {
+      return res.json(tareas);
+    }
+
+    if (req.user?.rol === 'admin') {
+      return res.json(tareas);
+    }
+
+    // Estudiante: la relación docente → curso → estudiante determina qué tareas ve
+    let docenteDeMiCurso = null;
+    try {
+      docenteDeMiCurso = await obtenerDocenteDeEstudiante(req.user.uid);
+    } catch (e) {
+      console.error('Error resolviendo el curso del estudiante:', e);
+    }
+
+    const idsVisibles = new Set();
+
+    // 1) Tareas publicadas del docente de su curso (nunca de otros docentes)
+    if (docenteDeMiCurso) {
+      tareas.forEach(t => {
+        if (t.estado === 'publicada' && t.docenteId === docenteDeMiCurso) {
+          idsVisibles.add(t.id);
+        }
+      });
+    }
+
+    // 2) Tareas autogeneradas propias (origen auto/ia)
+    tareas.forEach(t => {
+      if (t.estudianteId === req.user.uid && (t.origen === 'auto' || t.origen === 'ia')) {
+        idsVisibles.add(t.id);
+      }
+    });
+
+    // Mantener el orden cronológico original
+    const tareasFiltradas = tareas.filter(t => idsVisibles.has(t.id));
     return res.json(tareasFiltradas);
   } catch (error) {
     console.error(error);

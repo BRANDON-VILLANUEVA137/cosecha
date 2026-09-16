@@ -41,6 +41,9 @@ app.use('/api/progreso', require('./routes/progreso'));
 
 app.use('/api/estudiantes', require('./routes/estudiantes'));
 
+// Módulo de administración (CRUD docentes → cursos → estudiantes)
+app.use('/api/admin', require('./routes/admin'));
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: Date.now() }));
 

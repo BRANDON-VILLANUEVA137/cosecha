@@ -24,7 +24,12 @@ export const ViewRenderers = {
       { id: 'progreso', ico: '📊', label: 'Progreso' },
       { id: 'estudiantes', ico: '👥', label: 'Estudiantes' },
     ];
-    const tabs = currentRole === 'docente' ? tabsDocente : tabsEstudiante;
+    const tabsAdmin = [
+      { id: 'admin', ico: '🛡️', label: 'Administración' },
+    ];
+    const tabs = currentRole === 'docente' ? tabsDocente
+      : currentRole === 'admin' ? tabsAdmin
+      : tabsEstudiante;
     
     const navBar = document.getElementById('navBar');
     if (navBar) {

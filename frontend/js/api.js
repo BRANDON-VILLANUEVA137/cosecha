@@ -211,6 +211,51 @@ const API = {
     });
   },
   
+  // ---- Módulo de administración (rol admin) ----
+  getAdminResumen() {
+    return this.request('/admin');
+  },
+  // Docentes
+  getAdminDocentes() {
+    return this.request('/admin/docentes');
+  },
+  crearAdminDocente(data) {
+    return this.request('/admin/docentes', { method: 'POST', body: JSON.stringify(data) });
+  },
+  editarAdminDocente(id, data) {
+    return this.request('/admin/docentes/' + id, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  eliminarAdminDocente(id) {
+    return this.request('/admin/docentes/' + id, { method: 'DELETE' });
+  },
+  // Cursos
+  getAdminCursos() {
+    return this.request('/admin/cursos');
+  },
+  crearAdminCurso(data) {
+    return this.request('/admin/cursos', { method: 'POST', body: JSON.stringify(data) });
+  },
+  editarAdminCurso(id, data) {
+    return this.request('/admin/cursos/' + id, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  eliminarAdminCurso(id) {
+    return this.request('/admin/cursos/' + id, { method: 'DELETE' });
+  },
+  // Estudiantes
+  getAdminEstudiantes() {
+    return this.request('/admin/estudiantes');
+  },
+  crearAdminEstudiante(data) {
+    return this.request('/admin/estudiantes', { method: 'POST', body: JSON.stringify(data) });
+  },
+  editarAdminEstudiante(id, data) {
+    return this.request('/admin/estudiantes/' + id, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  eliminarAdminEstudiante(id, hardDelete = true) {
+    const q = hardDelete ? '?hardDelete=true' : '';
+    return this.request('/admin/estudiantes/' + id + q, { method: 'DELETE' });
+  },
+
   // Analytics
   getAnalyticsEstudiante(estudianteId, filtros = {}) {
     const params = new URLSearchParams();

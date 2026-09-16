@@ -75,8 +75,9 @@ export const AuthHandler = {
       window.API.setAuthToken(token);
       const session = await window.API.getSession();
       state.currentRole = session.rol || 'estudiante';
-      // Módulo inicial según el rol: el docente entra directo a su panel de materia
-      state.currentModule = state.currentRole === 'docente' ? 'matematicas' : 'inicio';
+      // Módulo inicial según el rol: docente → panel de materia, admin → su panel de administración
+      if (state.currentRole === 'admin') state.currentModule = 'admin';
+      else state.currentModule = state.currentRole === 'docente' ? 'matematicas' : 'inicio';
       this.applyRoleSkin(state.currentRole);
       this.updateUserPill();
       this.hideLoginScreen();
@@ -159,6 +160,11 @@ export const AuthHandler = {
       return;
     }
 
+    if (state.currentRole === 'admin') {
+      toast('Tu cuenta está configurada como administrador.');
+      return;
+    }
+
     toast('Tu cuenta está configurada como estudiante.');
   },
 
@@ -183,7 +189,7 @@ export const AuthHandler = {
 
     const email = state.authUser.email || 'Usuario';
     const rol = state.currentRole || 'sin rol';
-    userPill.innerHTML = `<span class="user-pill__label">${email}</span><span class="tag ${rol === 'docente' ? 'mat' : 'ing'}">${rol}</span>`;
+    userPill.innerHTML = `<span class="user-pill__label">${email}</span><span class="tag ${rol === 'estudiante' ? 'ing' : 'mat'}">${rol}</span>`;
   },
 
   showLoginScreen(message = '') {
@@ -232,7 +238,8 @@ export const AuthHandler = {
 
     const allowedRole = state.currentRole || role;
     state.currentRole = allowedRole;
-    state.currentModule = allowedRole === 'docente' ? 'matematicas' : 'inicio';
+    state.currentModule = allowedRole === 'admin' ? 'admin'
+      : allowedRole === 'docente' ? 'matematicas' : 'inicio';
     this.applyRoleSkin(allowedRole);
 
     const roleSelect = document.getElementById('roleSelectScreen');
@@ -246,8 +253,9 @@ export const AuthHandler = {
     if (navBar) navBar.style.display = 'flex';
     if (appScreen) appScreen.style.display = 'block';
     if (roleTag) {
-      roleTag.className = 'tag ' + (allowedRole === 'docente' ? 'mat' : 'ing');
-      roleTag.textContent = allowedRole === 'docente' ? '🧑‍🏫 Docente' : '🧒 Estudiante';
+      roleTag.className = 'tag ' + (allowedRole === 'docente' ? 'mat' : allowedRole === 'admin' ? 'mat' : 'ing');
+      roleTag.textContent = allowedRole === 'admin' ? '🛡️ Admin'
+        : allowedRole === 'docente' ? '🧑‍🏫 Docente' : '🧒 Estudiante';
     }
 
     this.updateUserPill();
@@ -266,7 +274,7 @@ export const AuthHandler = {
    */
   applyRoleSkin(role) {
     try {
-      if (role === 'docente') {
+      if (role === 'docente' || role === 'admin') {
         document.body.setAttribute('data-role', 'docente');
       } else {
         document.body.removeAttribute('data-role');

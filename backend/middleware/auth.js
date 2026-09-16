@@ -32,7 +32,7 @@ async function authMiddleware(req, res, next) {
     const rol = userDoc.data()?.rol;
     console.log('👤 [Auth] Rol del usuario:', rol);
     
-    if (!['estudiante', 'docente'].includes(rol)) {
+    if (!['estudiante', 'docente', 'admin'].includes(rol)) {
       console.log('❌ [Auth] Rol no válido');
       return res.status(401).json({ error: 'Rol no válido' });
     }
@@ -46,9 +46,14 @@ async function authMiddleware(req, res, next) {
   }
 }
 
-function requireRole(rol) {
+/**
+ * Middleware de autorización por rol.
+ * Acepta un rol o una lista de roles permitidos.
+ * Ejemplos: requireRole('admin'), requireRole('docente', 'admin')
+ */
+function requireRole(...rolesPermitidos) {
   return (req, res, next) => {
-    if (!req.user || req.user.rol !== rol) {
+    if (!req.user || !rolesPermitidos.includes(req.user.rol)) {
       return res.status(403).json({ error: 'No autorizado' });
     }
     return next();
