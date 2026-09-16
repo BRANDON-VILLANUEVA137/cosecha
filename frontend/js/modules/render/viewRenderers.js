@@ -71,7 +71,6 @@ export const ViewRenderers = {
                 <td style="padding:10px; text-align:center;">${tareasAsignadas}</td>
                 <td style="padding:10px; text-align:center; white-space:nowrap;">
                   <button class="ghost" onclick="window.App.editarEstudianteForm('${e.id}')">✏️ Editar</button>
-                  <button class="ghost" onclick="window.App.eliminarEstudianteGestion('${e.id}')" style="color:var(--error-suave);">🗑️ Eliminar</button>
                 </td>
               </tr>
             `;
@@ -80,7 +79,7 @@ export const ViewRenderers = {
 
       // Estado del formulario
       const editando = appInstance.estudianteEditando;
-      const formVisible = appInstance.estudianteFormVisible || !!editando;
+      const formVisible = !!editando; // el docente solo edita: nunca hay alta de estudiantes
 
       // Personaje seleccionado
       const avatarSel = appInstance.avatarSeleccionado || (editando && editando.personaje ? editando.personaje.id : '');
@@ -112,7 +111,10 @@ export const ViewRenderers = {
 
       const formHtml = formVisible ? `
         <div class="card" style="background:var(--fondo-2); margin-bottom:14px;">
-          <h3>${editando ? '✏️ Editar Estudiante' : '➕ Registrar Nuevo Estudiante'}</h3>
+          <h3>✏️ Editar Estudiante</h3>
+          <p style="font-size:12px; color:var(--texto-suave); margin:4px 0 10px;">
+            Corrige aquí cualquier dato erróneo. La creación, baja y desactivación de cuentas es exclusiva del administrador.
+          </p>
           <div class="grid2">
             <div>
               <label>Nombre completo</label>
@@ -123,13 +125,13 @@ export const ViewRenderers = {
               <input type="text" id="estGrado" value="${editando ? (editando.grado || '') : ''}" placeholder="Ej: 5° Primaria">
             </div>
             <div>
-              <label>Contraseña ${editando ? '(dejar vacío para no cambiar)' : 'inicial'}</label>
-              <input type="password" id="estPassword" placeholder="${editando ? '••••••••' : 'Mínimo 6 caracteres'}">
+              <label>Contraseña (dejar vacío para no cambiar)</label>
+              <input type="password" id="estPassword" placeholder="••••••••">
             </div>
           </div>
           ${avatarPickerHtml}
           <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="primary" onclick="window.App.guardarEstudiante()">${editando ? '💾 Guardar Cambios' : '✅ Registrar Estudiante'}</button>
+            <button class="primary" onclick="window.App.guardarEstudiante()">💾 Guardar Cambios</button>
             <button class="ghost" onclick="window.App.cancelarEdicionEstudiante()">Cancelar</button>
           </div>
         </div>
@@ -141,10 +143,9 @@ export const ViewRenderers = {
             <div class="badge" style="background:var(--acento);">👥</div>
             <div>
               <h2>Gestión de Estudiantes</h2>
-              <p>Registra, edita y administra las cuentas de tus estudiantes.</p>
+              <p>Consulta y edita los datos de tus estudiantes. La creación, baja y desactivación de cuentas es exclusiva del administrador.</p>
             </div>
           </div>
-          <button class="primary" onclick="window.App.mostrarFormEstudiante()">➕ Registrar Estudiante</button>
         </div>
         ${formHtml}
         <div class="card">

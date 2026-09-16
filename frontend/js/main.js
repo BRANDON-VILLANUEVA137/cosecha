@@ -31,6 +31,7 @@ import { ShopHandler } from './modules/handlers/shopHandler.js';
 import { ExerciseHandler } from './modules/handlers/exerciseHandler.js';
 import { MissionHandler } from './modules/handlers/missionHandler.js';
 import { AdminHandler } from './modules/handlers/adminHandler.js';
+import { NotificacionHandler } from './modules/handlers/notificacionHandler.js';
 
 // --- Utils ---
 import { toast } from './modules/utils/domUtils.js';
@@ -77,6 +78,7 @@ const App = {
   ...ExerciseHandler,
   ...MissionHandler,
   ...AdminHandler,
+  ...NotificacionHandler,
 
   // Utils expuestos para uso en HTML
   formatMathText,

@@ -25,7 +25,8 @@ export async function renderAdmin(app) {
   const tabs = [
     { id: 'docentes', ico: '🧑‍🏫', label: 'Docentes' },
     { id: 'cursos', ico: '📚', label: 'Cursos' },
-    { id: 'estudiantes', ico: '👥', label: 'Estudiantes' }
+    { id: 'estudiantes', ico: '👥', label: 'Estudiantes' },
+    { id: 'administradores', ico: '🛡️', label: 'Administradores' }
   ];
 
   const tabsHtml = `
@@ -34,20 +35,26 @@ export async function renderAdmin(app) {
         <div class="module-icon">🛡️</div>
         <div>
           <h2>Panel de Administración</h2>
-          <p>Gestiona docentes, cursos y estudiantes de la plataforma.</p>
+          <p>Único punto de gestión completa de usuarios: docentes, cursos, estudiantes y administradores.</p>
         </div>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        ${tabs.map(t => `
-          <button class="${state.adminTab === t.id ? 'primary' : 'ghost'}" onclick="window.App.goAdminTab('${t.id}')">
-            ${t.ico} ${t.label} (${t.id === 'docentes' ? state.adminDocentes.length : t.id === 'cursos' ? state.adminCursos.length : state.adminEstudiantes.length})
-          </button>`).join('')}
+        ${tabs.map(t => {
+          const conteo = t.id === 'docentes' ? state.adminDocentes.length
+            : t.id === 'cursos' ? state.adminCursos.length
+            : t.id === 'estudiantes' ? state.adminEstudiantes.length
+            : state.adminAdministradores.length;
+          return `<button class="${state.adminTab === t.id ? 'primary' : 'ghost'}" onclick="window.App.goAdminTab('${t.id}')">
+            ${t.ico} ${t.label} (${conteo})
+          </button>`;
+        }).join('')}
       </div>
     </div>
   `;
 
   if (state.adminTab === 'cursos') return tabsHtml + await renderSeccionCursos(app);
   if (state.adminTab === 'estudiantes') return tabsHtml + await renderSeccionEstudiantes(app);
+  if (state.adminTab === 'administradores') return tabsHtml + renderSeccionAdministradores();
   return tabsHtml + renderSeccionDocentes();
 }
 
@@ -287,6 +294,78 @@ function renderSeccionEstudiantes() {
               <th style="padding:8px; text-align:left;">Correo</th>
               <th style="padding:8px; text-align:left;">Grado</th>
               <th style="padding:8px; text-align:left;">Curso</th>
+              <th style="padding:8px;">Estado</th>
+              <th style="padding:8px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+/* ------------------------------------------------------------------ *
+ * ADMINISTRADORES (solo el admin gestiona esta pestaña)
+ * ------------------------------------------------------------------ */
+function renderSeccionAdministradores() {
+  const editando = state.adminEditandoAdministrador
+    ? state.adminAdministradores.find(a => a.id === state.adminEditandoAdministrador)
+    : null;
+
+  const formHtml = state.adminFormAdministrador ? `
+    <div class="card" style="background:var(--fondo-2); margin-bottom:14px;">
+      <h3>${editando ? '✏️ Editar Administrador' : '➕ Nuevo Administrador'}</h3>
+      <div class="grid2">
+        <div>
+          <label>Nombre completo</label>
+          <input type="text" id="admAdmNombre" value="${esc(editando?.nombre || '')}" placeholder="Ej: Brandon Villanueva">
+          <label>Correo electrónico</label>
+          <input type="email" id="admAdmEmail" value="${esc(editando?.email || '')}" placeholder="Ej: brandon@cosecha.com">
+        </div>
+        <div>
+          <label>Contraseña ${editando ? '(dejar vacío para no cambiar)' : ''}</label>
+          <input type="password" id="admAdmPassword" placeholder="${editando ? '••••••••' : 'Mínimo 6 caracteres'}">
+        </div>
+      </div>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="primary" onclick="window.App.guardarAdminAdministrador()">${editando ? '💾 Guardar Cambios' : '✅ Crear Administrador'}</button>
+        <button class="ghost" onclick="window.App.cancelarAdminAdministrador()">Cancelar</button>
+      </div>
+    </div>
+  ` : '';
+
+  const filas = state.adminAdministradores.length > 0
+    ? state.adminAdministradores.map(a => `
+        <tr style="border-bottom:1px solid var(--borde);">
+          <td style="padding:10px; font-weight:600;">${esc(a.nombre) || 'Sin nombre'}${a.id === state.authUser?.uid ? ' <span class="tag mat" style="font-size:10px;">TÚ</span>' : ''}</td>
+          <td style="padding:10px;">${esc(a.email)}</td>
+          <td style="padding:10px; text-align:center;">
+            <span class="tag" style="background:${a.estado !== 'inactivo' ? 'var(--secundario)' : 'var(--texto-suave)'}; color:white;">
+              ${a.estado !== 'inactivo' ? 'Activo' : 'Inactivo'}
+            </span>
+          </td>
+          <td style="padding:10px; text-align:center; white-space:nowrap;">
+            <button class="ghost" onclick="window.App.editarAdminAdministradorForm('${a.id}')">✏️ Editar</button>
+            ${a.id === state.authUser?.uid ? '' : `<button class="ghost" onclick="window.App.eliminarAdminAdministradorFila('${a.id}')" style="color:var(--error-suave);">🗑️ Eliminar</button>`}
+          </td>
+        </tr>`).join('')
+    : '<tr><td colspan="4" style="padding:14px;" class="empty">No hay administradores registrados</td></tr>';
+
+  return `
+    ${formHtml}
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+        <h3 style="margin:0;">🛡️ Administradores</h3>
+        <button class="primary" onclick="window.App.nuevoAdminAdministrador()">➕ Nuevo Administrador</button>
+      </div>
+      <p style="font-size:12px; color:var(--texto-suave); margin:0 0 10px;">⚠️ No puedes eliminar ni desactivar tu propia cuenta.</p>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:2px solid var(--borde);">
+              <th style="padding:8px; text-align:left;">Nombre</th>
+              <th style="padding:8px; text-align:left;">Correo</th>
               <th style="padding:8px;">Estado</th>
               <th style="padding:8px;">Acciones</th>
             </tr>

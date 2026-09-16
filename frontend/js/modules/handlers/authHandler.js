@@ -81,6 +81,21 @@ export const AuthHandler = {
       this.applyRoleSkin(state.currentRole);
       this.updateUserPill();
       this.hideLoginScreen();
+
+      // Buzón de notificaciones: campana solo para el estudiante + polling
+      if (window.App && typeof window.App.renderBuzon === 'function') {
+        state.notificaciones = [];
+        state.notificacionesNoLeidas = 0;
+        state.buzonAbierto = false;
+        if (typeof window.App.detenerPollingNotificaciones === 'function') {
+          window.App.detenerPollingNotificaciones();
+        }
+        await window.App.renderBuzon();
+        if (state.currentRole === 'estudiante' && typeof window.App.iniciarPollingNotificaciones === 'function') {
+          window.App.iniciarPollingNotificaciones();
+        }
+      }
+
       await this.cargarPrendas();
       await this.hydrateProgress();
       if (window.App && typeof window.App.render === 'function') {
@@ -194,6 +209,15 @@ export const AuthHandler = {
 
   showLoginScreen(message = '') {
     this.applyRoleSkin(null);
+    // Buzón: detener polling y limpiar la campana al cerrar sesión
+    if (window.App && typeof window.App.detenerPollingNotificaciones === 'function') {
+      window.App.detenerPollingNotificaciones();
+    }
+    state.notificaciones = [];
+    state.notificacionesNoLeidas = 0;
+    state.buzonAbierto = false;
+    const buzonLayer = document.getElementById('buzonLayer');
+    if (buzonLayer) buzonLayer.innerHTML = '';
     const errorBox = document.getElementById('loginError');
     if (errorBox) {
       errorBox.textContent = message;

@@ -6,6 +6,7 @@ const { instanciarEjercicio, generarTareaProcedural, tituloAuto } = require('../
 const { generarConGemini, iaDisponible } = require('../services/aiGenerador');
 const { getLogro } = require('../services/gamificacion');
 const { obtenerDocenteDeEstudiante } = require('../services/cursoEstudiantes');
+const { notificarNuevaTarea } = require('../services/notificaciones');
 
 /* Permisos: el docente gestiona sus tareas propias y las autogeneradas (origen auto/ia),
    que no tienen docenteId porque las crea el sistema a petición del estudiante. */
@@ -341,10 +342,23 @@ router.patch('/:id/publicar', authMiddleware, requireRole('docente'), async (req
       return res.status(403).json({ error: 'No tienes permiso para modificar esta tarea' });
     }
     
+    const estadoAnterior = tareaDoc.data().estado;
+    
     await db.collection('tareas').doc(req.params.id).update({
       estado,
       fechaActualizacion: new Date()
     });
+    
+    // Buzón: al PUBLICAR por primera vez, notificar a los estudiantes de los cursos del docente.
+    // Best-effort: un fallo de notificación no debe romper la publicación.
+    if (estado === 'publicada' && estadoAnterior !== 'publicada') {
+      try {
+        const notificados = await notificarNuevaTarea(req.user.uid, { id: req.params.id, ...tareaDoc.data(), estado });
+        console.log(`🔔 [Tareas] Notificación de nueva tarea enviada a ${notificados} estudiante(s).`);
+      } catch (e) {
+        console.error('Error notificando nueva tarea:', e);
+      }
+    }
     
     return res.json({ id: req.params.id, estado, message: `Tarea ${estado === 'publicada' ? 'publicada' : 'despublicada'}` });
   } catch (error) {

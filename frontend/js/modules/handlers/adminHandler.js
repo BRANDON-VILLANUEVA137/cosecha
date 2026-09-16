@@ -22,19 +22,23 @@ export const AdminHandler = {
     state.adminEditandoCurso = null;
     state.adminFormEstudiante = false;
     state.adminEditandoEstudiante = null;
+    state.adminFormAdministrador = false;
+    state.adminEditandoAdministrador = null;
     window.App.render();
   },
 
-  /** Carga las tres colecciones para la vista y el resumen. */
+  /** Carga las cuatro colecciones para la vista y el resumen. */
   async cargarAdminDatos() {
-    const [docentes, cursos, estudiantes] = await Promise.all([
+    const [docentes, cursos, estudiantes, administradores] = await Promise.all([
       window.API.getAdminDocentes(),
       window.API.getAdminCursos(),
-      window.API.getAdminEstudiantes()
+      window.API.getAdminEstudiantes(),
+      window.API.getAdminAdministradores()
     ]);
     state.adminDocentes = Array.isArray(docentes) ? docentes : [];
     state.adminCursos = Array.isArray(cursos) ? cursos : [];
     state.adminEstudiantes = Array.isArray(estudiantes) ? estudiantes : [];
+    state.adminAdministradores = Array.isArray(administradores) ? administradores : [];
   },
 
   /* ---------------- DOCENTES ---------------- */
@@ -190,6 +194,59 @@ export const AdminHandler = {
     try {
       await window.API.eliminarAdminEstudiante(id, true);
       toast('🗑️ Estudiante eliminado');
+      window.App.render();
+    } catch (error) {
+      toast('⚠️ ' + error.message);
+    }
+  },
+
+  /* ---------------- ADMINISTRADORES ---------------- */
+  nuevoAdminAdministrador() {
+    state.adminFormAdministrador = true;
+    state.adminEditandoAdministrador = null;
+    window.App.render();
+  },
+
+  editarAdminAdministradorForm(id) {
+    state.adminFormAdministrador = true;
+    state.adminEditandoAdministrador = id;
+    window.App.render();
+  },
+
+  cancelarAdminAdministrador() {
+    state.adminFormAdministrador = false;
+    state.adminEditandoAdministrador = null;
+    window.App.render();
+  },
+
+  async guardarAdminAdministrador() {
+    const nombre = document.getElementById('admAdmNombre')?.value.trim();
+    const email = document.getElementById('admAdmEmail')?.value.trim();
+    const password = document.getElementById('admAdmPassword')?.value;
+
+    try {
+      if (state.adminEditandoAdministrador) {
+        const cambios = { nombre };
+        if (email) cambios.email = email;
+        if (password) cambios.password = password;
+        await window.API.editarAdminAdministrador(state.adminEditandoAdministrador, cambios);
+        toast('✅ Administrador actualizado');
+      } else {
+        await window.API.crearAdminAdministrador({ nombre, email, password });
+        toast('✅ Administrador creado');
+      }
+      this.cancelarAdminAdministrador();
+    } catch (error) {
+      toast('⚠️ ' + error.message);
+    }
+  },
+
+  async eliminarAdminAdministradorFila(id) {
+    const admin = state.adminAdministradores.find(a => a.id === id);
+    if (!confirm(`¿Eliminar al administrador "${admin?.nombre || id}"? No puedes eliminar tu propia cuenta.`)) return;
+    try {
+      await window.API.eliminarAdminAdministrador(id);
+      toast('🗑️ Administrador eliminado');
       window.App.render();
     } catch (error) {
       toast('⚠️ ' + error.message);

@@ -25,19 +25,29 @@ export const state = {
   temasDisponibles: [],
   estudiantesGestion: [],
   estudianteEditando: null,
-  estudianteFormVisible: false,
+  // Nota: el docente no puede crear estudiantes (CRUD completo = solo admin),
+  // por eso no existe el flag `estudianteFormVisible`: el formulario solo se
+  // abre al editar (estudianteEditando != null).
   avatarSeleccionado: '',
   // --- Módulo de administración (rol admin) ---
   adminTab: 'docentes',
   adminDocentes: [],
   adminCursos: [],
   adminEstudiantes: [],
+  adminAdministradores: [],
+  adminFormAdministrador: false,
+  adminEditandoAdministrador: null,
   adminFormDocente: false,
   adminEditandoDocente: null,
   adminFormCurso: false,
   adminEditandoCurso: null,
   adminFormEstudiante: false,
   adminEditandoEstudiante: null,
+  // --- Buzón de notificaciones (estudiante) ---
+  notificaciones: [],
+  notificacionesNoLeidas: 0,
+  buzonAbierto: false,
+  buzonTimer: null,
   opcionesRows: [{ clave: 'a', texto: '', correcta: false }, { clave: 'b', texto: '', correcta: false }],
   graficaSel: {},
   metodologiaHints: {

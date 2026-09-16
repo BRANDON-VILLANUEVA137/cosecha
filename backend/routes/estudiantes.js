@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { auth, db } = require('../config/firebase-admin');
-const gamificacion = require('../services/gamificacion');
 const { getPersonaje } = require('../services/personajes');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 
@@ -39,80 +38,25 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST /api/estudiantes - Crear estudiante
-router.post('/', async (req, res) => {
-  try {
-    const { nombre, email, password, grado, avatarId } = req.body;
+/* ============================================================
+ * REGLA DE NEGOCIO — CRUD de usuarios
+ * El docente solo puede CONSULTAR y EDITAR estudiantes.
+ * Crear, eliminar y desactivar cuentas es exclusivo del
+ * administrador (módulo /api/admin/*).
+ * ============================================================ */
 
-    // Validaciones
-    if (!nombre || !email || !password) {
-      return res.status(400).json({ error: 'Nombre, correo y contraseña son obligatorios' });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
-    }
-
-    // Validar personaje si viene
-    const personaje = getPersonaje(avatarId);
-    if (avatarId && !personaje) {
-      return res.status(400).json({ error: 'El personaje elegido no existe' });
-    }
-
-    // Seguridad: forzar rol a "estudiante" — nunca usar el rol recibido del cliente
-    const rol = 'estudiante';
-
-    // Crear usuario en Firebase Auth primero (valida correo único automáticamente)
-    const userRecord = await auth.createUser({
-      email,
-      password,
-      emailVerified: true
-    });
-
-    try {
-      // Crear documento en Firestore
-      await db.collection('usuarios').doc(userRecord.uid).set({
-        email,
-        rol, // Forzado a estudiante — evita inyección de rol
-        nombre,
-        grado: grado || '',
-        estado: 'activo',
-        createdAt: new Date()
-      });
-
-                  // Crear logro predeterminado con la nueva estructura de gamificación
-      const nuevoLogro = gamificacion.defaultsLogro(userRecord.uid, nombre);
-      nuevoLogro.email = email;
-      if (personaje) nuevoLogro.personaje = personaje;
-      await db.collection('logros').doc(userRecord.uid).set(nuevoLogro);
-
-      return res.status(201).json({
-        id: userRecord.uid,
-        nombre,
-        email,
-        estado: 'activo',
-        grado: grado || '',
-        personaje: personaje || null
-      });
-    } catch (firestoreError) {
-      // Si falla Firestore, eliminar el usuario de Auth para no dejar inconsistencias
-      console.error('Error creando documento Firestore, revirtiendo usuario Auth:', firestoreError.message);
-      await auth.deleteUser(userRecord.uid).catch(() => {});
-      throw firestoreError;
-    }
-  } catch (error) {
-    if (error.code === 'auth/email-already-exists') {
-      return res.status(409).json({ error: 'El correo ya está registrado' });
-    }
-    console.error('Error creando estudiante:', error);
-    return res.status(500).json({ error: 'No se pudo crear el estudiante' });
-  }
+// POST /api/estudiantes - Crear estudiante (RESERVADO AL ADMIN)
+router.post('/', (req, res) => {
+  return res.status(403).json({ error: 'Solo el administrador puede crear estudiantes. Usa el panel de administración.' });
 });
 
 // PUT /api/estudiantes/:id - Editar estudiante
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, email, password, estado, grado, avatarId } = req.body;
+    // Nota: `estado` se excluye a propósito — el docente NO puede
+    // activar/desactivar cuentas (regla del CRUD: solo editar datos).
+    const { nombre, email, password, grado, avatarId } = req.body;
 
     // Verificar que el estudiante existe y tiene rol estudiante
     const usuarioRef = db.collection('usuarios').doc(id);
@@ -143,11 +87,10 @@ router.put('/:id', async (req, res) => {
       await auth.updateUser(id, authUpdates);
     }
 
-    // Actualizar Firestore
+    // Actualizar Firestore (sin `estado` — el docente no puede activar/desactivar)
     const firestoreUpdates = {};
     if (nombre !== undefined) firestoreUpdates.nombre = nombre;
     if (email !== undefined) firestoreUpdates.email = email;
-    if (estado !== undefined && ['activo', 'inactivo'].includes(estado)) firestoreUpdates.estado = estado;
     if (grado !== undefined) firestoreUpdates.grado = grado;
 
     await usuarioRef.update(firestoreUpdates);
@@ -173,38 +116,9 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/estudiantes/:id - Eliminar o dar de baja
-router.delete('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { hardDelete } = req.query;
-
-    const usuarioRef = db.collection('usuarios').doc(id);
-    const usuarioSnap = await usuarioRef.get();
-    if (!usuarioSnap.exists) {
-      return res.status(404).json({ error: 'Estudiante no encontrado' });
-    }
-    if (usuarioSnap.data().rol !== 'estudiante') {
-      return res.status(403).json({ error: 'Solo puedes eliminar cuentas de estudiantes' });
-    }
-
-    if (hardDelete === 'true') {
-      // Eliminación física: borrar Auth, Firestore y logros
-      await db.collection('logros').doc(id).delete().catch(() => {});
-      await usuarioRef.delete();
-      await auth.deleteUser(id).catch((e) => {
-        if (e.code !== 'auth/user-not-found') throw e;
-      });
-      return res.json({ ok: true, eliminado: true });
-    }
-
-    // Desactivación: marcar como inactivo (preserva historial)
-    await usuarioRef.update({ estado: 'inactivo' });
-    return res.json({ ok: true, estado: 'inactivo' });
-  } catch (error) {
-    console.error('Error eliminando estudiante:', error);
-    return res.status(500).json({ error: 'No se pudo eliminar el estudiante' });
-  }
+// DELETE /api/estudiantes/:id - Eliminar o dar de baja (RESERVADO AL ADMIN)
+router.delete('/:id', (req, res) => {
+  return res.status(403).json({ error: 'Solo el administrador puede eliminar o desactivar estudiantes. Usa el panel de administración.' });
 });
 
 module.exports = router;

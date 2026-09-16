@@ -96,19 +96,12 @@ const API = {
     });
   },
 
-  // ---- Estudiantes (Docente) ----
+  // ---- Estudiantes (Docente — solo lectura y edición) ----
   getEstudiantes() {
     return this.request('/estudiantes');
   },
-  crearEstudiante(data) {
-    return this.request('/estudiantes', { method: 'POST', body: JSON.stringify(data) });
-  },
   editarEstudiante(id, data) {
     return this.request('/estudiantes/' + id, { method: 'PUT', body: JSON.stringify(data) });
-  },
-  eliminarEstudiante(id, hardDelete = false) {
-    const q = hardDelete ? '?hardDelete=true' : '';
-    return this.request('/estudiantes/' + id + q, { method: 'DELETE' });
   },
 
   // ---- Logros ----
@@ -254,6 +247,30 @@ const API = {
   eliminarAdminEstudiante(id, hardDelete = true) {
     const q = hardDelete ? '?hardDelete=true' : '';
     return this.request('/admin/estudiantes/' + id + q, { method: 'DELETE' });
+  },
+  // Administradores
+  getAdminAdministradores() {
+    return this.request('/admin/administradores');
+  },
+  crearAdminAdministrador(data) {
+    return this.request('/admin/administradores', { method: 'POST', body: JSON.stringify(data) });
+  },
+  editarAdminAdministrador(id, data) {
+    return this.request('/admin/administradores/' + id, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  eliminarAdminAdministrador(id) {
+    return this.request('/admin/administradores/' + id, { method: 'DELETE' });
+  },
+
+  // ---- Buzón de notificaciones (estudiante) ----
+  getNotificaciones() {
+    return this.request('/notificaciones');
+  },
+  marcarNotificacionLeida(id) {
+    return this.request('/notificaciones/' + id + '/leer', { method: 'PATCH' });
+  },
+  marcarTodasNotificacionesLeidas() {
+    return this.request('/notificaciones/leer-todas', { method: 'PATCH' });
   },
 
   // Analytics
