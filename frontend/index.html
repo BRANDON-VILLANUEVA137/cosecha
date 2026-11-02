@@ -11,8 +11,16 @@
 <link rel="stylesheet" href="css/cosecha-redesign.css">
 <link rel="stylesheet" href="css/cosecha-ludico.css">
 <link rel="stylesheet" href="css/cosecha-cartoon.css">
+<link rel="stylesheet" href="css/cosecha-tinta.css">
 </head>
 <body data-theme="citrico">
+<!-- Filtro del contorno entintado (lo usa cosecha-tinta.css) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="tinta-rugosa" x="-3%" y="-3%" width="106%" height="106%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="4"/>
+  </filter>
+</svg>
 <div class="app">
 
   <div class="topbar">

@@ -1,0 +1,111 @@
+/* ============================================================
+   COSECHA TINTA — cómic entintado sobre papel sepia
+   Capa final de la vista del estudiante (carga después de
+   cosecha-cartoon.css). Técnica, no personajes:
+   · tinta marrón casi negra, contorno grueso y levemente irregular
+   · papel sepia con grano y puntos de impresión (halftone)
+   · sombreado plano en dos tonos (una banda más oscura, sin degradados)
+   · color solo como acento: naranja (acción), verde (acierto), rojo (error)
+   · lo memorable: cajas de texto de cómic (saludo) y avisos como globos
+   Todo va con body:not([data-role="docente"]) para no tocar la piel docente.
+   ============================================================ */
+
+body:not([data-role="docente"]){
+  --tinta:#1C130D;
+  --fondo:#F2E2B6;           /* papel sepia */
+  --panel:#FAF0D2;
+  --papel:#FFF8E1;
+  --borde:#D3B574;
+  --texto:#2A1D12;
+  --texto-suave:#6B4E2E;     /* ≥5:1 sobre el papel */
+  --sombra-plana:rgba(138,90,34,.22);  /* segundo tono del sombreado */
+  --sol:#E8B53A;
+  --sol-claro:#F7DE96;
+  --secundario:#3E8E74;
+  --ok-bg:#CFE5C6;   --ok-tx:#1F4D33;
+  --error-bg:#F2C9B8; --error-tx:#7A2417;
+  --aviso-bg:#F7DE96; --aviso-tx:#4A2F08;
+  --amb-mat:#EFC27A;  --amb-ing:#B9D6BE;
+  --grosor:3px;
+  --sombra:0 6px 0 var(--tinta);
+}
+
+/* ---------- Papel: color + grano + puntos ---------- */
+body:not([data-role="docente"]){
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .22  0 0 0 0 .08  0 0 0 .22 0'/></filter><rect width='160' height='160' filter='url(%23g)'/></svg>"),
+    radial-gradient(circle at 1px 1px, rgba(138,90,34,.20) 1.3px, transparent 1.7px) 0 0 / 20px 20px,
+    var(--fondo);
+  background-attachment:fixed;
+  color:var(--texto);
+}
+
+/* ---------- Contorno entintado e irregular ----------
+   El borde real se pinta en ::before y se deforma con un filtro SVG,
+   así el texto y los controles del interior no se distorsionan. */
+body:not([data-role="docente"]) :is(.card,.task-card,.m-card,.subject-cta .cta-card,.modnav,.role-card,.login-card,.stat){
+  position:relative; border-color:transparent;
+}
+body:not([data-role="docente"]) :is(.card,.task-card,.m-card,.subject-cta .cta-card,.modnav,.role-card,.login-card,.stat)::before{
+  content:""; position:absolute; inset:-3px; border:var(--grosor) solid var(--tinta);
+  border-radius:inherit; pointer-events:none; filter:url(#tinta-rugosa);
+}
+
+/* ---------- Sombreado plano: una banda más oscura abajo-derecha ---------- */
+body:not([data-role="docente"]) :is(.card,.task-card,.m-card,.role-card,.login-card){
+  background-image:linear-gradient(160deg, transparent 0, transparent calc(100% - 22px), var(--sombra-plana) calc(100% - 22px));
+}
+body:not([data-role="docente"]) .card.hero{
+  background:
+    linear-gradient(90deg, var(--sol-claro) 42%, rgba(247,222,150,0) 100%),
+    radial-gradient(circle, rgba(138,90,34,.38) 1.4px, transparent 1.8px) 0 0 / 11px 11px,
+    var(--sol-claro);
+}
+
+/* ---------- Marca ---------- */
+body:not([data-role="docente"]) .brand h1{ color:var(--sol); -webkit-text-stroke:3px var(--tinta); text-shadow:4px 4px 0 var(--tinta); }
+body:not([data-role="docente"]) .brand .fruit{ filter:drop-shadow(2px 3px 0 var(--tinta)); }
+
+/* ---------- Saludo = caja de texto de cómic ---------- */
+body:not([data-role="docente"]) .hero-text h2{
+  display:inline-block; background:var(--sol); color:var(--tinta);
+  border:var(--grosor) solid var(--tinta); border-radius:4px;
+  padding:6px 16px 8px; margin-bottom:12px; transform:rotate(-1deg);
+  box-shadow:5px 5px 0 var(--tinta); text-transform:none;
+}
+
+/* ---------- Colores planos de acento ---------- */
+body:not([data-role="docente"]) .tag.mat, body:not([data-role="docente"]) .module-header .badge{ background:var(--amb-mat); }
+body:not([data-role="docente"]) .tag.ing, body:not([data-role="docente"]) .module-header .badge.ing{ background:var(--amb-ing); }
+body:not([data-role="docente"]) .subject-cta .cta-card.mat{ background:var(--amb-mat); }
+body:not([data-role="docente"]) .subject-cta .cta-card.ing{ background:var(--amb-ing); }
+body:not([data-role="docente"]) .modnav button.active[data-mod="ingles"]{ background:var(--amb-ing); }
+body:not([data-role="docente"]) .role-card:nth-child(odd):hover{ background:var(--amb-mat); }
+body:not([data-role="docente"]) .role-card:nth-child(even):hover{ background:var(--amb-ing); }
+body:not([data-role="docente"]) .m-badge--hecha{ background:var(--secundario); color:#fff; }
+body:not([data-role="docente"]) .xp-bar__fill{ background:var(--primario); }
+
+/* El segundo contorno de los chips ya viene del grosor; evita duplicar */
+body:not([data-role="docente"]) .stat{ background:var(--papel); }
+
+/* ---------- Avisos como globos de cómic ---------- */
+.toast{ border-radius:14px; border-color:var(--tinta); background:var(--papel); color:var(--tinta); position:fixed; }
+.toast::after{
+  content:""; position:absolute; left:26px; bottom:-14px;
+  border:8px solid transparent; border-top:12px solid var(--tinta); border-bottom:0;
+}
+.toast--ok{ background:var(--ok-bg); }
+.toast--error{ background:var(--error-bg); }
+.toast--aviso{ background:var(--aviso-bg); }
+
+/* ---------- Foco y botón flotante ---------- */
+body:not([data-role="docente"]) :is(button,a,input,select,textarea,[tabindex]):focus-visible{ outline:3px dashed var(--tinta); outline-offset:3px; }
+body:not([data-role="docente"]) #fabLayer .fab{ background:var(--primario); }
+body:not([data-role="docente"]) #fabLayer .fab .count{ background:var(--sol); }
+
+/* ---------- Inputs sobre papel ---------- */
+body:not([data-role="docente"]) :is(select,input[type="text"],input[type="email"],input[type="password"],input[type="number"],textarea){ background:var(--papel); }
+
+@media (prefers-reduced-motion:reduce){
+  body:not([data-role="docente"]) .brand:hover .fruit, body:not([data-role="docente"]) .role-card:hover{ animation:none; transform:none; }
+}
