@@ -33,6 +33,39 @@ export const MissionHandler = {
     }
   },
 
+  // Muestra un estado en la zona de la vista "Generar tarea".
+  // Devuelve false si la zona no existe (entonces se usa un aviso flotante).
+  _mostrarEstado(materia, tipo, titulo, detalle) {
+    const caja = document.getElementById(`autoEstado_${materia}`);
+    if (!caja) return false;
+    const iconos = { cargando: '', limite: '🍊', espera: '⏱️', error: '⚠️', ok: '✅' };
+    caja.className = `gen-estado gen-estado--${tipo}`;
+    caja.textContent = '';
+    const ico = document.createElement('span');
+    if (tipo === 'cargando') {
+      ico.className = 'gen-spinner';
+      ico.setAttribute('aria-hidden', 'true');
+    } else {
+      ico.className = 'gen-estado__ico';
+      ico.setAttribute('aria-hidden', 'true');
+      ico.textContent = iconos[tipo] || '';
+    }
+    const txt = document.createElement('span');
+    txt.className = 'gen-estado__txt';
+    const fuerte = document.createElement('strong');
+    fuerte.textContent = titulo;
+    txt.appendChild(fuerte);
+    if (detalle) txt.appendChild(document.createTextNode(detalle));
+    caja.append(ico, txt);
+    caja.hidden = false;
+    return true;
+  },
+
+  _ocultarEstado(materia) {
+    const caja = document.getElementById(`autoEstado_${materia}`);
+    if (caja) { caja.hidden = true; caja.textContent = ''; }
+  },
+
   // Generar una tarea personalizada (algoritmo o IA según disponibilidad)
   async generarTareaAuto(materia) {
     const input = document.getElementById(`autoSolicitud_${materia}`);
@@ -43,15 +76,14 @@ export const MissionHandler = {
     const btn = document.getElementById(`btnGenerarARem_${materia}`);
 
     // Evitar doble clic / bucle: si ya hay una petición en curso para esta materia, ignorar.
-    if (this._generando.has(materia)) {
-      toast('⏳ Ya estás generando una tarea. Espera a que termine.');
-      return;
-    }
+    if (this._generando.has(materia)) return;
     this._generando.add(materia);
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Generando...'; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Generando…'; }
+    this._mostrarEstado(materia, 'cargando', 'Preparando tus ejercicios', ' Puede tardar unos segundos.');
 
     try {
       const res = await API.generarTarea({ materia, cantidad, solicitud });
+      this._mostrarEstado(materia, 'ok', 'Tarea lista', ' Abriéndola ahora.');
       toast(res.mensaje || '✅ Tarea generada');
       if (window.App && typeof window.App.startTask === 'function') {
         await window.App.startTask(res.id);
@@ -61,15 +93,24 @@ export const MissionHandler = {
     } catch (e) {
       const esLimitePendientes = e.status === 429 && e.tipo === 'limite_pendientes';
       const esRateLimit = e.status === 429 && e.retryAfter;
+      let mostrado;
 
       if (esLimitePendientes) {
-        toast(`🚫 ${e.message} Ve a "Tus tareas" para completarlas y libera espacio.`);
+        mostrado = this._mostrarEstado(materia, 'limite',
+          'Tienes tareas pendientes.',
+          ' Termina alguna en “Tus tareas” para poder generar otra.');
       } else if (esRateLimit) {
         const segundos = e.retryAfter || 30;
-        toast(`⏱️ Demasiadas peticiones. Espera ${segundos} segundos e inténtalo de nuevo.`);
+        mostrado = this._mostrarEstado(materia, 'espera',
+          'Demasiados intentos seguidos.',
+          ` Espera ${segundos} segundos y vuelve a probar.`);
       } else {
-        toast('⚠️ ' + e.message);
+        mostrado = this._mostrarEstado(materia, 'error',
+          'No se pudo generar la tarea.',
+          e.message ? ` ${e.message}` : ' Prueba de nuevo en un momento.');
       }
+      // Si la vista no tiene zona de estado, avisa con un toast.
+      if (!mostrado) toast('⚠️ ' + (e.message || 'No se pudo generar la tarea.'));
     } finally {
       this._generando.delete(materia);
       if (btn) { btn.disabled = false; btn.textContent = '🎲 Generar mi tarea'; }

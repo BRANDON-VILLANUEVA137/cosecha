@@ -1,0 +1,181 @@
+/* ============================================================
+   COSECHA LÚDICO — capa de rediseño del estudiante
+   Se carga DESPUÉS de cosecha-redesign.css. No toca la piel docente.
+   Idea: todo lo que se puede tocar parece una pegatina con borde de
+   tinta y sombra dura; el XP se lee como gajos de naranja.
+   ============================================================ */
+
+body:not([data-role="docente"]){
+  --tinta:#2B3A3F;
+  --texto-suave:#566B71;          /* contraste 5:1 sobre crema */
+  --papel:#FFFDF7;
+  --sol:#FFC83D;
+  --aviso-bg:#FFF1C7; --aviso-tx:#5B3A00;
+  --error-bg:#FFE3E0; --error-tx:#8F2A22;
+  --ok-bg:#DDF3EC;    --ok-tx:#1B5E4C;
+  --pegatina:0 4px 0 var(--tinta);
+}
+
+/* ---------- Foco visible (teclado) ---------- */
+body:not([data-role="docente"]) :is(button,a,input,select,textarea,[tabindex]):focus-visible{
+  outline:3px solid var(--tinta); outline-offset:3px;
+}
+
+/* ---------- Botones tipo pegatina ---------- */
+body:not([data-role="docente"]) button.primary{
+  background:var(--primario); color:var(--tinta);
+  border:2px solid var(--tinta); box-shadow:var(--pegatina);
+  font-weight:800;
+}
+body:not([data-role="docente"]) button.primary:hover{
+  transform:translateY(-1px); box-shadow:0 5px 0 var(--tinta);
+}
+body:not([data-role="docente"]) button.primary:active{
+  transform:translateY(3px); box-shadow:0 1px 0 var(--tinta);
+}
+body:not([data-role="docente"]) button.primary:disabled{
+  background:var(--borde); color:var(--texto-suave);
+  border-color:var(--texto-suave); box-shadow:none; transform:none; cursor:progress;
+}
+body:not([data-role="docente"]) button.ghost:disabled{ cursor:not-allowed; }
+
+/* ---------- Barra de XP en gajos ---------- */
+body:not([data-role="docente"]) .xp-bar{
+  position:relative; height:20px; overflow:hidden;
+  background:var(--papel); border:2px solid var(--tinta);
+}
+body:not([data-role="docente"]) .xp-bar__fill{
+  height:100%; background:var(--primario); box-shadow:none;
+  transition:width .9s cubic-bezier(.3,.9,.3,1);
+}
+body:not([data-role="docente"]) .xp-bar::after{            /* 10 gajos */
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(90deg,
+    transparent 0, transparent calc(10% - 3px),
+    var(--papel) calc(10% - 3px), var(--papel) 10%);
+}
+body:not([data-role="docente"]) .xp-bar__labels{
+  display:flex; justify-content:space-between; gap:12px;
+  margin-top:6px; font-size:12px; font-weight:800; color:var(--texto-suave);
+}
+
+/* ---------- Inicio: héroe y chips ---------- */
+body:not([data-role="docente"]) .card.hero{
+  border:2px solid var(--tinta); box-shadow:0 6px 0 var(--tinta);
+}
+body:not([data-role="docente"]) .hero-text h2{
+  font-family:'Fredoka',sans-serif; font-size:30px; line-height:1.1; margin:0 0 6px;
+}
+body:not([data-role="docente"]) .hero-text > p{ max-width:52ch; color:var(--texto-suave); }
+body:not([data-role="docente"]) .stat-row{ margin-top:14px; }
+body:not([data-role="docente"]) .stat{
+  background:var(--papel); border:2px solid var(--tinta);
+  box-shadow:0 3px 0 var(--tinta); border-radius:14px;
+}
+body:not([data-role="docente"]) .stat b{ color:var(--tinta); }
+body:not([data-role="docente"]) .stat span{ color:var(--texto-suave); }
+
+/* Accesos a materias */
+body:not([data-role="docente"]) .subject-cta{ gap:18px; margin-top:22px; }
+body:not([data-role="docente"]) .subject-cta .cta-card{
+  position:relative; color:var(--tinta);
+  border:2px solid var(--tinta); box-shadow:0 6px 0 var(--tinta);
+  padding:22px 22px 20px; border-radius:24px;
+  display:grid; grid-template-columns:auto 1fr; column-gap:16px; align-items:center;
+}
+body:not([data-role="docente"]) .subject-cta .cta-card:hover{
+  transform:translateY(-3px); box-shadow:0 9px 0 var(--tinta);
+}
+body:not([data-role="docente"]) .subject-cta .cta-card:active{
+  transform:translateY(4px); box-shadow:0 2px 0 var(--tinta);
+}
+body:not([data-role="docente"]) .subject-cta .cta-card .n{
+  grid-row:1 / span 2; width:68px; height:68px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:36px;
+  background:var(--papel); border:2px solid var(--tinta);
+}
+body:not([data-role="docente"]) .subject-cta .cta-card h3{
+  font-family:'Fredoka',sans-serif; font-size:24px; margin:0; color:var(--tinta);
+}
+body:not([data-role="docente"]) .subject-cta .cta-card p{
+  opacity:1; color:var(--tinta); font-weight:700; margin:2px 0 0;
+}
+body:not([data-role="docente"]) .cta-card__go{
+  grid-column:1 / -1; justify-self:start; margin-top:14px;
+  background:var(--tinta); color:var(--papel); font-weight:800; font-size:13px;
+  padding:7px 16px; border-radius:999px;
+}
+
+/* ---------- Misiones (vista de página) ---------- */
+.m-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; margin-top:20px; }
+.m-card, #fabLayer .mission-card{ position:relative; }
+body:not([data-role="docente"]) .m-card{
+  display:flex; flex-direction:column; gap:10px;
+  background:var(--panel); border:2px solid var(--tinta); border-radius:20px;
+  box-shadow:0 5px 0 var(--tinta); padding:18px;
+}
+body:not([data-role="docente"]) .m-card--lista{ background:var(--aviso-bg); box-shadow:0 5px 0 var(--tinta), 0 0 0 4px rgba(255,200,61,.45); }
+body:not([data-role="docente"]) .m-card--hecha{ background:var(--ok-bg); }
+.m-card__top{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.m-card__icon{
+  width:44px; height:44px; border-radius:14px; display:flex; align-items:center;
+  justify-content:center; font-size:22px; background:var(--papel); border:2px solid var(--tinta);
+}
+.m-badge{
+  font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px;
+  background:var(--papel); border:2px solid var(--tinta); color:var(--tinta);
+}
+.m-badge--lista{ background:var(--sol); }
+.m-badge--hecha{ background:var(--secundario); color:#fff; border-color:var(--tinta); }
+body:not([data-role="docente"]) .m-card h3{ font-family:'Fredoka',sans-serif; font-size:19px; margin:2px 0 0; color:var(--tinta); }
+body:not([data-role="docente"]) .m-card p{ margin:0; color:var(--texto-suave); font-size:14px; line-height:1.45; }
+.m-card__meta{ display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; font-weight:800; color:var(--tinta); }
+.m-reward{ background:var(--papel); border:2px solid var(--tinta); border-radius:999px; padding:3px 10px; font-size:12px; font-weight:800; }
+.m-card .m-action{ margin-top:auto; width:100%; }
+.m-card .m-action.pulse{ animation:cosechaPulso 1.8s ease-in-out 3; }
+@keyframes cosechaPulso{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+
+/* Misiones en el panel flotante: mismo lenguaje */
+#fabLayer .mission-card{ border:2px solid var(--tinta); box-shadow:0 4px 0 var(--tinta); }
+#fabLayer .missions-panel{ border:2px solid var(--tinta); }
+#fabLayer .m-track{ border:2px solid var(--tinta); background:var(--papel); }
+
+/* ---------- Generar tarea ---------- */
+.gen-form{ display:flex; flex-wrap:wrap; gap:10px; align-items:stretch; }
+.gen-input{ flex:2 1 240px; min-width:0; }
+.gen-select{ flex:0 0 auto; }
+.gen-estado{
+  display:flex; align-items:flex-start; gap:10px; margin-top:14px;
+  padding:12px 14px; border:2px solid var(--tinta); border-radius:14px;
+  font-weight:700; font-size:14px; line-height:1.4; color:var(--tinta);
+}
+.gen-estado[hidden]{ display:none; }
+.gen-estado__ico{ font-size:20px; line-height:1.2; flex:0 0 auto; }
+.gen-estado__txt strong{ display:block; font-weight:800; }
+.gen-estado--cargando{ background:var(--papel); }
+.gen-estado--limite{ background:var(--aviso-bg); color:var(--aviso-tx); }
+.gen-estado--espera{ background:var(--aviso-bg); color:var(--aviso-tx); }
+.gen-estado--error{ background:var(--error-bg); color:var(--error-tx); }
+.gen-estado--ok{ background:var(--ok-bg); color:var(--ok-tx); }
+.gen-spinner{
+  width:20px; height:20px; border-radius:50%; flex:0 0 auto;
+  border:3px solid var(--borde); border-top-color:var(--primario);
+  animation:cosechaGira .8s linear infinite;
+}
+@keyframes cosechaGira{ to{ transform:rotate(360deg); } }
+
+/* ---------- Avisos (toast) ---------- */
+.toast{
+  display:flex; align-items:center; gap:10px; max-width:min(420px, calc(100vw - 32px));
+  background:var(--papel); color:var(--tinta);
+  border:2px solid var(--tinta); box-shadow:0 4px 0 var(--tinta);
+  font-weight:800; line-height:1.35;
+}
+.toast--ok{ background:var(--ok-bg); }
+.toast--error{ background:var(--error-bg); }
+.toast--aviso{ background:var(--aviso-bg); }
+@media (max-width:560px){
+  .toast{ left:16px; right:16px; top:12px; max-width:none; }
+  body:not([data-role="docente"]) .subject-cta .cta-card{ grid-template-columns:auto 1fr; }
+  body:not([data-role="docente"]) .hero-text h2{ font-size:26px; }
+}

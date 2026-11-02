@@ -294,16 +294,17 @@ export const ViewRenderers = {
             <p>Cosecha crea ejercicios desde cero para ti: escribe qué quieres practicar y cuántos.</p>
           </div>
         </div>
-        <div class="answer-row" style="flex-wrap:wrap; gap:10px;">
-          <input type="text" id="autoSolicitud_${materia}" placeholder="${esMat ? 'Ej: sumas de fracciones, números negativos, problemas con naranjas...' : 'Ej: verb to be, a/an, plurales, vocabulario...'}" style="flex:2; min-width:220px; padding:10px; border:1px solid var(--borde); border-radius:8px;">
-          <select id="autoCantidad_${materia}" style="padding:10px; border:1px solid var(--borde); border-radius:8px;">
+        <div class="gen-form">
+          <input type="text" class="gen-input" id="autoSolicitud_${materia}" aria-label="Qué quieres practicar" placeholder="${esMat ? 'Ej: división, sumas de fracciones, números negativos...' : 'Ej: verb to be, a/an, plurales, vocabulario...'}">
+          <select class="gen-select" id="autoCantidad_${materia}" aria-label="Cantidad de ejercicios">
             <option value="5">5 ejercicios</option>
             <option value="10" selected>10 ejercicios</option>
             <option value="15">15 ejercicios</option>
           </select>
           <button class="primary" id="btnGenerarARem_${materia}" onclick="window.App.generarTareaAuto('${materia}')">🎲 Generar mi tarea</button>
         </div>
-        <p class="task-meta" style="margin-top:8px;">Se usará IA (Gemini) si está configurada; si no, el algoritmo de Cosecha. Máximo 3 temas en la solicitud.</p>
+        <div class="gen-estado" id="autoEstado_${materia}" role="status" aria-live="polite" hidden></div>
+        <p class="task-meta" style="margin-top:8px;">Escribe hasta 3 temas separados por comas.</p>
       </div>
     `;
 

@@ -1,18 +1,34 @@
 import { state } from '../state.js';
 import { formatMathText, cap } from '../utils/formatters.js';
 import { calcularProgreso } from '../utils/progressUtils.js';
+import { esc } from '../utils/domUtils.js';
 
 const API = window.API;
 const Personaje = window.Personaje;
+
+// Acceso a una materia: tarjeta clicable que también funciona con teclado.
+function accesoMateria(clase, modulo, icono, titulo, descripcion) {
+  return `
+    <div class="cta-card ${clase}" role="link" tabindex="0"
+         aria-label="Entrar a ${titulo}"
+         onclick="window.App.goModule('${modulo}')"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.App.goModule('${modulo}');}">
+      <div class="n" aria-hidden="true">${icono}</div>
+      <h3>${titulo}</h3>
+      <p>${descripcion}</p>
+      <span class="cta-card__go">Practicar</span>
+    </div>`;
+}
 
 export async function renderInicio() {
   const logro = await API.getLogros();
   const rango = Personaje.rangoDeNivel(logro.nivel || 1);
   const prog = calcularProgreso(logro);
-  const urlAvatar = Personaje.generarUrlDiceBear(logro.equipo, state.cachePrendas, { 
-    seed: (logro.personaje && logro.personaje.seed) || state.authUser?.uid || 'cosecha', 
-    racha: logro.racha 
+  const urlAvatar = Personaje.generarUrlDiceBear(logro.equipo, state.cachePrendas, {
+    seed: (logro.personaje && logro.personaje.seed) || state.authUser?.uid || 'cosecha',
+    racha: logro.racha
   });
+  const faltanXp = Math.max(0, (prog.xpParaSiguiente || 0) - (prog.xpTotal || 0));
 
   return `
     <div class="card hero">
@@ -24,11 +40,16 @@ export async function renderInicio() {
           </div>
         </div>
         <div class="hero-text">
-          <h2>¡Hola, ${logro.nombre || 'Aventurero'}! 👋</h2>
+          <h2>¡Hola, ${esc(logro.nombre || 'Aventurero')}! 👋</h2>
           <p>Gana <strong>XP</strong> y <strong>🍊 naranjas</strong> resolviendo ejercicios para personalizar tu personaje.</p>
           <div class="xp-block">
-            <div class="xp-bar"><div class="xp-bar__fill" style="width:${prog.progreso}%"></div></div>
-            <div class="xp-bar__labels"><span>Nivel ${prog.nivel}</span><span>${prog.xpEnNivel} / ${prog.xpParaSiguiente} XP · ${prog.progreso}%</span></div>
+            <div class="xp-bar" role="progressbar" aria-label="Progreso de nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${prog.progreso}">
+              <div class="xp-bar__fill" style="width:${prog.progreso}%"></div>
+            </div>
+            <div class="xp-bar__labels">
+              <span>Nivel ${prog.nivel}</span>
+              <span>Te faltan ${faltanXp} XP para el nivel ${Number(prog.nivel) + 1}</span>
+            </div>
           </div>
           <div class="stat-row">
             <div class="stat"><b>${prog.xpTotal}</b><span>XP TOTAL</span></div>
@@ -39,16 +60,8 @@ export async function renderInicio() {
       </div>
     </div>
     <div class="subject-cta">
-      <div class="cta-card mat" onclick="window.App.goModule('matematicas')">
-        <div class="n">🍊</div>
-        <h3>Matemáticas</h3>
-        <p>Fracciones: sumas y multiplicación</p>
-      </div>
-      <div class="cta-card ing" onclick="window.App.goModule('ingles')">
-        <div class="n">🌴</div>
-        <h3>Inglés</h3>
-        <p>Verbo to be y pronombres</p>
-      </div>
+      ${accesoMateria('mat', 'matematicas', '🍊', 'Matemáticas', 'Fracciones: sumas y multiplicación')}
+      ${accesoMateria('ing', 'ingles', '🌴', 'Inglés', 'Verbo to be y pronombres')}
     </div>
   `;
 }
