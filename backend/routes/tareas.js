@@ -179,7 +179,13 @@ router.post('/generar', authMiddleware, requireRole('estudiante'), async (req, r
       const batch = db.batch();
       for (const ej of ejercicios) {
         const { id, ...datos } = ej;
-        batch.set(db.collection('ejercicios').doc(id), datos);
+        const ahora = new Date().toISOString();
+        batch.set(db.collection('ejercicios').doc(id), {
+          ...datos,
+          origen: datos.origen || 'ia',
+          generadoPara: uid,
+          fechaCreacion: datos.fechaCreacion || ahora
+        });
       }
       await batch.commit();
     } catch (eBatch) {

@@ -12,7 +12,7 @@ router.use(authMiddleware);
 // GET /api/ejercicios?materia=matematicas
 router.get('/', async (req, res) => {
   try {
-    const { materia } = req.query;
+    const { materia, mostrarGenerados } = req.query;
     let query = db.collection('ejercicios');
 
     if (materia) {
@@ -20,7 +20,14 @@ router.get('/', async (req, res) => {
     }
 
     const snapshot = await query.get();
-    const ejercicios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    let ejercicios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    if (!mostrarGenerados || mostrarGenerados !== 'true') {
+      ejercicios = ejercicios.filter(ej => {
+        if ((ej.origen === 'ia' || ej.origen === 'auto')) return false;
+        if (ej.id && (String(ej.id).startsWith('gen-m-') || String(ej.id).startsWith('gen-i-'))) return false;
+        return true;
+      });
+    }
     const instanciados = ejercicios.map(ej =>
       instanciarEjercicio(ej, req.user.uid, null)
     );
