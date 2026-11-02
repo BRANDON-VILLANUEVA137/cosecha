@@ -184,10 +184,6 @@ export const ViewRenderers = {
     // Filtrar tareas por materia y que estén publicadas
     const tareasFiltradas = Array.isArray(tareas) ? tareas.filter(t => t.materia === materia && t.estado === 'publicada') : [];
     
-    // Obtener ejercicios de la materia para mostrarlos en las tareas
-    const ejercicios = await API.getEjercicios(materia);
-    const ejerciciosMap = new Map((Array.isArray(ejercicios) ? ejercicios : []).map(e => [e.id, e]));
-    
     // Para cada tarea, cargar sus ejercicios completos
     const tareasAsignadas = await Promise.all(
       tareasFiltradas.map(async (tarea) => {

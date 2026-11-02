@@ -11,12 +11,34 @@ const API = {
   })(),
   authToken: null,
 
+  // ---- Caché corta de lecturas (GET) ----
+  // Evita repetir las mismas peticiones al cambiar de pestaña. Cualquier
+  // petición que modifique datos (POST/PUT/DELETE) vacía la caché, y se vacía
+  // también al cambiar de sesión.
+  _cache: new Map(),
+  _inflight: new Map(),
+  _ttl(path) {
+    if (/^\/(logros|misiones)$/.test(path)) return 15000;
+    if (/^\/prendas(\?.*)?$/.test(path)) return 300000;
+    if (/^\/tareas(\/[^/?]+)?$/.test(path)) return 20000;
+    return 0;
+  },
+  _copia(v) {
+    return typeof structuredClone === 'function' ? structuredClone(v) : JSON.parse(JSON.stringify(v));
+  },
+  limpiarCache() {
+    this._cache.clear();
+    this._inflight.clear();
+  },
+
   setAuthToken(token) {
+    if (this.authToken !== token) this.limpiarCache();
     this.authToken = token;
   },
 
   clearAuthToken() {
     this.authToken = null;
+    this.limpiarCache();
   },
 
   async getAuthHeaders() {
@@ -38,7 +60,31 @@ const API = {
     return { Authorization: `Bearer ${token}` };
   },
 
-  async request(path, options = {}, _retry = false) {
+  async request(path, options = {}) {
+    const metodo = String(options.method || 'GET').toUpperCase();
+    if (metodo !== 'GET') {
+      const res = await this._fetch(path, options);
+      this.limpiarCache();            // algo cambió: las lecturas guardadas ya no valen
+      return res;
+    }
+
+    const ttl = this._ttl(path);
+    if (!ttl) return this._fetch(path, options);
+
+    const hit = this._cache.get(path);
+    if (hit && hit.exp > Date.now()) return this._copia(hit.data);
+
+    let pendiente = this._inflight.get(path);
+    if (!pendiente) {
+      pendiente = this._fetch(path, options)
+        .then(data => { this._cache.set(path, { data, exp: Date.now() + ttl }); return data; })
+        .finally(() => { this._inflight.delete(path); });
+      this._inflight.set(path, pendiente);
+    }
+    return this._copia(await pendiente);
+  },
+
+  async _fetch(path, options = {}, _retry = false) {
     const authHeaders = await this.getAuthHeaders();
     const res = await fetch(this.base + path, {
       headers: {
@@ -59,7 +105,7 @@ const API = {
         try {
           const token = await user.getIdToken(true);
           this.authToken = token;
-          return this.request(path, options, true);
+          return this._fetch(path, options, true);
         } catch (_) { /* cae al manejo de error original */ }
       }
     }

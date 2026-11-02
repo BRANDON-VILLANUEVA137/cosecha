@@ -5,17 +5,23 @@ const { authMiddleware } = require('../middleware/auth');
 
 router.use(authMiddleware);
 
-/** Quita la respuestaCorrecta del historial por seguridad (nunca al cliente). */
-function sanitizarLogro(logro) {
-  const historial = (logro.historial || []).map(({ respuestaCorrecta, ...item }) => item);
-  return { ...logro, historial };
+/**
+ * Prepara el logro para el cliente. El historial puede tener miles de
+ * intentos y la interfaz no lo usa, así que no se envía salvo que se pida
+ * con ?historial=1 (y siempre sin respuestaCorrecta).
+ */
+function sanitizarLogro(logro, incluirHistorial = false) {
+  const { historial, ...resto } = logro;
+  if (!incluirHistorial) return resto;
+  const limpio = (historial || []).map(({ respuestaCorrecta, ...item }) => item);
+  return { ...resto, historial: limpio };
 }
 
 // GET /api/logros — perfil / gamificación completa del estudiante
 router.get('/', async (req, res) => {
   try {
     const logro = await gamificacion.getLogro(req.user.uid);
-    return res.json(sanitizarLogro(logro));
+    return res.json(sanitizarLogro(logro, req.query.historial === '1'));
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'No se pudieron obtener los logros' });
