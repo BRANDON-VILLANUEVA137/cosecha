@@ -16,6 +16,7 @@ export const ViewRenderers = {
       { id: 'inicio', ico: '🏠', label: 'Inicio' },
       { id: 'matematicas', ico: '🍊', label: 'Matemáticas' },
       { id: 'ingles', ico: '🌴', label: 'Inglés' },
+      { id: 'armario', ico: '👕', label: 'Armario' },
       { id: 'album', ico: '🖼️', label: 'Álbum' },
     ];
     const tabsDocente = [

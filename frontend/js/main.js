@@ -124,6 +124,7 @@ const App = {
           html = await this.renderModuloEstudiante(this.currentModule);
         } else if (this.currentModule === 'misiones') html = await this.renderMissiones();
         else if (this.currentModule === 'album') html = await this.renderAlbum();
+        else if (this.currentModule === 'armario') html = await this.renderArmario();
       }
       screen.innerHTML = html;
       this.wireEvents();
