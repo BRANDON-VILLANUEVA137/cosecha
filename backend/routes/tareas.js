@@ -145,8 +145,9 @@ router.post('/generar', authMiddleware, requireRole('estudiante'), async (req, r
     let origenGenerado = 'auto';
     if (iaDisponible()) {
       try {
-        ejercicios = await generarConGemini({ materia, cantidad: cant, solicitud: solicitudLimpia });
-        if (ejercicios && ejercicios.length) origenGenerado = 'ia';
+        console.log(`[GEN] ${uid} materia=${materia} req="${solicitudLimpia}" → IA`);
+        ejercicios = await generarConGemini({ materia, cantidad: cant, solicitud: solicitudLimpia, tema: solicitudLimpia });
+        if (ejercicios && ejercicios.length) { console.log(`[GEN] ${uid} origen=gemini tema=${solicitudLimpia || 'none'} cantidad=${ejercicios.length}`); origenGenerado = 'ia'; }
       } catch (eIA) { console.error('⚠️ [Tareas/generar] IA falló, usando algoritmo:', eIA && eIA.message); ejercicios = null; }
     }
     if (!ejercicios || !ejercicios.length) {
@@ -160,6 +161,9 @@ router.post('/generar', authMiddleware, requireRole('estudiante'), async (req, r
     }
 
     if (!ejercicios || !ejercicios.length) {
+      if (solicitudLimpia && solicitudLimpia.length > 0) {
+        return res.status(400).json({ error: `No hay ejercicios disponibles para el tema "${solicitudLimpia}". Intente con "fracciones", "suma", "resta" o "multiplicación".` });
+      }
       return res.status(500).json({ error: 'No se pudieron generar ejercicios. Intenta de nuevo.' });
     }
 

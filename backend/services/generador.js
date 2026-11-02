@@ -634,10 +634,16 @@ function matchPlantillasPorSolicitud(solicitud, materia) {
 
 /** Genera `cantidad` ejercicios procedurales (sin tocar el banco). */
 function generarTareaProcedural(materia, solicitud, cantidad = 10, seedStr = '') {
+  console.log(`[GEN] ${materia} ${solicitud || 'none'} seed=${seedStr || 'procedural'} → procedural`);
   const rng = mulberry32(hashString(seedStr || `${materia}:${Date.now()}:${Math.random()}`));
   const idsMatch = matchPlantillasPorSolicitud(solicitud, materia);
   let plantillas = (materia === 'ingles' ? TEMPLATES_ING : TEMPLATES_MAT)
     .filter(t => idsMatch.includes(t.id));
+  // Si la solicitud pide un tema específico que no está en el catálogo, no inventamos otros temas
+  if (!plantillas.length && solicitud && solicitud.trim().length > 0) {
+    console.log(`[GEN] ${materia} ${solicitud || 'none'} seed=${seedStr || 'procedural'} → NO MATCH, no se inventan temas`);
+    return []; // No generamos ejercicios de otro tema
+  }
   if (!plantillas.length) plantillas = (materia === 'ingles' ? TEMPLATES_ING : TEMPLATES_MAT);
 
   const ejercicios = [];
@@ -695,6 +701,7 @@ function generarTareaProcedural(materia, solicitud, cantidad = 10, seedStr = '')
     }
   }
 
+  console.log(`[GEN] ${materia} ${solicitud || 'none'} origin=procedural cantidad=${ejercicios.length} tema=${ejercicios[0]?.tema || 'mixed'}`);
   return ejercicios.slice(0, cantidad);
 }
 
