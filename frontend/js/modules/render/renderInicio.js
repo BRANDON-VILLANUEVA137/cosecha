@@ -24,18 +24,21 @@ export async function renderInicio() {
   const logro = await API.getLogros();
   const rango = Personaje.rangoDeNivel(logro.nivel || 1);
   const prog = calcularProgreso(logro);
-  const urlAvatar = Personaje.generarUrlDiceBear(logro.equipo, state.cachePrendas, {
-    seed: (logro.personaje && logro.personaje.seed) || state.authUser?.uid || 'cosecha',
-    racha: logro.racha
-  });
+  const prendas = state.cachePrendas || [];
+  const equipo = logro.equipo || {};
+  const svgAvatar = Personaje.renderSVG(equipo, prendas);
+  const marcoPrenda = equipo.marco ? prendas.find(p => p.id === equipo.marco) : null;
+  const marcoRango = (marcoPrenda && marcoPrenda.rango) || rango.nombre;
+  const fondoPrenda = equipo.fondo ? prendas.find(p => p.id === equipo.fondo) : null;
+  const fondoStyle = fondoPrenda && fondoPrenda.gradiente ? ` style="background:${esc(fondoPrenda.gradiente)};"` : '';
   const faltanXp = Math.max(0, (prog.xpParaSiguiente || 0) - (prog.xpTotal || 0));
 
   return `
     <div class="card hero">
       <div class="hero-gamifica">
         <div class="profile-avatar">
-          <div class="avatar-frame avatar-frame--${rango.nombre}">
-            <img src="${urlAvatar}" alt="Tu personaje" class="avatar-dicebear" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=cosecha&clothing=shirt'">
+          <div class="avatar-frame avatar-frame--${marcoRango}"${fondoStyle}>
+            <div class="avatar-dicebear">${svgAvatar}</div>
             <div class="avatar-frame__badge">${rango.icono} ${cap(rango.nombre)}</div>
           </div>
         </div>

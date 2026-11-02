@@ -19,81 +19,149 @@ const Personaje = {
     return prendas.find(p => p.id === id) || null;
   },
 
+  /* ================= Muñeco entintado (SVG propio) =================
+     Dibuja busto + ropa según lo equipado. Sin servicios externos.
+     Usa del catálogo: shape y color (torso, cabeza, accesorio),
+     dicebearOptions.facialExpression (avatar) y variante (perfil). */
+  INK: '#1C130D',
+
+  // Oscurece un color #RRGGBB (para sombreado plano de dos tonos)
+  _oscuro(hex, f) {
+    const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ''));
+    if (!m) return '#00000033';
+    const n = parseInt(m[1], 16);
+    const c = v => Math.max(0, Math.round(v * (1 - f))).toString(16).padStart(2, '0');
+    return '#' + c((n >> 16) & 255) + c((n >> 8) & 255) + c(n & 255);
+  },
+
   renderSVG(equipo, prendas, size) {
-    size = size || 220;
-    const torso = this.pieza(prendas, equipo.torso) || { shape: 'camiseta', color: '#F4F4F4' };
-    const piernas = this.pieza(prendas, equipo.piernas) || { shape: 'pantalon_largo', color: '#4A6FA5' };
-    const calzado = this.pieza(prendas, equipo.calzado) || { shape: 'tenis', color: '#EDEDED' };
-    const cabeza = this.pieza(prendas, equipo.cabeza);
-    const accesorio = this.pieza(prendas, equipo.accesorio);
-    const skin = '#FFD9A8', hair = '#6B4226';
+    equipo = equipo || {};
+    prendas = prendas || [];
+    const INK = this.INK;
+    const ink = `stroke="${INK}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"`;
+    const get = id => (id ? this.pieza(prendas, id) : null);
 
-    const mangaLarga = torso.shape === 'buso';
-    const shortsStyle = piernas.shape === 'pantalon_corto';
-    const botasStyle = calzado.shape === 'botas';
+    // Piel y pelo vienen del "perfil" elegido (variante OpenPeeps)
+    const perfil = get(equipo.perfil);
+    const v = this.OPENPEEPS_VARIANTES[(perfil && perfil.variante) || 'p1'] || this.OPENPEEPS_VARIANTES.p1;
+    const piel = v.skin, pielSombra = this._oscuro(v.skin, 0.14), pelo = v.hair;
 
-    let svg = `<svg viewBox="0 0 220 320" width="${size}" height="${size * 320 / 220}" xmlns="http://www.w3.org/2000/svg">`;
+    const torso = get(equipo.torso) || { shape: 'camiseta', color: '#F4F4F4' };
+    const cabeza = get(equipo.cabeza);
+    const acc = get(equipo.accesorio);
+    const avatar = get(equipo.avatar);
+    const expr = (avatar && avatar.dicebearOptions && avatar.dicebearOptions.facialExpression) || 'smile';
 
-    // hair back
-    svg += `<ellipse cx="110" cy="55" rx="48" ry="40" fill="${hair}"/>`;
-    // arms (skin)
-    svg += `<rect x="34" y="128" width="26" height="82" rx="13" fill="${skin}"/>`;
-    svg += `<rect x="160" y="128" width="26" height="82" rx="13" fill="${skin}"/>`;
-    // legs (skin base)
-    svg += `<rect x="76" y="228" width="26" height="76" rx="10" fill="${skin}"/>`;
-    svg += `<rect x="118" y="228" width="26" height="76" rx="10" fill="${skin}"/>`;
-    // pants overlay
-    const pantH = shortsStyle ? 38 : 76;
-    svg += `<rect x="76" y="228" width="26" height="${pantH}" rx="10" fill="${piernas.color}"/>`;
-    svg += `<rect x="118" y="228" width="26" height="${pantH}" rx="10" fill="${piernas.color}"/>`;
-    // shoes
-    if (botasStyle) {
-      svg += `<rect x="72" y="286" width="34" height="26" rx="9" fill="${calzado.color}"/>`;
-      svg += `<rect x="114" y="286" width="34" height="26" rx="9" fill="${calzado.color}"/>`;
+    const tC = torso.color || '#F4F4F4';
+    const tSombra = this._oscuro(tC, 0.2);
+    let s = '';
+
+    // --- pelo trasero (largo)
+    if (v.pelo === 'largo') {
+      s += `<path d="M52 72 Q44 132 62 146 L138 146 Q156 132 148 72 Q100 18 52 72Z" fill="${pelo}" ${ink}/>`;
+    }
+
+    // --- busto (cuerpo)
+    s += `<path d="M26 200 Q26 150 72 142 L128 142 Q174 150 174 200Z" fill="${tC}"/>`;
+    s += `<path d="M148 150 Q174 160 174 200 L144 200 Q154 172 148 150Z" fill="${tSombra}"/>`;
+
+    // --- prenda según forma
+    const f = torso.shape;
+    if (f === 'buso') {
+      const cap = this._oscuro(tC, 0.12);
+      s += `<path d="M66 146 Q100 126 134 146 Q128 174 100 178 Q72 174 66 146Z" fill="${cap}" ${ink}/>`;
+      s += `<path d="M70 182 L130 182 L138 200 L62 200Z" fill="${tSombra}" ${ink}/>`;
+      s += `<path d="M92 158 L90 176 M108 158 L110 176" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`;
+    } else if (f === 'sueter') {
+      s += `<path d="M30 192 L170 192 M28 198 L172 198" stroke="${tSombra}" stroke-width="4"/>`;
+      s += `<path d="M44 164 l10 -8 l10 8 l10 -8 l10 8 l10 -8 l10 8 l10 -8 l10 8 l10 -8 l10 8" fill="none" stroke="${this._oscuro(tC, 0.35)}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+      s += `<path d="M82 144 Q100 160 118 144" fill="none" stroke="${tSombra}" stroke-width="7" stroke-linecap="round"/>`;
+    } else if (f === 'chaleco') {
+      s += `<path d="M26 200 Q26 150 72 142 L128 142 Q174 150 174 200Z" fill="#F4F4F4"/>`;
+      s += `<path d="M62 146 L90 144 L98 200 L40 200 Q38 162 62 146Z" fill="${tC}" ${ink}/>`;
+      s += `<path d="M138 146 L110 144 L102 200 L160 200 Q162 162 138 146Z" fill="${tC}" ${ink}/>`;
+      s += `<circle cx="86" cy="170" r="3" fill="${INK}"/><circle cx="114" cy="170" r="3" fill="${INK}"/>`;
+    } else { // camiseta
+      s += `<path d="M84 143 Q100 162 116 143" fill="none" stroke="${tSombra}" stroke-width="7" stroke-linecap="round"/>`;
+    }
+    s += `<path d="M26 200 Q26 150 72 142 L128 142 Q174 150 174 200" fill="none" ${ink}/>`;
+
+    // --- cuello
+    s += `<path d="M86 122 L86 146 Q100 156 114 146 L114 122Z" fill="${piel}" ${ink}/>`;
+    s += `<path d="M104 126 L114 124 L114 146 Q108 150 104 150Z" fill="${pielSombra}"/>`;
+
+    // --- cabeza
+    s += `<circle cx="57" cy="84" r="9" fill="${piel}" ${ink}/><circle cx="143" cy="84" r="9" fill="${piel}" ${ink}/>`;
+    s += `<ellipse cx="100" cy="80" rx="43" ry="47" fill="${piel}"/>`;
+    s += `<path d="M130 44 C148 70 146 100 124 124 C140 100 138 66 122 44Z" fill="${pielSombra}"/>`;
+    s += `<ellipse cx="100" cy="80" rx="43" ry="47" fill="none" ${ink}/>`;
+
+    // --- cara
+    const eyeR = expr === 'surprised' ? 5.5 : 4.5;
+    s += `<circle cx="84" cy="82" r="${eyeR}" fill="${INK}"/><circle cx="116" cy="82" r="${eyeR}" fill="${INK}"/>`;
+    s += `<circle cx="82.5" cy="80.5" r="1.4" fill="#fff"/><circle cx="114.5" cy="80.5" r="1.4" fill="#fff"/>`;
+    s += `<circle cx="76" cy="96" r="5" fill="#E8742A" opacity=".25"/><circle cx="124" cy="96" r="5" fill="#E8742A" opacity=".25"/>`;
+    if (expr === 'serious') {
+      s += `<path d="M74 70 L92 74 M126 70 L108 74" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>`;
+      s += `<path d="M88 106 L112 106" stroke="${INK}" stroke-width="3.5" stroke-linecap="round" fill="none"/>`;
+    } else if (expr === 'surprised') {
+      s += `<path d="M74 68 Q84 60 94 68 M106 68 Q116 60 126 68" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      s += `<ellipse cx="100" cy="108" rx="7" ry="9" fill="${INK}"/>`;
     } else {
-      svg += `<ellipse cx="89" cy="304" rx="21" ry="11" fill="${calzado.color}" stroke="#00000018" stroke-width="2"/>`;
-      svg += `<ellipse cx="131" cy="304" rx="21" ry="11" fill="${calzado.color}" stroke="#00000018" stroke-width="2"/>`;
+      s += `<path d="M84 102 Q100 118 116 102" stroke="${INK}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
     }
-    // torso
-    svg += `<ellipse cx="110" cy="292" rx="54" ry="12" fill="#00000010"/>`;
-    svg += `<rect x="62" y="118" width="96" height="112" rx="26" fill="${torso.color}" stroke="#00000012" stroke-width="2"/>`;
-    // sleeves overlay
-    const sleeveH = mangaLarga ? 74 : 36;
-    svg += `<rect x="34" y="128" width="26" height="${sleeveH}" rx="13" fill="${torso.color}"/>`;
-    svg += `<rect x="160" y="128" width="26" height="${sleeveH}" rx="13" fill="${torso.color}"/>`;
-    // hands
-    svg += `<circle cx="47" cy="214" r="13" fill="${skin}"/>`;
-    svg += `<circle cx="173" cy="214" r="13" fill="${skin}"/>`;
-    // neck
-    svg += `<rect x="98" y="98" width="24" height="22" fill="${skin}"/>`;
-    // head + face
-    svg += `<circle cx="110" cy="66" r="40" fill="${skin}" stroke="#E8A96B" stroke-width="2"/>`;
-    svg += `<circle cx="95" cy="66" r="4.5" fill="#3A2A1E"/><circle cx="125" cy="66" r="4.5" fill="#3A2A1E"/>`;
-    svg += `<rect x="96" y="96" width="28" height="10" rx="5" fill="#F4C79A"/>`;
-    svg += `<circle cx="88" cy="74" r="3" fill="#F6A97A" opacity="0.35"/><circle cx="132" cy="74" r="3" fill="#F6A97A" opacity="0.35"/>`;
-    svg += `<path d="M95 80 Q110 90 125 80" stroke="#B5651D" stroke-width="3" fill="none" stroke-linecap="round"/>`;
-    // hair fringe
-    svg += `<path d="M70 48 Q76 22 110 21 Q144 22 150 48 Q140 34 110 34 Q80 34 70 48 Z" fill="${hair}"/>`;
-    // headwear
-    if (cabeza && cabeza.shape === 'gorro') {
-      svg += `<ellipse cx="110" cy="40" rx="49" ry="27" fill="${cabeza.color}"/>`;
-      svg += `<rect x="61" y="52" width="98" height="12" rx="6" fill="${cabeza.color}"/>`;
-      svg += `<circle cx="110" cy="11" r="8" fill="${cabeza.color}"/>`;
-    } else if (cabeza && cabeza.shape === 'sombrero') {
-      svg += `<ellipse cx="110" cy="46" rx="72" ry="13" fill="${cabeza.color}"/>`;
-      svg += `<rect x="83" y="8" width="54" height="40" rx="12" fill="${cabeza.color}"/>`;
+
+    // --- pelo frontal
+    if (v.pelo === 'rizado') {
+      s += `<path d="M54 80 Q38 52 62 38 Q70 18 100 22 Q130 18 138 38 Q162 52 146 80 Q142 56 100 54 Q58 56 54 80Z" fill="${pelo}" ${ink}/>`;
+    } else {
+      s += `<path d="M55 78 Q56 28 100 26 Q144 28 145 78 Q134 50 100 50 Q66 50 55 78Z" fill="${pelo}" ${ink}/>`;
     }
-    // accesorio
-    if (accesorio && accesorio.shape === 'bolso') {
-      svg += `<line x1="150" y1="150" x2="120" y2="112" stroke="${accesorio.color}" stroke-width="7" stroke-linecap="round"/>`;
-      svg += `<rect x="148" y="150" width="36" height="46" rx="11" fill="${accesorio.color}"/>`;
-    } else if (accesorio && accesorio.shape === 'lentes') {
-      svg += `<circle cx="95" cy="66" r="10" fill="none" stroke="${accesorio.color}" stroke-width="3.5"/>`;
-      svg += `<circle cx="125" cy="66" r="10" fill="none" stroke="${accesorio.color}" stroke-width="3.5"/>`;
-      svg += `<line x1="105" y1="66" x2="115" y2="66" stroke="${accesorio.color}" stroke-width="3.5"/>`;
+
+    // --- gafas del perfil (variante con lentes)
+    if (v.glasses) {
+      s += `<circle cx="84" cy="82" r="13" fill="none" stroke="#1E3A40" stroke-width="3"/><circle cx="116" cy="82" r="13" fill="none" stroke="#1E3A40" stroke-width="3"/><path d="M97 82 L103 82" stroke="#1E3A40" stroke-width="3"/>`;
     }
-    svg += `</svg>`;
-    return svg;
+
+    // --- accesorio
+    if (acc) {
+      const c = acc.color || '#6B4226';
+      if (acc.shape === 'lentes') {
+        const solar = /sol/i.test(acc.id || '');
+        const lente = solar ? `${INK}` : 'rgba(255,255,255,.35)';
+        s += `<circle cx="84" cy="82" r="14" fill="${lente}" stroke="${c}" stroke-width="4"/><circle cx="116" cy="82" r="14" fill="${lente}" stroke="${c}" stroke-width="4"/>`;
+        s += `<path d="M98 82 L102 82 M70 80 L58 78 M130 80 L142 78" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`;
+      } else if (acc.shape === 'bigote') {
+        s += `<path d="M78 96 Q90 88 100 95 Q110 88 122 96 Q112 104 100 99 Q88 104 78 96Z" fill="${c}" ${ink}/>`;
+      } else if (acc.shape === 'barba') {
+        const larga = /sabi/i.test(acc.id || '');
+        const y = larga ? 160 : 140;
+        s += `<path d="M58 90 Q58 ${y - 6} 100 ${y} Q142 ${y - 6} 142 90 Q132 114 100 114 Q68 114 58 90Z" fill="${c}" ${ink}/>`;
+        s += `<path d="M84 102 Q100 118 116 102" stroke="${INK}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+      }
+    }
+
+    // --- prenda de cabeza
+    if (cabeza) {
+      const c = cabeza.color || '#FFC93C', cs = this._oscuro(c, 0.2);
+      if (cabeza.shape === 'gorro') {
+        s += `<path d="M56 62 Q54 20 100 20 Q146 20 144 62Z" fill="${c}" ${ink}/>`;
+        s += `<path d="M52 60 L148 60 L148 74 Q100 82 52 74Z" fill="${cs}" ${ink}/>`;
+        s += `<circle cx="100" cy="16" r="10" fill="${c}" ${ink}/>`;
+      } else if (cabeza.shape === 'sombrero') {
+        s += `<path d="M70 56 Q70 18 100 18 Q130 18 130 56Z" fill="${c}" ${ink}/>`;
+        s += `<path d="M70 50 L130 50" stroke="${cs}" stroke-width="7"/>`;
+        s += `<ellipse cx="100" cy="58" rx="68" ry="12" fill="${c}" ${ink}/>`;
+      } else if (cabeza.shape === 'rizeta') {
+        s += `<path d="M66 44 L40 30 L42 60Z" fill="${c}" ${ink}/><path d="M66 44 L92 30 L90 60Z" fill="${c}" ${ink}/><circle cx="66" cy="45" r="7" fill="${cs}" ${ink}/>`;
+      } else if (cabeza.shape === 'tiara') {
+        s += `<path d="M62 50 L70 24 L86 40 L100 16 L114 40 L130 24 L138 50Z" fill="${c}" ${ink}/>`;
+        s += `<circle cx="100" cy="36" r="4.5" fill="#E8742A" stroke="${INK}" stroke-width="2.5"/>`;
+      }
+    }
+
+    const dim = size ? `width="${size}" height="${size}"` : 'width="100%" height="100%"';
+    return `<svg viewBox="0 0 200 200" ${dim} xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tu personaje" class="avatar-svg">${s}</svg>`;
   },
 
   /* ================= Cosecha 2.0 ================= */
@@ -215,12 +283,22 @@ const Personaje = {
   PARAM_DEFAULT: { clothing: 'shirt', hat: 'beanie', accessories: 'glasses', facialExpression: 'smile' },
   EMOJI_CATEGORIA: { cabeza: '🧢', torso: '👕', accesorio: '🕶️', avatar: '🙂', perfil: '🧑' },
 
-  // ---------- Open Peeps (Armario y Tienda) ----------
+  // ---------- Vistas previas del Armario y la Tienda ----------
+  // Cada prenda se ve puesta en el muñeco; marcos y fondos se dibujan aparte.
   preview(prendas, prenda) {
-    // Para el Armario y Tienda: Renderizado exclusivo con Open Peeps
-    // Si la prenda tiene una variante de Open Peeps, la usamos.
-    // De lo contrario, simulamos la vista previa con Open Peeps.
-    return `<div class="swatch-inline">${this.renderOpenPeeps(prenda.variante || 'p1', 60)}</div>`;
+    const esc = x => String(x == null ? '' : x).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const cat = prenda.categoria;
+    if (cat === 'perfil') {
+      return `<div class="swatch-inline">${this.renderOpenPeeps(prenda.variante || 'p1', 60)}</div>`;
+    }
+    if (cat === 'marco') {
+      return `<div class="swatch-inline"><svg viewBox="0 0 64 64" width="60" height="60" role="img" aria-label="${esc(prenda.nombre)}"><rect x="6" y="6" width="52" height="52" rx="14" fill="#FFF8E1" stroke="${esc(prenda.color || '#8B5A2B')}" stroke-width="8"/><rect x="2.5" y="2.5" width="59" height="59" rx="17" fill="none" stroke="${this.INK}" stroke-width="3"/></svg></div>`;
+    }
+    if (cat === 'fondo') {
+      return `<div class="swatch-inline"><div style="width:60px;height:60px;border-radius:14px;border:3px solid ${this.INK};background:${esc(prenda.gradiente || prenda.color || '#ddd')};"></div></div>`;
+    }
+    const equipo = { perfil: 'perfil-1', [cat]: prenda.id };
+    return `<div class="swatch-inline">${this.renderSVG(equipo, prendas, 64)}</div>`;
   },
 
   emojiDe(cat, prenda) {

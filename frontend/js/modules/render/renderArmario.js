@@ -5,6 +5,7 @@
 import { state } from '../state.js';
 import { formatMathText, cap } from '../utils/formatters.js';
 import { calcularProgreso } from '../utils/progressUtils.js';
+import { esc } from '../utils/domUtils.js';
 
 const API = window.API;
 const Personaje = window.Personaje;
@@ -15,14 +16,12 @@ export async function renderArmario() {
   const nivel = logro.nivel || 1;
   const rango = Personaje.rangoDeNivel(nivel);
   const prog = calcularProgreso(logro);
-  const urlAvatar = Personaje.generarUrlDiceBear(logro.equipo, prendas, { 
-    seed: (logro.personaje && logro.personaje.seed) || state.authUser?.uid || 'cosecha', 
-    racha: logro.racha 
-  });
-  const marcoId = logro.equipo && logro.equipo.marco;
+  const equipo = logro.equipo || {};
+  const svgAvatar = Personaje.renderSVG(equipo, prendas);
+  const marcoId = equipo.marco;
   const marcoPrenda = marcoId ? prendas.find(p => p.id === marcoId) : null;
   const marcoRango = (marcoPrenda && marcoPrenda.rango) || rango.nombre;
-  const fondoId = logro.equipo && logro.equipo.fondo;
+  const fondoId = equipo.fondo;
   const fondoPrenda = fondoId ? prendas.find(p => p.id === fondoId) : null;
 
   const tab = Personaje.TABS_ARMARIO.find(t => t.id === state.currentArmarioTab) || Personaje.TABS_ARMARIO[0];
@@ -31,7 +30,7 @@ export async function renderArmario() {
 
   const grid = gridPrendas.map(p => {
     const esDuena = (logro.inventario || []).includes(p.id);
-    const esEquipada = logro.equipo[p.categoria] === p.id;
+    const esEquipada = equipo[p.categoria] === p.id;
     const bloqueada = (p.nivelRequerido || 1) > nivel;
     const precio = p.precio || 0;
     const sinNaranjas = (logro.naranjas || 0) < precio;
@@ -55,13 +54,13 @@ export async function renderArmario() {
       <div class="prenda ${esEquipada ? 'equipped' : ''} ${bloqueada ? 'locked' : ''}">
         ${badge}
         <div class="prenda__preview">${Personaje.preview(prendas, p)}</div>
-        <small>${p.nombre}</small>
+        <small>${esc(p.nombre)}</small>
         <div class="prenda__cond">${esEquipada ? 'Equipado' : esDuena ? 'Comprado' : bloqueada ? 'Bloqueado por nivel' : (sinNaranjas ? 'Faltan 🍊' : 'Disponible')}</div>
         ${boton}
       </div>`;
   }).join('');
 
-  const fondoStyle = fondoPrenda && fondoPrenda.gradiente ? `background:${fondoPrenda.gradiente};` : '';
+  const fondoStyle = fondoPrenda && fondoPrenda.gradiente ? `background:${esc(fondoPrenda.gradiente)};` : '';
 
   return `
     <div class="card">
@@ -74,13 +73,13 @@ export async function renderArmario() {
           <div class="perfil-card" style="${fondoStyle}">
             <div class="perfil-card__avatar">
               <div class="avatar-frame avatar-frame--${marcoRango}">
-                <img src="${urlAvatar}" alt="Tu personaje" class="avatar-dicebear" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=cosecha&clothing=shirt'">
+                <div class="avatar-dicebear">${svgAvatar}</div>
                 <div class="avatar-frame__badge">${rango.icono} ${cap(rango.nombre)}</div>
               </div>
             </div>
             <div class="perfil-card__id">
-              <h3>${logro.nombre || 'Aventurero'}</h3>
-              <span class="perfil-card__role">${state.authUser?.email || 'estudiante'}</span>
+              <h3>${esc(logro.nombre || 'Aventurero')}</h3>
+              <span class="perfil-card__role">${esc(state.authUser?.email || 'estudiante')}</span>
             </div>
             <div class="xp-block perfil-card__xp">
               <div class="xp-bar"><div class="xp-bar__fill" style="width:${prog.progreso}%"></div></div>
