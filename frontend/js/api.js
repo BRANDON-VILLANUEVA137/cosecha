@@ -66,7 +66,11 @@ const API = {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || 'Error en la petición');
+      const error = new Error(err.error || 'Error en la petición');
+      error.status = res.status;
+      error.tipo = err.tipo || null;
+      error.retryAfter = res.headers.get('Retry-After');
+      throw error;
     }
     return res.json();
   },

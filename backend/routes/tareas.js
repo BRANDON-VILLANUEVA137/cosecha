@@ -90,23 +90,52 @@ router.post('/generar', authMiddleware, requireRole('estudiante'), async (req, r
     }
 
     // --- Anti-acumulación: no generar más si hay >= 5 autogeneradas pendientes ---
-    const autoSnap = await db.collection('tareas').where('estudianteId', '==', uid).get();
+    // Filtramos 'estado' en Firestore (igualdad) para reducir datos en memoria. No requiere índice compuesto.
+    const autoSnap = await db.collection('tareas').where('estudianteId', '==', uid).where('estado', '==', 'publicada').get();
     const autoTareas = autoSnap.docs
       .map(d => ({ id: d.id, ...d.data() }))
       .filter(t => t.origen === 'auto' || t.origen === 'ia');
     const completadasSet = new Set(Array.isArray(logro.tareasCompletadas) ? logro.tareasCompletadas : []);
-    const pendientes = autoTareas.filter(t => !completadasSet.has(t.id) && t.estado === 'publicada');
 
-    const BLOQUEO_PENDIENTES = 5;
-    const MAX_PENDIENTES = 6;
-    if (pendientes.length >= MAX_PENDIENTES) {
+    // Función robusta para parsear fechas: string ISO, Date, Timestamp Firestore (.toDate), o null.
+    // Si falta la fecha, se cuenta como pendiente para no desactivar el límite por error.
+    const parseFecha = (fecha) => {
+      if (fecha == null) return new Date();
+      if (fecha instanceof Date) return fecha;
+      if (typeof fecha === 'string') {
+        const parsed = new Date(fecha);
+        return isNaN(parsed.getTime()) ? new Date() : parsed;
+      }
+      if (typeof fecha?.toDate === 'function') return fecha.toDate(); // Firestore Timestamp
+      return new Date(); // fallback
+    };
+
+    // Límite temporal: solo tareas de los últimos LIMITE_DIAS días cuentan como pendientes.
+    const LIMITE_DIAS = 30;
+    const fechaLimite = new Date(Date.now() - LIMITE_DIAS * 24 * 60 * 60 * 1000);
+
+    // Log de tareas descartadas por antigüedad (útil para validar en producción)
+    const tareasDescartadas = autoTareas.filter(t => {
+      const fechaTarea = parseFecha(t.fechaCreacion);
+      const esAntigua = fechaTarea < fechaLimite;
+      const esPendiente = !completadasSet.has(t.id) && t.estado === 'publicada';
+      if (esAntigua && esPendiente) {
+        console.log(`[Tareas/generar] Descartada tarea antigua ${t.id} (creada ${t.fechaCreacion})`);
+      }
+      return esAntigua && esPendiente;
+    });
+
+    const pendientes = autoTareas.filter(t => {
+      const fechaTarea = parseFecha(t.fechaCreacion);
+      const esAntigua = fechaTarea < fechaLimite;
+      const esPendiente = !completadasSet.has(t.id) && t.estado === 'publicada';
+      return esPendiente && !esAntigua;
+    });
+
+    if (pendientes.length >= 5) {
       return res.status(429).json({
-        error: `Llegaste al máximo de ${MAX_PENDIENTES} tareas pendientes (` + pendientes.length + `). Completa algunas primero.`
-      });
-    }
-    if (pendientes.length >= BLOQUEO_PENDIENTES) {
-      return res.status(429).json({
-        error: `Tienes ${pendientes.length} tareas pendientes. Completa al menos ${BLOQUEO_PENDIENTES} de ellas antes de pedir otra. ¡Ánimo! 🍊`
+        error: `Tienes ${pendientes.length} tareas pendientes. Completa algunas para generar más.`,
+        tipo: 'limite_pendientes'
       });
     }
 

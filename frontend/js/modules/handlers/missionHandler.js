@@ -7,6 +7,9 @@ import { toast } from '../utils/domUtils.js';
 const API = window.API;
 
 export const MissionHandler = {
+  // Estado para evitar doble clic en generar tarea
+  _generando: new Set(),
+
   // Reclamar la recompensa de una misión completada
   async reclamarMision(id) {
     try {
@@ -38,6 +41,13 @@ export const MissionHandler = {
     const cantidad = Number(select ? select.value : 10) || 10;
 
     const btn = document.getElementById(`btnGenerarARem_${materia}`);
+
+    // Evitar doble clic / bucle: si ya hay una petición en curso para esta materia, ignorar.
+    if (this._generando.has(materia)) {
+      toast('⏳ Ya estás generando una tarea. Espera a que termine.');
+      return;
+    }
+    this._generando.add(materia);
     if (btn) { btn.disabled = true; btn.textContent = '⏳ Generando...'; }
 
     try {
@@ -49,7 +59,19 @@ export const MissionHandler = {
         window.App.render();
       }
     } catch (e) {
-      toast('⚠️ ' + e.message);
+      const esLimitePendientes = e.status === 429 && e.tipo === 'limite_pendientes';
+      const esRateLimit = e.status === 429 && e.retryAfter;
+
+      if (esLimitePendientes) {
+        toast(`🚫 ${e.message} Ve a "Tus tareas" para completarlas y libera espacio.`);
+      } else if (esRateLimit) {
+        const segundos = e.retryAfter || 30;
+        toast(`⏱️ Demasiadas peticiones. Espera ${segundos} segundos e inténtalo de nuevo.`);
+      } else {
+        toast('⚠️ ' + e.message);
+      }
+    } finally {
+      this._generando.delete(materia);
       if (btn) { btn.disabled = false; btn.textContent = '🎲 Generar mi tarea'; }
     }
   },
