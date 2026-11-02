@@ -1,0 +1,160 @@
+/* ============================================================
+   COSECHA CARTOON — capa visual de toda la plataforma (estudiante,
+   login y selección de rol). Se carga DESPUÉS de cosecha-ludico.css.
+   Reglas del estilo:
+   · contorno de tinta grueso (3px) en todo lo que se puede tocar
+   · colores planos, sin degradados ni sombras difusas
+   · sombra dura hacia abajo; al pulsar, el objeto "se hunde"
+   · movimiento solo como respuesta a una acción (acierto, error, hover)
+   La piel docente queda fuera: todo va con body:not([data-role="docente"]).
+   ============================================================ */
+
+body:not([data-role="docente"]){
+  --grosor:3px;
+  --sombra:0 6px 0 var(--tinta);
+  --radio-lg:24px; --radio-md:16px; --radio-sm:12px;
+  --sol-claro:#FFF1C7;
+}
+
+/* ---------- Fondo: papel con puntos de impresión ---------- */
+body:not([data-role="docente"]){
+  background:
+    radial-gradient(circle at 1px 1px, rgba(43,58,63,.11) 1.3px, transparent 1.7px) 0 0 / 22px 22px,
+    var(--fondo);
+  background-attachment:fixed;
+}
+
+/* ---------- Marca ---------- */
+body:not([data-role="docente"]) .brand h1{
+  font-family:'Fredoka',sans-serif; font-weight:700; font-size:34px; line-height:1;
+  color:var(--primario); letter-spacing:.5px;
+  -webkit-text-stroke:2px var(--tinta); paint-order:stroke fill;
+  text-shadow:3px 3px 0 var(--tinta);
+}
+body:not([data-role="docente"]) .brand span{ color:var(--texto-suave); font-weight:700; }
+body:not([data-role="docente"]) .brand .fruit{ font-size:44px; display:inline-block; filter:none; transform-origin:50% 80%; }
+body:not([data-role="docente"]) .brand:hover .fruit{ animation:cosechaBalanceo .6s ease-in-out; }
+@keyframes cosechaBalanceo{ 0%,100%{ transform:rotate(0); } 25%{ transform:rotate(-14deg); } 75%{ transform:rotate(12deg); } }
+
+body:not([data-role="docente"]) .user-pill{ background:var(--papel); border:2px solid var(--tinta); border-radius:999px; font-weight:800; color:var(--tinta); }
+
+/* ---------- Controles ---------- */
+body:not([data-role="docente"]) :is(select,input[type="text"],input[type="email"],input[type="password"],input[type="number"],textarea){
+  border:var(--grosor) solid var(--tinta); background:var(--papel); color:var(--tinta);
+  border-radius:var(--radio-md); box-shadow:0 3px 0 var(--tinta);
+}
+body:not([data-role="docente"]) :is(select,input,textarea):focus{
+  border-color:var(--tinta); box-shadow:0 3px 0 var(--tinta), 0 0 0 5px var(--sol);
+}
+body:not([data-role="docente"]) button.ghost{
+  background:var(--papel); color:var(--tinta); font-weight:800;
+  border:var(--grosor) solid var(--tinta); box-shadow:0 3px 0 var(--tinta);
+}
+body:not([data-role="docente"]) button.ghost:hover{ background:var(--sol-claro); transform:translateY(-1px); }
+body:not([data-role="docente"]) button.ghost:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--tinta); }
+body:not([data-role="docente"]) button.ghost:disabled{ box-shadow:none; border-style:dashed; border-color:var(--texto-suave); color:var(--texto-suave); background:transparent; }
+body:not([data-role="docente"]) button.primary{ border-width:var(--grosor); }
+
+/* ---------- Navegación estudiante ---------- */
+body:not([data-role="docente"]) .modnav{
+  background:var(--papel); border:var(--grosor) solid var(--tinta);
+  box-shadow:0 5px 0 var(--tinta); gap:8px;
+}
+body:not([data-role="docente"]) .modnav button{ border:2px solid transparent; color:var(--tinta); font-weight:800; }
+body:not([data-role="docente"]) .modnav button:hover{ background:var(--sol-claro); border-color:var(--tinta); }
+body:not([data-role="docente"]) .modnav button.active{
+  color:var(--tinta); border:2px solid var(--tinta); box-shadow:0 3px 0 var(--tinta);
+  transform:translateY(-1px);
+}
+body:not([data-role="docente"]) .modnav button.active[data-mod="matematicas"]{ background:var(--primario); }
+body:not([data-role="docente"]) .modnav button.active[data-mod="ingles"]{ background:#5CCFB0; }
+body:not([data-role="docente"]) .modnav button.active[data-mod="inicio"],
+body:not([data-role="docente"]) .modnav button.active[data-mod="armario"],
+body:not([data-role="docente"]) .modnav button.active[data-mod="misiones"],
+body:not([data-role="docente"]) .modnav button.active[data-mod="album"],
+body:not([data-role="docente"]) .modnav button.active[data-mod="progreso"]{ background:var(--sol); }
+
+/* ---------- Tarjetas ---------- */
+body:not([data-role="docente"]) .card{
+  background:var(--panel); border:var(--grosor) solid var(--tinta);
+  border-radius:var(--radio-lg); box-shadow:var(--sombra);
+}
+body:not([data-role="docente"]) .card.hero{ background:var(--sol-claro); border-color:var(--tinta); box-shadow:0 8px 0 var(--tinta); }
+body:not([data-role="docente"]) .module-header .badge{ background:#FFD9B3; border:var(--grosor) solid var(--tinta); box-shadow:0 3px 0 var(--tinta); }
+body:not([data-role="docente"]) .module-header .badge.ing{ background:#BFEBDD; border-color:var(--tinta); }
+body:not([data-role="docente"]) .module-header h2{ font-family:'Fredoka',sans-serif; font-weight:700; }
+
+body:not([data-role="docente"]) .tag{ border:2px solid var(--tinta); font-weight:800; letter-spacing:0; }
+body:not([data-role="docente"]) .tag.mat{ background:#FFD9B3; color:var(--tinta); }
+body:not([data-role="docente"]) .tag.ing{ background:#BFEBDD; color:var(--tinta); }
+
+body:not([data-role="docente"]) .task-card{
+  background:var(--panel); border:var(--grosor) solid var(--tinta);
+  box-shadow:0 5px 0 var(--tinta);
+}
+body:not([data-role="docente"]) .task-card:hover{ transform:translate(-2px,-3px); box-shadow:0 8px 0 var(--tinta); border-color:var(--tinta); }
+body:not([data-role="docente"]) .task-status{ background:var(--sol); color:var(--tinta); border:2px solid var(--tinta); }
+body:not([data-role="docente"]) .ex-item{ background:var(--papel); border:var(--grosor) solid var(--tinta); }
+body:not([data-role="docente"]) .empty{ border:var(--grosor) dashed var(--tinta); background:var(--papel); color:var(--texto-suave); }
+
+/* Elementos de Inicio y Misiones heredan el mismo grosor */
+body:not([data-role="docente"]) :is(.stat,.m-card,.subject-cta .cta-card,.card.hero,.gen-estado,.xp-bar,.m-badge,.m-reward,.m-card__icon){ border-width:var(--grosor); }
+body:not([data-role="docente"]) .xp-bar{ background:var(--papel); }
+
+/* ---------- Ejercicios: opciones y respuestas ---------- */
+body:not([data-role="docente"]) .opcion-item{ border:2px solid var(--tinta); background:var(--papel); }
+body:not([data-role="docente"]) .opcion-item:hover{ background:var(--sol-claro); }
+body:not([data-role="docente"]) .opcion-item:has(input:checked){ background:var(--sol); box-shadow:0 3px 0 var(--tinta); }
+body:not([data-role="docente"]) .opcion-item input:checked + span{ background:transparent; color:var(--tinta); font-weight:800; }
+body:not([data-role="docente"]) .answer-row button{ border:var(--grosor) solid var(--tinta); box-shadow:0 3px 0 var(--tinta); color:var(--tinta); }
+body:not([data-role="docente"]) .feedback{ border:var(--grosor) solid var(--tinta); border-radius:var(--radio-md); color:var(--tinta); font-weight:800; }
+body:not([data-role="docente"]) .feedback.ok{ background:var(--ok-bg); animation:cosechaPop .45s cubic-bezier(.3,1.5,.5,1); }
+body:not([data-role="docente"]) .feedback.bad{ background:var(--error-bg); animation:cosechaSacude .4s ease; }
+@keyframes cosechaPop{ 0%{ transform:scale(.88); } 100%{ transform:scale(1); } }
+@keyframes cosechaSacude{ 0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-6px); } 60%{ transform:translateX(6px); } }
+
+/* ---------- Armario / álbum ---------- */
+body:not([data-role="docente"]) .cat-tabs button{ border:2px solid var(--tinta); background:var(--papel); color:var(--tinta); font-weight:800; box-shadow:0 3px 0 var(--tinta); }
+body:not([data-role="docente"]) .cat-tabs button.active{ background:var(--sol); }
+body:not([data-role="docente"]) .prenda{ border:var(--grosor) solid var(--tinta); background:var(--papel); box-shadow:0 4px 0 var(--tinta); }
+body:not([data-role="docente"]) .prenda.equipped{ background:var(--sol-claro); }
+body:not([data-role="docente"]) .prenda.locked{ border-style:dashed; box-shadow:none; filter:grayscale(.6); }
+body:not([data-role="docente"]) .carta-item{ border:var(--grosor) solid var(--tinta); box-shadow:0 4px 0 var(--tinta); }
+
+/* ---------- Login y selección de rol ---------- */
+.login-screen{ background:transparent; }
+body:not([data-role="docente"]) .login-card{ border:var(--grosor) solid var(--tinta); box-shadow:0 8px 0 var(--tinta); background:var(--panel); }
+body:not([data-role="docente"]) .login-card h2{ font-family:'Fredoka',sans-serif; font-weight:700; }
+body:not([data-role="docente"]) .login-error{ color:var(--error-tx); font-weight:800; }
+body:not([data-role="docente"]) .role-card{
+  background:var(--panel); border:var(--grosor) solid var(--tinta);
+  box-shadow:0 7px 0 var(--tinta); border-radius:var(--radio-lg);
+  transition:transform .16s ease, box-shadow .16s ease, background .16s ease;
+}
+body:not([data-role="docente"]) .role-card:nth-child(odd):hover{ transform:translateY(-4px) rotate(-1.5deg); background:#FFD9B3; box-shadow:0 11px 0 var(--tinta); }
+body:not([data-role="docente"]) .role-card:nth-child(even):hover{ transform:translateY(-4px) rotate(1.5deg); background:#BFEBDD; box-shadow:0 11px 0 var(--tinta); }
+body:not([data-role="docente"]) .role-card:active{ transform:translateY(3px); box-shadow:0 2px 0 var(--tinta); }
+body:not([data-role="docente"]) .role-card .emoji{ display:inline-block; font-size:56px; }
+body:not([data-role="docente"]) .role-card h3{ font-family:'Fredoka',sans-serif; font-weight:700; color:var(--tinta); }
+
+/* ---------- Botón flotante y panel de misiones ---------- */
+body:not([data-role="docente"]) #fabLayer .fab{
+  background:var(--primario); color:var(--tinta);
+  border:var(--grosor) solid var(--tinta); box-shadow:0 5px 0 var(--tinta);
+}
+body:not([data-role="docente"]) #fabLayer .fab:hover{ transform:translateY(-2px); box-shadow:0 7px 0 var(--tinta); }
+body:not([data-role="docente"]) #fabLayer .fab:active{ transform:translateY(3px); box-shadow:0 1px 0 var(--tinta); }
+body:not([data-role="docente"]) #fabLayer .fab .fab-icon{ background:var(--papel); border:2px solid var(--tinta); }
+body:not([data-role="docente"]) #fabLayer .fab .fab-icon::after{ border-color:var(--tinta); }
+body:not([data-role="docente"]) #fabLayer .fab .count{ background:var(--sol); color:var(--tinta); border:2px solid var(--tinta); }
+body:not([data-role="docente"]) #fabLayer .missions-panel{ border:var(--grosor) solid var(--tinta); box-shadow:0 8px 0 var(--tinta); background:var(--fondo); }
+body:not([data-role="docente"]) #fabLayer .mp-header{ border-bottom:var(--grosor) solid var(--tinta); }
+body:not([data-role="docente"]) #fabLayer .mp-header .icon{ background:var(--primario); border:2px solid var(--tinta); }
+body:not([data-role="docente"]) #fabLayer .mp-close{ background:var(--papel); border:2px solid var(--tinta); color:var(--tinta); }
+body:not([data-role="docente"]) #fabLayer .mission-card{ border-width:var(--grosor); }
+body:not([data-role="docente"]) #fabLayer .m-reward .claim{ background:var(--sol); color:var(--tinta); border:2px solid var(--tinta); box-shadow:0 3px 0 var(--tinta); }
+
+/* ---------- Avisos ---------- */
+.toast{ border-width:var(--grosor); box-shadow:0 5px 0 var(--tinta); animation:cosechaPop .35s cubic-bezier(.3,1.5,.5,1); }
+
+body:not([data-role="docente"]) footer.note{ color:var(--texto-suave); font-weight:700; }
